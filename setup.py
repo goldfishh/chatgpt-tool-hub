@@ -12,7 +12,7 @@ with open(os.path.join(HERE, "README.md")) as fid:
     README = fid.read()
 
 __version__ = None  # set __version__ in this exec() call
-exec(open('chatgpt-tool-hub/version.py').read())
+exec(open('chatgpt_tool_hub/version.py').read())
 # This call to setup() does all the work
 setup(
     name="chatgpt-tool-hub",
@@ -30,14 +30,14 @@ setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     install_requires=[
-        'pydantic>=1.10.7',
-        'aiohttp>=3.8.4',
-        'requests>=2.28.2',
-        'pyyaml>=6.0',
-        "tenacity>=8.2.2",
-        "openai>=0.27.2",
-        "SQLAlchemy>=2.0.7",
-        "tiktoken>=0.3.2",
+        'pydantic~=1.10.7',
+        'aiohttp~=3.8.4',
+        'requests~=2.28.2',
+        'pyyaml',
+        "tenacity~=8.2.2",
+        "openai",
+        "SQLAlchemy~=2.0.7",
+        "tiktoken~=0.3.2",
         "google-api-python-client",
         "wikipedia",
         "wolframalpha"

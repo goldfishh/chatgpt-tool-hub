@@ -8,10 +8,12 @@ You can install directly using **pip** by doing `chatgpt-tool-hub`
 
 ### Example
 ```python
-from chatgpt-tool-hub.apps import load_app
+import os
+from chatgpt_tool_hub.apps import load_app
+os.environ["OPENAI_API_KEY"] = YOUR_OPENAI_API_KEY
 os.environ["PROXY"] = "http://192.168.7.1:7890"
 app = load_app()
-reply = app.ask("北京今天的天气怎么样？")
+reply = app.ask("你现在有哪些能力？")
 print(reply)
 ```
 
