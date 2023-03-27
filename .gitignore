@@ -1,0 +1,12 @@
+**/dev/*
+**/*.self
+
+*.tar.gz
+*.whl
+
+build/
+*.egg-info/
+dist/
+**/.DS_Store
+.idea/
+*.pyc
