@@ -1,7 +1,7 @@
 """Tool for the Google search API."""
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from wrapper import GoogleSearchAPIWrapper
+from chatgpt_tool_hub.tools.google_search.wrapper import GoogleSearchAPIWrapper
 
 
 class GoogleSearch(BaseTool):

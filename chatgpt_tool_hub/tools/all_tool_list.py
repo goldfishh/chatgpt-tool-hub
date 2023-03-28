@@ -59,7 +59,7 @@ BASE_TOOLS = {
 }
 
 BOT_TOOLS = {
-    "open-meteo-api": _get_open_meteo_api,
+    "meteo-weather": _get_open_meteo_api,
 }
 
 BOT_WITH_KEY_TOOLS = {

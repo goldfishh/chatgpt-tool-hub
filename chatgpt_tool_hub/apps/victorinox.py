@@ -22,7 +22,7 @@ class Victorinox(App):
             model_kwargs = {
                 "openai_api_key": openai_api_key,
                 "proxy": os.environ.get("PROXY", None),
-                "model_name": "gpt-3.5-turbo",  # 对话模型的名称
+                "model_name": os.environ.get("MODEL_NAME", "gpt-3.5-turbo"),  # 对话模型的名称
                 "top_p": 1,
                 "frequency_penalty": 0.0,  # [-2,2]之间，该值越大则更倾向于产生不同的内容
                 "presence_penalty": 0.0,  # [-2,2]之间，该值越大则更倾向于产生不同的内容
@@ -38,28 +38,65 @@ class Victorinox(App):
     def create(self, tools_list: list, **tools_kwargs):
         if tools_list is None:
             tools_list = []
-
-        LOG.debug(f"Initializing {self.get_class_name()}, use_tools={tools_list}")
-
         if not self._check_mandatory_tools(tools_list):
-            raise ValueError("_check_mandatory_tools failed")
+            raise ValueError("check mandatory tools failed")
+        if self.tools or self.tools_kwargs:
+            LOG.warning("refresh the config of tools")
+
+        [self.tools.add(tool) for tool in tools_list]
+        self.tools_kwargs = tools_kwargs
+
+        try:
+            tools = load_tools(tools_list, llm=self.llm, **tools_kwargs)
+        except ValueError as e:
+            LOG.exception(e)
+            LOG.error(str(e))
+            return "load_tools failed"
 
         # loading tools from config.
-        LOG.info(str(tools_kwargs))
-
-        tools = load_tools(tools_list, llm=self.llm, **tools_kwargs)
+        LOG.debug(f"Initializing {self.get_class_name()} success, "
+                  f"use_tools={tools_list}, params: {str(tools_kwargs)}")
 
         # create bots
         self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,
                                   memory=self.memory, max_iterations=2, early_stopping_method="generate")
 
+    def add_tool(self, tools_list: list, **tools_kwargs):
+        """todo: I think there have better way to implement"""
+        if not tools_list:
+            LOG.info("no tool to add")
+            return
+
+        [self.tools.add(tool) for tool in tools_list]
+        for tool_key in tools_kwargs:
+            self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
+
+        try:
+            new_tools_list = load_tools(list(self.tools), llm=self.llm, **self.tools_kwargs)
+        except ValueError as e:
+            LOG.exception(e)
+            LOG.error(str(e))
+            return "load_tools failed"
+
+        # loading tools from config.
+        LOG.debug(f"add_tool {self.get_class_name()} success, "
+                  f"use_tools={new_tools_list}, params: {str(self.tools_kwargs)}")
+
+        # create bots
+        self.bot = initialize_bot(new_tools_list, self.llm, bot="chat-bot", verbose=True,
+                                  memory=self.memory, max_iterations=2, early_stopping_method="generate")
+
     def ask(self, query: str, session: list = None, retry_num: int = 0) -> str:
-        assert self.bot is not None
+        if self.bot is None:
+            return "before calling the ask method, you should use create bot firstly"
         if not query:
             LOG.warning("[APP]: query is zero value")
             return "query is empty"
+
+        # 更新session
         if session is not None:
             self._refresh_memory(session)
+
         try:
             return self.bot.run(query)
         except ValueError as e:
@@ -79,13 +116,6 @@ class Victorinox(App):
             elif item.get('role') == 'assistant':
                 self.memory.chat_memory.add_ai_message(item.get('content'))
         LOG.debug("Now memory: {}".format(self.memory.chat_memory))
-
-    def _check_mandatory_tools(self, use_tools: list) -> bool:
-        for tool in self.mandatory_tools:
-            if tool not in use_tools:
-                LOG.error(f"You have to load {tool} as a basic tool for f{self.get_class_name()}")
-                return False
-        return True
 
 
 if __name__ == "__main__":

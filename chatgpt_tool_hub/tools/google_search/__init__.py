@@ -1,2 +1,2 @@
-from google_search import GoogleSearch
-from wrapper import GoogleSearchAPIWrapper
+from chatgpt_tool_hub.tools.google_search.google_search import GoogleSearch
+from chatgpt_tool_hub.tools.google_search.wrapper import GoogleSearchAPIWrapper

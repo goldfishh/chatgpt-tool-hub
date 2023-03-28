@@ -12,7 +12,7 @@ def load_app(app_type: str = 'victorinox', tools_list: list = None, **tools_kwar
     elif app_type == 'victorinox':
         from chatgpt_tool_hub.apps.victorinox import Victorinox
         # default tool_list for Victorinox
-        default_tools_list = ["python_repl", "requests", "terminal", "open-meteo-api"]
+        default_tools_list = ["python_repl", "requests", "terminal", "meteo-weather"]
         if not tools_list:
             tools_list = default_tools_list
         app = Victorinox()

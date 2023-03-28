@@ -1,7 +1,6 @@
 """An bot designed to hold a conversation in addition to using tools."""
 from __future__ import annotations
 
-import logging
 import re
 from typing import Any, List, Optional, Sequence, Tuple
 
@@ -72,7 +71,7 @@ class ChatBot(Bot):
             input_variables = ["input", "chat_history", "bot_scratchpad"]
         prompt = PromptTemplate(template=template, input_variables=input_variables)
 
-        LOG.info("---\nprompt: " + str(prompt) + "\n---")
+        LOG.debug("\nnow prompt: " + str(prompt) + "\n")
         return prompt
 
     @property

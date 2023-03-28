@@ -8,7 +8,6 @@ from pydantic import BaseModel, Extra, Field, validator
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.callbacks import get_callback_manager
 
-
 class BaseTool(BaseModel):
     """Class responsible for defining a tool"""
 

@@ -1,2 +1,2 @@
-from wikipedia import WikipediaQuery
-from wrapper import WikipediaAPIWrapper
+from chatgpt_tool_hub.tools.wikipedia.wikipedia import WikipediaQuery
+from chatgpt_tool_hub.tools.wikipedia.wrapper import WikipediaAPIWrapper

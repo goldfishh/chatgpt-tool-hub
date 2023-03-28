@@ -4,6 +4,7 @@ from typing import Optional
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.schema import BaseLanguageModel
 from chatgpt_tool_hub.tools.all_tool_list import *
+from common.log import LOG
 
 
 def load_tools(
@@ -58,5 +59,6 @@ def load_tools(
         elif name in CUSTOM_TOOL:
             tools.append(CUSTOM_TOOL[name]())
         else:
+            LOG.error("现在支持的工具有："+str(get_all_tool_names()))
             raise ValueError(f"Got unknown tool {name}")
     return tools
