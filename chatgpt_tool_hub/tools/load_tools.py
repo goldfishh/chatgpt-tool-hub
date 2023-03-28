@@ -4,7 +4,7 @@ from typing import Optional
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.schema import BaseLanguageModel
 from chatgpt_tool_hub.tools.all_tool_list import *
-from common.log import LOG
+from chatgpt_tool_hub.common.log import LOG
 
 
 def load_tools(
