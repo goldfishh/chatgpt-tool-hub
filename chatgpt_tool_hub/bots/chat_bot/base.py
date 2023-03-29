@@ -29,6 +29,11 @@ class ChatBot(Bot):
         """Prefix to append the observation with."""
         return "Observation: "
 
+    def _fix_text(self, text: str) -> str:
+        return (f"You just told me: {text}, but it doesn't meet the format requirement I mentioned to you. "
+                f"Please generate the answer again according to the following format requirement.\n\n"
+                f"{FORMAT_INSTRUCTIONS}")
+
     @property
     def llm_prefix(self) -> str:
         """Prefix to append the llm call with."""
@@ -85,7 +90,8 @@ class ChatBot(Bot):
         regex = r"Action: (.*?)[\n]*Action Input: (.*)"
         match = re.search(regex, llm_output)
         if not match:
-            raise ValueError(f"Could not parse LLM output: `{llm_output}`")
+            return None
+
         action = match.group(1)
         action_input = match.group(2)
         return action.strip(), action_input.strip(" ").strip('"')

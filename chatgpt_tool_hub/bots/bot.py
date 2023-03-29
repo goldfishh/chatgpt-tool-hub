@@ -31,6 +31,8 @@ class Bot(BaseModel):
     llm_chain: LLMChain
     allowed_tools: Optional[List[str]] = None
     return_values: List[str] = ["output"]
+    # 当bot未按要求回复时，最多重试次数
+    max_parse_retry_num: int = 1
 
     @abstractmethod
     def _extract_tool_and_input(self, text: str) -> Optional[Tuple[str, str]]:
@@ -60,7 +62,12 @@ class Bot(BaseModel):
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
         full_output = self.llm_chain.predict(**full_inputs)
         parsed_output = self._extract_tool_and_input(full_output)
+        retry_num = 0
         while parsed_output is None:
+            retry_num += 1
+            if retry_num > self.max_parse_retry_num:
+                raise ValueError(f"Could not parse LLM output: `{parsed_output}`")
+
             full_output = self._fix_text(full_output)
             full_inputs["bot_scratchpad"] += full_output
             output = self.llm_chain.predict(**full_inputs)
@@ -279,7 +286,12 @@ class Bot(BaseModel):
     async def _aget_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
         full_output = await self.llm_chain.apredict(**full_inputs)
         parsed_output = self._extract_tool_and_input(full_output)
+        retry_num = 0
         while parsed_output is None:
+            retry_num += 1
+            if retry_num > self.max_parse_retry_num:
+                raise ValueError(f"Could not parse LLM output: `{parsed_output}`")
+
             full_output = self._fix_text(full_output)
             full_inputs["bot_scratchpad"] += full_output
             output = await self.llm_chain.apredict(**full_inputs)

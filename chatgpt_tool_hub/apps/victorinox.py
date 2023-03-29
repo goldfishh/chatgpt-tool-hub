@@ -32,7 +32,7 @@ class Victorinox(App):
             self.llm = ChatOpenAI(temperature=0, **model_kwargs)
 
             self.memory = ConversationTokenBufferMemory(llm=self.llm, memory_key="chat_history",
-                                                        output_key='output', max_token_limit=1600)
+                                                        output_key='output', max_token_limit=1200)
             self.init_flag = True
 
     def create(self, tools_list: list, **tools_kwargs):
@@ -59,7 +59,7 @@ class Victorinox(App):
 
         # create bots
         self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,
-                                  memory=self.memory, max_iterations=2, early_stopping_method="generate")
+                                  memory=self.memory, max_iterations=3, early_stopping_method="generate")
 
     def add_tool(self, tools_list: list, **tools_kwargs):
         """todo: I think there have better way to implement"""

@@ -1,7 +1,7 @@
 
-PREFIX = """You are a helpful assistant.
+PREFIX = """You are a helpful assistant to the chatgpt-tool-hub GitHub project.
 
-PLUGINS:
+TOOLS:
 ------
 
 Assistant has access to the following tools:"""

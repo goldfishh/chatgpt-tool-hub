@@ -1,2 +1,6 @@
-**/dev/
-**/*.self
+*.dev
+*.dev.*
+dev.*
+*.custom_tools
+*.custom_tools.*
+custom_tools.*

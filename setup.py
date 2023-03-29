@@ -27,7 +27,8 @@ setup(
     author="goldfishh",
     author_email="goldfish.buaa@gmail.com",
     license="MIT",
-    packages=setuptools.find_packages(exclude=["dev", "custom_tools"]),
+    packages=setuptools.find_packages('chatgpt_tool_hub', exclude=["*.dev", "*.dev.*", "dev.*", "*.custom_tools", "*.custom_tools.*", "custom_tools.*"]),
+    package_dir={'': 'chatgpt_tool_hub'},
     include_package_data=True,
     install_requires=[
         'pydantic~=1.10.7',
