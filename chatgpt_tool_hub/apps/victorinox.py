@@ -54,8 +54,8 @@ class Victorinox(App):
             return "load_tools failed"
 
         # loading tools from config.
-        LOG.debug(f"Initializing {self.get_class_name()} success, "
-                  f"use_tools={tools_list}, params: {str(tools_kwargs)}")
+        LOG.info(f"Initializing {self.get_class_name()} success, "
+                 f"use_tools={tools_list}, params: {str(tools_kwargs)}")
 
         # create bots
         self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,
@@ -79,8 +79,8 @@ class Victorinox(App):
             return "load_tools failed"
 
         # loading tools from config.
-        LOG.debug(f"add_tool {self.get_class_name()} success, "
-                  f"use_tools={new_tools_list}, params: {str(self.tools_kwargs)}")
+        LOG.info(f"add_tool {self.get_class_name()} success, "
+                 f"use_tools={new_tools_list}, params: {str(self.tools_kwargs)}")
 
         # create bots
         self.bot = initialize_bot(new_tools_list, self.llm, bot="chat-bot", verbose=True,
@@ -115,7 +115,7 @@ class Victorinox(App):
                 self.memory.chat_memory.add_user_message(item.get('content'))
             elif item.get('role') == 'assistant':
                 self.memory.chat_memory.add_ai_message(item.get('content'))
-        LOG.debug("Now memory: {}".format(self.memory.chat_memory))
+        LOG.info("Now memory: {}".format(self.memory.chat_memory))
 
 
 if __name__ == "__main__":

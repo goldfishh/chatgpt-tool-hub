@@ -2,6 +2,7 @@ from chatgpt_tool_hub.apps.app import App
 
 
 def load_app(app_type: str = 'victorinox', tools_list: list = None, **tools_kwargs) -> App:
+    tools_list = [] if not tools_list else tools_list
 
     if app_type == 'lite':
         from chatgpt_tool_hub.apps.lite_app import LiteApp
