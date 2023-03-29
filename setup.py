@@ -27,7 +27,7 @@ setup(
     author="goldfishh",
     author_email="goldfish.buaa@gmail.com",
     license="MIT",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(exclude=["dev", "custom_tools"]),
     include_package_data=True,
     install_requires=[
         'pydantic~=1.10.7',
@@ -35,7 +35,7 @@ setup(
         'requests~=2.28.2',
         'pyyaml',
         "tenacity~=8.2.2",
-        "openai",
+        "openai~=0.27.2",
         "SQLAlchemy~=2.0.7",
         "tiktoken~=0.3.2",
         "google-api-python-client",
