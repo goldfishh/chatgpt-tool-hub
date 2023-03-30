@@ -27,12 +27,14 @@ class BashProcess:
                 check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
+                timeout=10  # exit after 10s
             ).stdout.decode()
-        except subprocess.CalledProcessError as error:
+        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
             LOG.error("[Terminal] " + str(error))
             if self.return_err_output:
                 return error.stdout.decode()
             return str(error)
+
         if self.strip_newlines:
             output = output.strip()
         LOG.debug("[Terminal] output: " + str(output))
