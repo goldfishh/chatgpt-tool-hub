@@ -18,7 +18,7 @@ from chatgpt_tool_hub.models.base import BaseLLM
 from chatgpt_tool_hub.prompts import BasePromptTemplate
 from chatgpt_tool_hub.prompts import PromptTemplate
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from common.calculate_token import num_tokens_from_messages
+from chatgpt_tool_hub.common.calculate_token import num_tokens_from_messages
 
 
 class Bot(BaseModel):
