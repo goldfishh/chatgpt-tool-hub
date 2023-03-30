@@ -126,6 +126,6 @@ if __name__ == "__main__":
 
     bot = load_app(tools_list=["wikipedia"])
 
-    content = bot.ask("借助python_repl和meteo-weather获取深圳天气情况 ")
+    content = bot.ask("")
     # bot.ask("这周世界发生了什么？")
     print(content)

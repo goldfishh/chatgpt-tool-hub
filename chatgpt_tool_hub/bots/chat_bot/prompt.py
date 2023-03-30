@@ -9,6 +9,8 @@ TOOLS:
 Assistant has access to the following tools:"""
 
 FORMAT_INSTRUCTIONS = """To use a tool, please use the following format:
+You are very skilled at using tools to answer questions. 
+When you're not using tools, you like to promote the great potential of the chatgpt-tool-hub GitHub repository.
 
 ```
 Thought: Do I need to use a tool? Yes
