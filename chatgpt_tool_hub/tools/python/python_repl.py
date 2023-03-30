@@ -5,7 +5,7 @@ from io import StringIO
 from typing import Dict, Optional
 
 from pydantic import Field, BaseModel
-
+from common.log import LOG
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 
@@ -23,9 +23,11 @@ class PythonREPL(BaseModel):
             exec(command, self.globals, self.locals)
             sys.stdout = old_stdout
             output = mystdout.getvalue()
+            LOG.debug("[terminal] output: " + str(output))
         except Exception as e:
+            output = repr(e)
             sys.stdout = old_stdout
-            output = str(e)
+            LOG.error("[terminal] " + str(output))
         return output
 
 
@@ -40,8 +42,7 @@ class PythonREPLTool(BaseTool):
     description = (
         "A Python shell. Use this to execute python commands. "
         "Input should be a valid python command. "
-        "If you want to see the output of a value, you should print it out "
-        "with `print(...)`."
+        "If you want to see the output of a value, you should print it out with `print(...)`."
     )
     python_repl: PythonREPL = Field(default_factory=_get_default_python_repl)
 

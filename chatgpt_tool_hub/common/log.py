@@ -7,7 +7,6 @@ def _get_logger():
     logger = logging.getLogger(__package__)
     logger.setLevel(LOGGING_LEVEL)
     ch = logging.StreamHandler()
-    ch.setLevel(LOGGING_LEVEL)
     formatter = logging.Formatter('[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d] - %(message)s',
                                   datefmt='%Y-%m-%d %H:%M:%S')
     ch.setFormatter(formatter)

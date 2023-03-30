@@ -1,6 +1,6 @@
 """Util that calls WolframAlpha."""
 from typing import Any, Dict, Optional
-
+from common.log import LOG
 from pydantic import BaseModel, Extra, root_validator
 
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
@@ -45,6 +45,7 @@ class WolframAlphaAPIWrapper(BaseModel):
         try:
             assumption = next(res.pods).text
             answer = next(res.results).text
+            LOG.debug("[wolfram alpha]: " + str(assumption) + ", " + str(answer))
         except StopIteration:
             return "Wolfram Alpha wasn't able to answer it"
 

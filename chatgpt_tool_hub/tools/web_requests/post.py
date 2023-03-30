@@ -1,5 +1,9 @@
+import json
+import logging
+
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, _parse_input
+from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, _parse_input, RequestsWrapper
+from common.log import LOG
 
 
 class RequestsPostTool(BaseRequestsTool, BaseTool):
@@ -17,15 +21,36 @@ class RequestsPostTool(BaseRequestsTool, BaseTool):
     def _run(self, text: str) -> str:
         """Run the tool."""
         try:
-            data = _parse_input(text)
-            return self.requests_wrapper.post(data["url"], data["data"])
+            _data = _parse_input(text)
+            _content = self.requests_wrapper.post(_data["url"], _data["data"])
+            LOG.debug(("[requests_post] output: " + str(_content)))
+            return _content
         except Exception as e:
+            LOG.error(e)
             return repr(e)
 
     async def _arun(self, text: str) -> str:
         """Run the tool asynchronously."""
         try:
-            data = _parse_input(text)
-            return await self.requests_wrapper.apost(data["url"], data["data"])
+            _data = _parse_input(text)
+            _content = await self.requests_wrapper.apost(_data["url"], _data["data"])
+            LOG.debug(("[requests_post] output: " + str(_content)))
+            return _content
         except Exception as e:
+            LOG.error(e)
             return repr(e)
+
+
+if __name__ == "__main__":
+    LOG.setLevel(logging.DEBUG)
+    requests_wrapper = RequestsWrapper()
+    url = "https://api.live.bilibili.com/xlive/web-room/v1/dM/gethistory"
+    data = {
+        "roomid": 10661147,
+        "csrf_token": "",
+        "csrf": "",
+        "visit_id": "",
+    }
+    tool = RequestsPostTool(requests_wrapper=requests_wrapper)
+    content = tool.run(json.dumps({"url": url, "data": data}))
+    print(content)

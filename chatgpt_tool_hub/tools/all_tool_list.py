@@ -33,9 +33,9 @@ def _get_wolfram_alpha(**kwargs: Any) -> BaseTool:
 
 
 def _get_google_search(**kwargs: Any) -> BaseTool:
-    from chatgpt_tool_hub.tools.google_search.google_search import GoogleSearch, GoogleSearchAPIWrapper
+    from chatgpt_tool_hub.tools.google_search.google_search import GoogleSearch, GoogleSearchJson, GoogleSearchAPIWrapper
 
-    return GoogleSearch(api_wrapper=GoogleSearchAPIWrapper(**kwargs))
+    return GoogleSearchJson(api_wrapper=GoogleSearchAPIWrapper(**kwargs))
 
 
 def _get_wikipedia(**kwargs: Any) -> BaseTool:

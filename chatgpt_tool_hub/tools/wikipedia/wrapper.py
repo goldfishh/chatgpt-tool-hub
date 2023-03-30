@@ -3,6 +3,8 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Extra, root_validator
 
+from common.log import LOG
+
 
 class WikipediaAPIWrapper(BaseModel):
     """Wrapper around WikipediaAPI.
@@ -43,7 +45,9 @@ class WikipediaAPIWrapper(BaseModel):
             summary = self.fetch_formatted_page_summary(search_results[i])
             if summary is not None:
                 summaries.append(summary)
-        return "\n\n".join(summaries)
+        _content = "\n\n".join(summaries)
+        LOG.debug("[wikipedia]: " + str(_content))
+        return _content
 
     def fetch_formatted_page_summary(self, page: str) -> Optional[str]:
         try:
@@ -52,5 +56,6 @@ class WikipediaAPIWrapper(BaseModel):
         except (
             self.wiki_client.exceptions.PageError,
             self.wiki_client.exceptions.DisambiguationError,
-        ):
+        ) as e:
+            LOG.error("[wikipedia]: " + e)
             return None

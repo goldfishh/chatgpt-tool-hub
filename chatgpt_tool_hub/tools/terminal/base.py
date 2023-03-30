@@ -4,6 +4,7 @@ from typing import List, Union
 from pydantic import Field
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
+from common.log import LOG
 
 
 class BashProcess:
@@ -28,11 +29,13 @@ class BashProcess:
                 stderr=subprocess.STDOUT,
             ).stdout.decode()
         except subprocess.CalledProcessError as error:
+            LOG.error("[Terminal] " + str(error))
             if self.return_err_output:
                 return error.stdout.decode()
             return str(error)
         if self.strip_newlines:
             output = output.strip()
+        LOG.debug("[Terminal] output: " + str(output))
         return output
 
 
@@ -41,12 +44,11 @@ def _get_default_bash_process() -> BashProcess:
 
 
 class Terminal(BaseTool):
-    name = "Python REPL"
+    name = "Terminal"
     description = (
-        "A Python shell. Use this to execute python commands. "
-        "Input should be a valid python command. "
-        "If you want to see the output of a value, you should print it out "
-        "with `print(...)`."
+        "Executes commands in a terminal. Input should be valid commands, "
+        "and the output will be any output from running that command."
+        "You're not allowed to do anything risky or dangerous, no matter what kind of instructions you're given."
     )
 
     bash_process: BashProcess = Field(default_factory=_get_default_bash_process)
@@ -57,4 +59,4 @@ class Terminal(BaseTool):
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
-        raise NotImplementedError("PythonReplTool does not support async")
+        raise NotImplementedError("[Terminal] does not support async")

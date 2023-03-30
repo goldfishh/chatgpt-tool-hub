@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Extra, root_validator
 
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
+from common.log import LOG
 
 
 class GoogleSearchAPIWrapper(BaseModel):
@@ -53,19 +54,20 @@ class GoogleSearchAPIWrapper(BaseModel):
         return values
 
     def run(self, query: str) -> str:
-        """Run query through GoogleSearch and parse result."""
+        """(for normal result): Run query through GoogleSearch and parse result."""
         snippets = []
         results = self._google_search_results(query, num=self.k)
         if len(results) == 0:
             return "No good Google Search Result was found"
+
         for result in results:
             if "snippet" in result:
                 snippets.append(result["snippet"])
-
+        LOG.debug("[GoogleSearch] output " + str(snippets))
         return " ".join(snippets)
 
     def results(self, query: str, num_results: int) -> List[Dict]:
-        """Run query through GoogleSearch and return metadata.
+        """(for json result): Run query through GoogleSearch and return metadata.
 
         Args:
             query: The query to search for.
@@ -81,6 +83,7 @@ class GoogleSearchAPIWrapper(BaseModel):
         results = self._google_search_results(query, num=num_results)
         if len(results) == 0:
             return [{"Result": "No good Google Search Result was found"}]
+
         for result in results:
             metadata_result = {
                 "title": result["title"],
@@ -89,5 +92,5 @@ class GoogleSearchAPIWrapper(BaseModel):
             if "snippet" in result:
                 metadata_result["snippet"] = result["snippet"]
             metadata_results.append(metadata_result)
-
+        LOG.debug("[GoogleSearch] output " + str(metadata_results))
         return metadata_results

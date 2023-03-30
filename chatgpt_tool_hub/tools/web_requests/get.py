@@ -1,7 +1,8 @@
+import logging
 
-from chatgpt_tool_hub.common.text_splitter import CharacterTextSplitter
-from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
+from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, _filter_text, RequestsWrapper
+from common.log import LOG
 
 
 class RequestsGetTool(BaseRequestsTool, BaseTool):
@@ -14,10 +15,30 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
 
     def _run(self, url: str) -> str:
         """Run the tool."""
-        content = self.requests_wrapper.get(url)
-        return CharacterTextSplitter(chunk_size=2000).split_text(content)[0]
+        try:
+            html = self.requests_wrapper.get(url)
+            _content = _filter_text(html)
+            LOG.debug("[requests_get]: output" + str(_content))
+        except Exception as e:
+            LOG.error("[requests_get] " + str(e))
+            _content = repr(e)
+        return _content
 
     async def _arun(self, url: str) -> str:
         """Run the tool asynchronously."""
-        content = await self.requests_wrapper.aget(url)
-        return CharacterTextSplitter(chunk_size=2000).split_text(content)[0]
+        try:
+            html = await self.requests_wrapper.aget(url)
+            _content = _filter_text(html)
+            LOG.debug("[requests_get]: output" + str(_content))
+        except Exception as e:
+            LOG.error("[requests_get] " + str(e))
+            _content = repr(e)
+        return _content
+
+
+if __name__ == "__main__":
+    LOG.setLevel(logging.DEBUG)
+    requests_wrapper = RequestsWrapper()
+    tool = RequestsGetTool(requests_wrapper=requests_wrapper)
+    content = tool.run("https://github.com/goldfishh/chatgpt-tool-hub")
+    print(content)

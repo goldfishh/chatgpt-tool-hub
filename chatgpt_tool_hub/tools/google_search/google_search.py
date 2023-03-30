@@ -24,7 +24,7 @@ class GoogleSearch(BaseTool):
         raise NotImplementedError("GoogleSearchRun does not support async")
 
 
-class GoogleSearchResults(BaseTool):
+class GoogleSearchJson(BaseTool):
     """Tool that has capability to query the Google Search API and get back json."""
 
     name = "Google Search Results JSON"
@@ -33,7 +33,7 @@ class GoogleSearchResults(BaseTool):
         "Useful for when you need to answer questions about current events. "
         "Input should be a search query. Output is a JSON array of the query results"
     )
-    num_results: int = 3  # the search api return top-3 results
+    num_results: int = 4  # the search api return top-3 results
     api_wrapper: GoogleSearchAPIWrapper
 
     def _run(self, query: str) -> str:
