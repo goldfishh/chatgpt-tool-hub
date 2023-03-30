@@ -2,7 +2,7 @@ import logging
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, _filter_text, RequestsWrapper
-from common.log import LOG
+from chatgpt_tool_hub.common.log import LOG
 
 
 class RequestsGetTool(BaseRequestsTool, BaseTool):
@@ -18,7 +18,7 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         try:
             html = self.requests_wrapper.get(url)
             _content = _filter_text(html)
-            LOG.debug("[requests_get]: output" + str(_content))
+            LOG.debug("[requests_get] output: " + str(_content))
         except Exception as e:
             LOG.error("[requests_get] " + str(e))
             _content = repr(e)
@@ -29,7 +29,7 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         try:
             html = await self.requests_wrapper.aget(url)
             _content = _filter_text(html)
-            LOG.debug("[requests_get]: output" + str(_content))
+            LOG.debug("[requests_get] output: " + str(_content))
         except Exception as e:
             LOG.error("[requests_get] " + str(e))
             _content = repr(e)

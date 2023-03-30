@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 
 def _filter_text(html: str) -> str:
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, "lxml")
     # kill all script and style elements
     for script in soup(["script", "style"]):
         script.extract()

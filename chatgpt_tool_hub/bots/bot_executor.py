@@ -96,7 +96,7 @@ class BotExecutor(Chain, BaseModel):
     def _take_next_step(
         self,
         name_to_tool_map: Dict[str, BaseTool],
-        # color_mapping: Dict[str, str],
+        color_mapping: Dict[str, str],
         inputs: Dict[str, str],
         intermediate_steps: List[Tuple[BotAction, str]],
     ) -> Union[BotFinish, Tuple[BotAction, str]]:
@@ -143,9 +143,9 @@ class BotExecutor(Chain, BaseModel):
         # Construct a mapping of tool name to tool for easy lookup
         name_to_tool_map = {tool.name: tool for tool in self.tools}
         # We construct a mapping from each tool to a color, used for logging.
-        # color_mapping = get_color_mapping(
-        #     [tool.name for tool in self.tools], excluded_colors=["green"]
-        # )
+        color_mapping = get_color_mapping(
+            [tool.name for tool in self.tools], excluded_colors=["green"]
+        )
         intermediate_steps: List[Tuple[BotAction, str]] = []
         # Let's start tracking the iterations the bot has gone through
         iterations = 0
@@ -153,7 +153,7 @@ class BotExecutor(Chain, BaseModel):
         while self._should_continue(iterations):
             next_step_output = self._take_next_step(
                 name_to_tool_map,
-                # color_mapping,
+                color_mapping,
                 inputs, intermediate_steps
             )
             if isinstance(next_step_output, BotFinish):

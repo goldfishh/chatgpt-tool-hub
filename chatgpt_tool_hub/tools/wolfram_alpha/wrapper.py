@@ -1,6 +1,6 @@
 """Util that calls WolframAlpha."""
 from typing import Any, Dict, Optional
-from common.log import LOG
+from chatgpt_tool_hub.common.log import LOG
 from pydantic import BaseModel, Extra, root_validator
 
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env

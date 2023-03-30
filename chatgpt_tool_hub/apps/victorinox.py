@@ -2,11 +2,13 @@ import logging
 import os
 
 from chatgpt_tool_hub.apps.app import App
+from chatgpt_tool_hub.apps.load_app import load_app
 from chatgpt_tool_hub.bots.initialize import initialize_bot
+from chatgpt_tool_hub.common.constants import MEMORY_MAX_TOKENS_NUM
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.database import ConversationTokenBufferMemory
 from chatgpt_tool_hub.models.chatgpt import ChatOpenAI
 from chatgpt_tool_hub.tools.load_tools import load_tools
-from chatgpt_tool_hub.common.log import LOG
 
 
 class Victorinox(App):
@@ -32,7 +34,7 @@ class Victorinox(App):
             self.llm = ChatOpenAI(temperature=0, **model_kwargs)
 
             self.memory = ConversationTokenBufferMemory(llm=self.llm, memory_key="chat_history",
-                                                        output_key='output', max_token_limit=1200)
+                                                        output_key='output', max_token_limit=MEMORY_MAX_TOKENS_NUM)
             self.init_flag = True
 
     def create(self, tools_list: list, **tools_kwargs):
@@ -120,8 +122,10 @@ class Victorinox(App):
 
 if __name__ == "__main__":
     LOG.setLevel(logging.DEBUG)
+    os.environ["PROXY"] = "http://192.168.7.1:7890"
 
-    bot = Victorinox()
-    bot.create([])
-    bot.ask("https://www.36kr.com/p/2186160784654466 总结这个链接的内容")
+    bot = load_app(tools_list=["wikipedia"])
+
+    content = bot.ask("https://www.zhihu.com/question/592724902 总结这个链接的内容")
     # bot.ask("这周世界发生了什么？")
+    print(content)

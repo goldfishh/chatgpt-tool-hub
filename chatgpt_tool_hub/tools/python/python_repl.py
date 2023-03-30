@@ -5,7 +5,7 @@ from io import StringIO
 from typing import Dict, Optional
 
 from pydantic import Field, BaseModel
-from common.log import LOG
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 

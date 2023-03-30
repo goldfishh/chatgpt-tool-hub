@@ -20,7 +20,7 @@ class PromptTemplate(StringPromptTemplate, BaseModel):
     Example:
         .. code-block:: python
 
-            from lib.langchain_lite.prompts import PromptTemplate
+            from common.prompts import PromptTemplate
             prompt = PromptTemplate(input_variables=["foo"], template="Say {foo}")
     """
 

@@ -3,7 +3,7 @@ import logging
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, _parse_input, RequestsWrapper
-from common.log import LOG
+from chatgpt_tool_hub.common.log import LOG
 
 
 class RequestsPostTool(BaseRequestsTool, BaseTool):
@@ -26,7 +26,7 @@ class RequestsPostTool(BaseRequestsTool, BaseTool):
             LOG.debug(("[requests_post] output: " + str(_content)))
             return _content
         except Exception as e:
-            LOG.error(e)
+            LOG.error("[requests_post] " + str(e))
             return repr(e)
 
     async def _arun(self, text: str) -> str:
@@ -37,7 +37,7 @@ class RequestsPostTool(BaseRequestsTool, BaseTool):
             LOG.debug(("[requests_post] output: " + str(_content)))
             return _content
         except Exception as e:
-            LOG.error(e)
+            LOG.error("[requests_post] " + str(e))
             return repr(e)
 
 

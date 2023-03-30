@@ -63,7 +63,6 @@ async def acompletion_with_retry(llm: ChatOpenAI, **kwargs: Any) -> Any:
 
 
 def _convert_dict_to_message(_dict: dict) -> BaseMessage:
-    LOG.debug("---\ndict: \n" + str(_dict) + "\n---")
     role = _dict["role"]
     if role == "user":
         return HumanMessage(content=_dict["content"])
@@ -76,7 +75,6 @@ def _convert_dict_to_message(_dict: dict) -> BaseMessage:
 
 
 def _convert_message_to_dict(message: BaseMessage) -> dict:
-    LOG.debug("---\nmessage: \n" + str(message.content) + "\n---")
     if isinstance(message, ChatMessage):
         message_dict = {"role": message.role, "content": message.content}
     elif isinstance(message, HumanMessage):
@@ -170,7 +168,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
                     openai.proxy = values['proxy']
                     LOG.info("[tool]success use proxy: {}".format(values['proxy']))
                 else:
-                    LOG.warning("proxy no find, directly request to openai instead")
+                    LOG.warning("proxy no find, directly request to chatgpt instead")
 
             openai.api_key = openai_api_key
         except ImportError:
@@ -253,7 +251,6 @@ class ChatOpenAI(BaseChatModel, BaseModel):
         self, messages: List[BaseMessage], stop: Optional[List[str]] = None
     ) -> ChatResult:
         message_dicts, params = self._create_message_dicts(messages, stop)
-        LOG.debug("---\nmessage_dicts: "+str(message_dicts)+" \nparams: "+str(params)+"\n---")
         if self.streaming:
             inner_completion = ""
             role = "assistant"

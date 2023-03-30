@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Extra, root_validator
 
-from common.log import LOG
+from chatgpt_tool_hub.common.log import LOG
 
 
 class WikipediaAPIWrapper(BaseModel):

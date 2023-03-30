@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Extra, root_validator
 
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from common.log import LOG
+from chatgpt_tool_hub.common.log import LOG
 
 
 class GoogleSearchAPIWrapper(BaseModel):
@@ -63,7 +63,7 @@ class GoogleSearchAPIWrapper(BaseModel):
         for result in results:
             if "snippet" in result:
                 snippets.append(result["snippet"])
-        LOG.debug("[GoogleSearch] output " + str(snippets))
+        LOG.debug("[GoogleSearch] output: " + str(snippets))
         return " ".join(snippets)
 
     def results(self, query: str, num_results: int) -> List[Dict]:
@@ -92,5 +92,5 @@ class GoogleSearchAPIWrapper(BaseModel):
             if "snippet" in result:
                 metadata_result["snippet"] = result["snippet"]
             metadata_results.append(metadata_result)
-        LOG.debug("[GoogleSearch] output " + str(metadata_results))
+        LOG.debug("[GoogleSearch] output: " + str(metadata_results))
         return metadata_results

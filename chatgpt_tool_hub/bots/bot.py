@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-import logging
 from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
@@ -12,12 +11,14 @@ from pydantic import BaseModel, root_validator
 
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
+from chatgpt_tool_hub.common.constants import ALL_MAX_TOKENS_NUM, BOT_SCRATCHPAD_MAX_TOKENS_NUM
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.schema import BotAction, BotFinish, BaseMessage
 from chatgpt_tool_hub.models.base import BaseLLM
 from chatgpt_tool_hub.prompts import BasePromptTemplate
 from chatgpt_tool_hub.prompts import PromptTemplate
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.common.log import LOG
+from common.calculate_token import num_tokens_from_messages
 
 
 class Bot(BaseModel):
@@ -33,6 +34,7 @@ class Bot(BaseModel):
     return_values: List[str] = ["output"]
     # 当bot未按要求回复时，最多重试次数
     max_parse_retry_num: int = 1
+    max_token_num: int = ALL_MAX_TOKENS_NUM
 
     @abstractmethod
     def _extract_tool_and_input(self, text: str) -> Optional[Tuple[str, str]]:
@@ -59,8 +61,24 @@ class Bot(BaseModel):
             thoughts += f"\n{self.observation_prefix}{observation}\n{self.llm_prefix}"
         return thoughts
 
+    def _crop_full_input(self, inputs: str) -> str:
+        if not inputs:
+            return inputs
+        _input = inputs
+
+        LOG.debug("\nbefore crop: " + str(_input))
+        while num_tokens_from_messages([{"user": "assistant", "content": _input}]) >= BOT_SCRATCHPAD_MAX_TOKENS_NUM:
+            _input_list = _input.split("\n")
+            if len(_input_list) == 1:
+                return inputs[:BOT_SCRATCHPAD_MAX_TOKENS_NUM]
+
+            _input = "\n".join(_input_list[1:])
+        LOG.debug("\nafter crop: " + str(_input))
+        return _input
+
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
         full_output = self.llm_chain.predict(**full_inputs)
+        LOG.debug(f"{full_output}")
         parsed_output = self._extract_tool_and_input(full_output)
         retry_num = 0
         while parsed_output is None:
@@ -101,8 +119,10 @@ class Bot(BaseModel):
     ) -> Dict[str, Any]:
         """Create the full inputs for the LLMChain from intermediate steps."""
         thoughts = self._construct_scratchpad(intermediate_steps)
-        new_inputs = {"bot_scratchpad": thoughts, "stop": self._stop}
+        new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
         full_inputs = {**kwargs, **new_inputs}
+        LOG.debug("(full_input): " + str(full_inputs))
+
         return full_inputs
 
     def prepare_for_new_call(self) -> None:

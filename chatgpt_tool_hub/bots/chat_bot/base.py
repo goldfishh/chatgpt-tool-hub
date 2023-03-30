@@ -76,7 +76,7 @@ class ChatBot(Bot):
             input_variables = ["input", "chat_history", "bot_scratchpad"]
         prompt = PromptTemplate(template=template, input_variables=input_variables)
 
-        LOG.debug("\nnow prompt: " + str(prompt) + "\n")
+        LOG.debug("\n(now prompt): " + str(prompt) + "\n")
         return prompt
 
     @property
@@ -94,6 +94,7 @@ class ChatBot(Bot):
 
         action = match.group(1)
         action_input = match.group(2)
+        LOG.info(f"\n执行Tool: {action}中...")
         return action.strip(), action_input.strip(" ").strip('"')
 
     @classmethod

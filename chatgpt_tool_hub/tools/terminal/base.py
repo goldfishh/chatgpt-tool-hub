@@ -4,7 +4,7 @@ from typing import List, Union
 from pydantic import Field
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from common.log import LOG
+from chatgpt_tool_hub.common.log import LOG
 
 
 class BashProcess:

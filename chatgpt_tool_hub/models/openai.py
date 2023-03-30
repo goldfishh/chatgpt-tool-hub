@@ -606,7 +606,7 @@ class OpenAIChat(BaseLLM, BaseModel):
                     openai.proxy = values['proxy']
                     LOG.info("[tool]success use proxy: {}".format(values['proxy']))
                 else:
-                    LOG.warning("proxy no find, directly request to openai instead")
+                    LOG.warning("proxy no find, directly request to OpenAIChat instead")
 
             openai.api_key = openai_api_key
         except ImportError:
