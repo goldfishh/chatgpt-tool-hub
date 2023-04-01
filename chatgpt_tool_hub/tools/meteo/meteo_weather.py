@@ -3,7 +3,7 @@ from typing import Any
 from chatgpt_tool_hub.chains import APIChain
 from chatgpt_tool_hub.tools.tool import Tool
 
-default_name = "OpenMeteo API"
+default_name = "Meteo Weather"
 default_description = (
         "Useful for when you want to get weather information from the OpenMeteo API. "
         "The input should be a question in natural language that this API can answer."

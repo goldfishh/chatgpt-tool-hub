@@ -9,7 +9,6 @@ from chatgpt_tool_hub.chains.api.prompt import API_RESPONSE_PROMPT, API_URL_PROM
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.chains.llm import LLMChain
 from chatgpt_tool_hub.common.schema import BaseLanguageModel
-from chatgpt_tool_hub.common.text_splitter import CharacterTextSplitter
 from chatgpt_tool_hub.prompts import BasePromptTemplate
 from chatgpt_tool_hub.tools.web_requests.wrapper import RequestsWrapper
 
@@ -75,7 +74,7 @@ class APIChain(Chain, BaseModel):
             api_response, color="yellow", end="\n", verbose=self.verbose
         )
         # api_docs chunking
-        self.api_docs = CharacterTextSplitter(chunk_size=1000).split_text(self.api_docs)[0]
+        self.api_docs = "Here represents the API documentation that you previously used to generate API url."
         answer = self.api_answer_chain.predict(
             question=question,
             api_docs=self.api_docs,

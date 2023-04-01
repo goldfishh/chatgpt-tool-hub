@@ -33,7 +33,6 @@ class ChatBot(Bot):
 
     def _fix_text(self, text: str) -> str:
         return (f"You just told me: {text}, but it doesn't meet the format requirement I mentioned to you. "
-                f"Please generate the answer again according to the following format requirement.\n\n"
                 f"{self.instruction_text}")
 
     @property

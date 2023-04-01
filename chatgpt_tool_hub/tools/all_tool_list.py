@@ -59,7 +59,7 @@ def _get_news_api(llm: BaseLLM, **kwargs: Any) -> BaseTool:
 
 
 BASE_TOOLS = {
-    "python_repl": _get_python_repl,
+    "python": _get_python_repl,
     "requests": _get_requests,
     "terminal": _get_terminal,
 }
@@ -69,7 +69,7 @@ BOT_TOOLS = {
 }
 
 BOT_WITH_KEY_TOOLS = {
-    "news-api": (_get_news_api, ["news_api_key"]),
+    "news": (_get_news_api, ["news_api_key"]),
 }
 
 OPTIONAL_ADVANCED_TOOLS = {
