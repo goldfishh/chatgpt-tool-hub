@@ -16,7 +16,7 @@ class WikipediaAPIWrapper(BaseModel):
     """
 
     wiki_client: Any  #: :meta private:
-    top_k_results: int = 3
+    top_k_results: int = 2
 
     class Config:
         """Configuration for this pydantic object."""
@@ -28,6 +28,8 @@ class WikipediaAPIWrapper(BaseModel):
         """Validate that the python package exists in environment."""
         try:
             import wikipedia
+
+            wikipedia.set_lang("zh")
 
             values["wiki_client"] = wikipedia
         except ImportError:
@@ -51,11 +53,11 @@ class WikipediaAPIWrapper(BaseModel):
 
     def fetch_formatted_page_summary(self, page: str) -> Optional[str]:
         try:
-            wiki_page = self.wiki_client.page(title=page)
+            wiki_page = self.wiki_client.page(title=page, auto_suggest=False)
             return f"Page: {page}\nSummary: {wiki_page.summary}"
         except (
             self.wiki_client.exceptions.PageError,
             self.wiki_client.exceptions.DisambiguationError,
         ) as e:
-            LOG.error("[wikipedia]: " + e)
+            LOG.error("[wikipedia]: " + repr(e))
             return None

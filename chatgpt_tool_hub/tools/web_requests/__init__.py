@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
 
-def _filter_text(html: str) -> str:
+def filter_text(html: str) -> str:
     soup = BeautifulSoup(html, "lxml")
     # kill all script and style elements
     for script in soup(["script", "style"]):
@@ -21,6 +21,8 @@ def _filter_text(html: str) -> str:
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
+    # compress text size
+    text = text[:600]
 
     return text.encode('utf-8').decode()
 
@@ -53,7 +55,7 @@ from chatgpt_tool_hub.tools.web_requests.put import RequestsPutTool
 __all__ = (
     "DEFAULT_HEADER",
     "_parse_input",
-    "_filter_text",
+    "filter_text",
     "BaseRequestsTool",
     "RequestsWrapper",
     "RequestsDeleteTool",

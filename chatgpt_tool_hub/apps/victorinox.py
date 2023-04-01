@@ -101,9 +101,9 @@ class Victorinox(App):
 
         try:
             return self.bot.run(query)
-        except ValueError as e:
+        except Exception as e:
             LOG.exception(e)
-            LOG.error(f"[APP] catch a ValueError: {str(e)}")
+            LOG.error(f"[APP] catch a Exception: {str(e)}")
             if retry_num < 1:
                 return self.ask(query, session, retry_num + 1)
             else:
@@ -127,5 +127,5 @@ if __name__ == "__main__":
     bot = load_app(tools_list=["wikipedia"])
 
     content = bot.ask("")
-    # bot.ask("这周世界发生了什么？")
+
     print(content)

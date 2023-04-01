@@ -4,3 +4,5 @@ dev.*
 *.custom_tools
 *.custom_tools.*
 custom_tools.*
+
+*.self

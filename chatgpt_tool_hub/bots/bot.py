@@ -10,6 +10,7 @@ import yaml
 from pydantic import BaseModel, root_validator
 
 from chatgpt_tool_hub.chains import LLMChain
+from chatgpt_tool_hub.common.calculate_token import num_tokens_from_messages
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.constants import ALL_MAX_TOKENS_NUM, BOT_SCRATCHPAD_MAX_TOKENS_NUM
 from chatgpt_tool_hub.common.log import LOG
@@ -18,7 +19,6 @@ from chatgpt_tool_hub.models.base import BaseLLM
 from chatgpt_tool_hub.prompts import BasePromptTemplate
 from chatgpt_tool_hub.prompts import PromptTemplate
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.common.calculate_token import num_tokens_from_messages
 
 
 class Bot(BaseModel):

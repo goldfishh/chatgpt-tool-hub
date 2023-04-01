@@ -1,7 +1,7 @@
 import logging
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, _filter_text, RequestsWrapper
+from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, filter_text, RequestsWrapper
 from chatgpt_tool_hub.common.log import LOG
 
 
@@ -17,7 +17,7 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         """Run the tool."""
         try:
             html = self.requests_wrapper.get(url)
-            _content = _filter_text(html)
+            _content = filter_text(html)
             LOG.debug("[requests_get] output: " + str(_content))
         except Exception as e:
             LOG.error("[requests_get] " + str(e))
@@ -28,7 +28,7 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         """Run the tool asynchronously."""
         try:
             html = await self.requests_wrapper.aget(url)
-            _content = _filter_text(html)
+            _content = filter_text(html)
             LOG.debug("[requests_get] output: " + str(_content))
         except Exception as e:
             LOG.error("[requests_get] " + str(e))

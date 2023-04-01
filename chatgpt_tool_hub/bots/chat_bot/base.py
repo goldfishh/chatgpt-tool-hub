@@ -19,6 +19,8 @@ class ChatBot(Bot):
 
     ai_prefix: str = "AI"
 
+    instruction_text: str = f"{ai_prefix}: the response to the original input question in chinese"
+
     @property
     def _bot_type(self) -> str:
         """Return Identifier of bot type."""
@@ -32,7 +34,7 @@ class ChatBot(Bot):
     def _fix_text(self, text: str) -> str:
         return (f"You just told me: {text}, but it doesn't meet the format requirement I mentioned to you. "
                 f"Please generate the answer again according to the following format requirement.\n\n"
-                f"{FORMAT_INSTRUCTIONS}")
+                f"{self.instruction_text}")
 
     @property
     def llm_prefix(self) -> str:
@@ -68,10 +70,11 @@ class ChatBot(Bot):
             [f"> {tool.name}: {tool.description}" for tool in tools]
         )
         tool_names = ", ".join([tool.name for tool in tools])
-        format_instructions = format_instructions.format(
+
+        cls.instruction_text = format_instructions.format(
             tool_names=tool_names, ai_prefix=ai_prefix, human_prefix=human_prefix
         )
-        template = "\n\n".join([prefix, tool_strings, format_instructions, suffix])
+        template = "\n\n".join([prefix, tool_strings, cls.instruction_text, suffix])
         if input_variables is None:
             input_variables = ["input", "chat_history", "bot_scratchpad"]
         prompt = PromptTemplate(template=template, input_variables=input_variables)

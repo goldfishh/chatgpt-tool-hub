@@ -70,5 +70,5 @@ if __name__ == "__main__":
 
     bot = LiteApp()
     bot.create([])
-    response = bot.ask("最近中国的新闻有哪些")
+    response = bot.ask("")
     print(str(response))

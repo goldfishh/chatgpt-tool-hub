@@ -33,7 +33,7 @@ class GoogleSearchJson(BaseTool):
         "Useful for when you need to answer questions about current events. "
         "Input should be a search query. Output is a JSON array of the query results"
     )
-    num_results: int = 4  # the search api return top-3 results
+    num_results: int = 2  # the search api return top-2 results
     api_wrapper: GoogleSearchAPIWrapper
 
     def _run(self, query: str) -> str:

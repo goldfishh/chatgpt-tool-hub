@@ -38,6 +38,12 @@ def _get_google_search(**kwargs: Any) -> BaseTool:
     return GoogleSearchJson(api_wrapper=GoogleSearchAPIWrapper(**kwargs))
 
 
+def _get_bing_search(**kwargs: Any) -> BaseTool:
+    from chatgpt_tool_hub.tools.bing_search import BingSearch, BingSearchAPIWrapper
+
+    return BingSearch(api_wrapper=BingSearchAPIWrapper(**kwargs))
+
+
 def _get_wikipedia(**kwargs: Any) -> BaseTool:
     from chatgpt_tool_hub.tools.wikipedia.wikipedia import WikipediaQuery, WikipediaAPIWrapper
 
@@ -69,6 +75,7 @@ BOT_WITH_KEY_TOOLS = {
 OPTIONAL_ADVANCED_TOOLS = {
     "wolfram-alpha": (_get_wolfram_alpha, ["wolfram_alpha_appid"]),
     "google-search": (_get_google_search, ["google_api_key", "google_cse_id"]),
+    "bing-search": (_get_bing_search, ["bing_subscription_key"]),
     "wikipedia": (_get_wikipedia, ["top_k_results"]),
 }
 

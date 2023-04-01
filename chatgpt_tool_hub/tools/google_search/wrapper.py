@@ -5,7 +5,7 @@ from pydantic import BaseModel, Extra, root_validator
 
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.common.log import LOG
-
+from chatgpt_tool_hub.tools.web_requests import filter_text
 
 class GoogleSearchAPIWrapper(BaseModel):
     """Wrapper for Google Search API."""
@@ -13,7 +13,7 @@ class GoogleSearchAPIWrapper(BaseModel):
     search_engine: Any  #: :meta private:
     google_api_key: Optional[str] = None
     google_cse_id: Optional[str] = None
-    k: int = 10
+    k: int = 2
 
     class Config:
         """Configuration for this pydantic object."""
@@ -62,7 +62,7 @@ class GoogleSearchAPIWrapper(BaseModel):
 
         for result in results:
             if "snippet" in result:
-                snippets.append(result["snippet"])
+                snippets.append(filter_text(result["snippet"]))
         LOG.debug("[GoogleSearch] output: " + str(snippets))
         return " ".join(snippets)
 
@@ -90,7 +90,7 @@ class GoogleSearchAPIWrapper(BaseModel):
                 "link": result["link"],
             }
             if "snippet" in result:
-                metadata_result["snippet"] = result["snippet"]
+                metadata_result["snippet"] = filter_text(result["snippet"])
             metadata_results.append(metadata_result)
         LOG.debug("[GoogleSearch] output: " + str(metadata_results))
         return metadata_results
