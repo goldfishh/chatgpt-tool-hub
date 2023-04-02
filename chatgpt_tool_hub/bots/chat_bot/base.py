@@ -32,8 +32,8 @@ class ChatBot(Bot):
         return "Observation: "
 
     def _fix_text(self, text: str) -> str:
-        return (f"You just told me: {text}, but it doesn't meet the format requirement I mentioned to you. "
-                f"{self.instruction_text}")
+        return (f"Observation: You told me: {text}, but it doesn't meet the format I mentioned to you. "
+                f"Please try again: {self.instruction_text}")
 
     @property
     def llm_prefix(self) -> str:
@@ -78,7 +78,7 @@ class ChatBot(Bot):
             input_variables = ["input", "chat_history", "bot_scratchpad"]
         prompt = PromptTemplate(template=template, input_variables=input_variables)
 
-        LOG.debug("\n(now prompt): " + str(prompt) + "\n")
+        LOG.debug("\nprompt: " + str(prompt) + "\n")
         return prompt
 
     @property
@@ -96,7 +96,7 @@ class ChatBot(Bot):
 
         action = match.group(1)
         action_input = match.group(2)
-        LOG.info(f"\n执行Tool: {action}中...")
+        LOG.info(f"执行Tool: {action}中...")
         return action.strip(), action_input.strip(" ").strip('"')
 
     @classmethod
@@ -114,7 +114,6 @@ class ChatBot(Bot):
         **kwargs: Any,
     ) -> Bot:
         """Construct an bot from an LLM and tools."""
-        cls._validate_tools(tools)
         prompt = cls.create_prompt(
             tools,
             ai_prefix=ai_prefix,

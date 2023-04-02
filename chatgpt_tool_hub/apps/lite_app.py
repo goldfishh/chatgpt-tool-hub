@@ -43,7 +43,6 @@ class LiteApp(App):
             LOG.info(f"[APP] response: {str(response)}")
             return str(response)
         except ValueError as e:
-            LOG.exception(e)
             LOG.error(f"[APP] catch a ValueError: {str(e)}")
             if retry_num < 1:
                 return self.ask(query, chat_history, retry_num + 1)

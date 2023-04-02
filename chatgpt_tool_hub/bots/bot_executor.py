@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, root_validator
-
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.bots.bot import Bot
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
@@ -151,6 +151,7 @@ class BotExecutor(Chain, BaseModel):
         iterations = 0
         # We now enter the bot loop (until it returns something).
         while self._should_continue(iterations):
+            LOG.info("CoT 迭代次数: {}\n".format(str(iterations+1)))
             next_step_output = self._take_next_step(
                 name_to_tool_map,
                 color_mapping,

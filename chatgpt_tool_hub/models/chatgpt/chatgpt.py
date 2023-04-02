@@ -166,7 +166,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
             if not openai.proxy:
                 if values.get('proxy'):
                     openai.proxy = values['proxy']
-                    LOG.info("[tool]success use proxy: {}".format(values['proxy']))
+                    LOG.info("success use proxy: {}".format(values['proxy']))
                 else:
                     LOG.warning("proxy no find, directly request to chatgpt instead")
 

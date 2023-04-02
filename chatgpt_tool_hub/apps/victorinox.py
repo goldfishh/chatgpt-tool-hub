@@ -33,7 +33,6 @@ class Victorinox(App):
         try:
             tools = load_tools(tools_list, llm=self.llm, **tools_kwargs)
         except ValueError as e:
-            LOG.exception(e)
             LOG.error(str(e))
             return "load_tools failed"
 
@@ -58,7 +57,6 @@ class Victorinox(App):
         try:
             new_tools_list = load_tools(list(self.tools), llm=self.llm, **self.tools_kwargs)
         except ValueError as e:
-            LOG.exception(e)
             LOG.error(str(e))
             return "load_tools failed"
 
@@ -86,7 +84,6 @@ class Victorinox(App):
         try:
             return self.bot.run(query)
         except Exception as e:
-            LOG.exception(e)
             LOG.error(f"[APP] catch a Exception: {str(e)}")
             if retry_num < 1:
                 return self.ask(query, chat_history, retry_num + 1)

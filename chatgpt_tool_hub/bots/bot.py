@@ -78,8 +78,8 @@ class Bot(BaseModel):
 
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
         full_output = self.llm_chain.predict(**full_inputs)
-        LOG.debug(f"{full_output}")
         parsed_output = self._extract_tool_and_input(full_output)
+        LOG.info(f"行动输入: {parsed_output[1]}")
         retry_num = 0
         while parsed_output is None:
             retry_num += 1
@@ -121,7 +121,6 @@ class Bot(BaseModel):
         thoughts = self._construct_scratchpad(intermediate_steps)
         new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
         full_inputs = {**kwargs, **new_inputs}
-        LOG.debug("(full_input): " + str(full_inputs))
 
         return full_inputs
 
