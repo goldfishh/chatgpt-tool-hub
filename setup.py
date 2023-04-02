@@ -34,11 +34,13 @@ setup(
         'aiohttp~=3.8.4',
         'requests~=2.28.2',
         'pyyaml',
+        'beautifulsoup4~=4.12.0',
         "tenacity~=8.2.2",
         "openai~=0.27.2",
         "SQLAlchemy~=2.0.7",
         "tiktoken~=0.3.2",
         "google-api-python-client",
+        'pyopenssl',
         "wikipedia",
         "wolframalpha"
     ],

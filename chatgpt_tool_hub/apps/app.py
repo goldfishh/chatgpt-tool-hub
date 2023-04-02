@@ -25,7 +25,7 @@ class App:
         instance_name = f"{cls.__name__}_instance"
         cls._instance = getattr(cls, instance_name, None)
         if not cls._instance:
-            cls._instance = super().__new__(cls, *args, **kwargs)
+            cls._instance = super(App, cls).__new__(cls)
             setattr(cls, instance_name, cls._instance)
         return cls._instance
 
@@ -37,7 +37,7 @@ class App:
         """overload this method to create a bot"""
 
     @abstractmethod
-    def ask(self, query: str, session: list = None, retry_num: int = 0) -> str:
+    def ask(self, query: str, chat_history: list = None, retry_num: int = 0) -> str:
         """use this method to interactive with bot"""
 
     def _check_mandatory_tools(self, use_tools: list) -> bool:
@@ -46,3 +46,6 @@ class App:
                 LOG.error(f"You have to load {tool} as a basic tool for f{self.get_class_name()}")
                 return False
         return True
+
+    def get_tool_list(self) -> list[str]:
+        return list(self.tools)

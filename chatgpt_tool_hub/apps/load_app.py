@@ -6,8 +6,7 @@ from chatgpt_tool_hub.common.log import LOG
 
 
 def init_env(**kwargs):
-    """ 自定义环境参数 """
-    global default_tools_list
+    """ 环境初始化 """
     # debug mode
     debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", "")
     if debug_flag:
@@ -15,7 +14,21 @@ def init_env(**kwargs):
     # default tools
     no_default_tools_flag = get_from_dict_or_env(kwargs, "no_default_tools", "NO_DEFAULT_TOOLS", "")
     if no_default_tools_flag:
+        global default_tools_list
         default_tools_list = []
+
+
+def get_app_kwargs(kwargs: dict) -> dict:
+    return {
+        "openai_api_key": get_from_dict_or_env(kwargs, "openai_api_key", "OPENAI_API_KEY"),
+        "proxy": get_from_dict_or_env(kwargs, "proxy", "PROXY", ""),
+        "model_name": get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo"),  # 对话模型的名称
+        "top_p": 1,
+        "frequency_penalty": 0.0,  # [-2,2]之间，该值越大则更倾向于产生不同的内容
+        "presence_penalty": 0.0,  # [-2,2]之间，该值越大则更倾向于产生不同的内容
+        "request_timeout": 12,
+        "max_retries": 3
+    }
 
 
 def load_app(app_type: str = 'victorinox', tools_list: list = None, **kwargs) -> App:
@@ -25,7 +38,7 @@ def load_app(app_type: str = 'victorinox', tools_list: list = None, **kwargs) ->
 
     if app_type == 'lite':
         from chatgpt_tool_hub.apps.lite_app import LiteApp
-        app = LiteApp()
+        app = LiteApp(**get_app_kwargs(kwargs))
         app.create(tools_list, **kwargs)
         return app
 
@@ -36,7 +49,7 @@ def load_app(app_type: str = 'victorinox', tools_list: list = None, **kwargs) ->
             if tool not in tools_list:
                 tools_list.append(tool)
 
-        app = Victorinox()
+        app = Victorinox(**get_app_kwargs(kwargs))
         app.create(tools_list, **kwargs)
         return app
 
