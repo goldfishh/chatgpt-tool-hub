@@ -23,5 +23,3 @@ openai~=0.27.2
 SQLAlchemy~=2.0.7
 
 tiktoken~=0.3.2
-
-

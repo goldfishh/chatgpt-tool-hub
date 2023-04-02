@@ -17,7 +17,7 @@ timezone	String	No	GMT	If timezone is set, all timestamps are returned as local-
 past_days	Integer (0-2)	No	0	If past_days is set, yesterday or the day before yesterday data are also returned.
 start_date
 end_date	String (yyyy-mm-dd)	No		The time interval to get weather data. A day must be specified as an ISO8601 date (e.g. 2022-06-30).
-model	String array	No	auto	Manually select one or more weather models. Per default, the best suitable weather models will be combined.
+models	String array	No	auto	Manually select one or more weather models. Per default, the best suitable weather models will be combined.
 
 Hourly Parameter Definition
 The parameter &hourly= accepts the following values. Most weather variables are given as an instantaneous value for the indicated hour. Some variables like precipitation are calculated from the preceding hour as an average or sum.

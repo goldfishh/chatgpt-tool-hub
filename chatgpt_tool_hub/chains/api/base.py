@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, root_validator
-
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.chains.api.prompt import API_RESPONSE_PROMPT, API_URL_PROMPT
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.chains.llm import LLMChain
@@ -66,10 +66,12 @@ class APIChain(Chain, BaseModel):
         api_url = self.api_request_chain.predict(
             question=question, api_docs=self.api_docs
         )
+        LOG.debug("[API] generate url: " + str(api_url))
         self.callback_manager.on_text(
             api_url, color="green", end="\n", verbose=self.verbose
         )
         api_response = self.requests_wrapper.get(api_url)
+        LOG.debug("[API] response: " + str(api_response))
         self.callback_manager.on_text(
             api_response, color="yellow", end="\n", verbose=self.verbose
         )
@@ -94,6 +96,8 @@ class APIChain(Chain, BaseModel):
         **kwargs: Any,
     ) -> APIChain:
         """Load chain from just an LLM and the api docs."""
+        if headers is None:
+            headers = dict()
         get_request_chain = LLMChain(llm=llm, prompt=api_url_prompt)
         requests_wrapper = RequestsWrapper(headers=headers)
         get_answer_chain = LLMChain(llm=llm, prompt=api_response_prompt)
