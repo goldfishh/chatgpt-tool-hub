@@ -93,13 +93,21 @@ class Victorinox(App):
 
     def _refresh_memory(self, chat_history: list):
         self.memory.chat_memory.clear()
+        inputs = {
+            "input": ""
+        }
+        outputs = {
+            "output": ""
+        }
 
         for item in chat_history:
             if item.get('role') == 'user':
-                self.memory.chat_memory.add_user_message(item.get('content'))
+                inputs["input"] = item.get('content')
             elif item.get('role') == 'assistant':
-                self.memory.chat_memory.add_ai_message(item.get('content'))
-        LOG.debug("Now memory: {}".format(self.memory.chat_memory))
+                outputs["output"] = item.get('content')
+                self.memory.save_context(inputs, outputs)
+
+        LOG.debug("Now memory: {}".format(self.memory.chat_memory.messages))
 
 
 if __name__ == "__main__":

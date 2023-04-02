@@ -59,10 +59,10 @@ class ConversationTokenBufferMemory(BaseChatMemory, BaseModel):
     def _filter_inputs(self, inputs: Dict[str, Any]):
         _inputs = inputs.copy()
         if not self.filter_key_list:
-            LOG.debug("[MEMORY]: filter_key_list is null")
             return _inputs
 
         for key in inputs.keys():
             if key in self.filter_key_list:
+                LOG.debug(f"[MEMORY]: key: {key} will pop up")
                 _inputs.pop(key)
         return _inputs

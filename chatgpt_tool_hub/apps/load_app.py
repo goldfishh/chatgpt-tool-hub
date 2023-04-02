@@ -12,8 +12,8 @@ def init_env(**kwargs):
     if debug_flag:
         LOG.setLevel(logging.DEBUG)
     # default tools
-    no_default_tools_flag = get_from_dict_or_env(kwargs, "no_default_tools", "NO_DEFAULT_TOOLS", "")
-    if no_default_tools_flag:
+    no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
+    if no_default_flag:
         global default_tools_list
         default_tools_list = []
 

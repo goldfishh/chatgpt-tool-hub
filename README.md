@@ -272,22 +272,24 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
   
 [✓] 结果可解释性输出  
 [○] 长文本场景, tool token溢出的问题    
-[○] gpt_index长文本(pdf、html)检索
+[○] gpt_index长文本(pdf、html)检索  
 [○] 接口并发支持  
 [○] support zero-shot tool && no tool    
-[○] 多tool固定顺序调用    
-[○] 语音输入
-[○] 支持图片处理工具  
-[○] 支持视频处理工具  
-[○] 支持ChatGPT官方插件  
+[○] 长工具顺序控制  
+[○] 工具中断、定时  
+[○] 粒度配置  
+[○] 语音输入  
 [✗] 一个前端demo   
   
 ### tool todolist  
    
 [○] stable-diffusion 中文prompt翻译    
 [○] ImageCaptioning   
-[○] 小米智能家居控制  
-[○] Wechat    
+[○] 小米智能家居控制   
+[○] 支持ChatGPT官方插件  
+[○] 支持图片处理工具   
+[○] 支持视频处理工具  
+[✗] Wechat  
 
 ## Q&A
 

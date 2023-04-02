@@ -62,18 +62,21 @@ class Bot(BaseModel):
         return thoughts
 
     def _crop_full_input(self, inputs: str) -> str:
+        """ crop too long text """
         if not inputs:
             return inputs
         _input = inputs
 
-        LOG.debug("\nbefore crop: " + str(_input))
         while num_tokens_from_messages([{"user": "assistant", "content": _input}]) >= BOT_SCRATCHPAD_MAX_TOKENS_NUM:
             _input_list = _input.split("\n")
-            if len(_input_list) == 1:
-                return inputs[:BOT_SCRATCHPAD_MAX_TOKENS_NUM]
+
+            # 单个长文本处理
+            if len(_input_list) <= 2 and _input_list[0].startswith(self.observation_prefix):
+                return _input_list[0][:BOT_SCRATCHPAD_MAX_TOKENS_NUM]
 
             _input = "\n".join(_input_list[1:])
-        LOG.debug("\nafter crop: " + str(_input))
+        else:
+            LOG.debug("\nafter crop: " + str(_input))
         return _input
 
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:

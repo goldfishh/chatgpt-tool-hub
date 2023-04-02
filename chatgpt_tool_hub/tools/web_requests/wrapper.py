@@ -20,10 +20,13 @@ class RequestsWrapper(BaseModel):
         extra = Extra.forbid
         arbitrary_types_allowed = True
 
-    def get(self, url: str) -> str:
+    def get(self, url: str, params: Dict[str, Any] = None, raise_for_status: bool = False) -> str:
         """GET the URL and return the text."""
-        self.headers = dict().update(DEFAULT_HEADER) if not self.headers else self.headers.update(DEFAULT_HEADER)
-        return requests.get(url, headers=self.headers).text
+        self.headers.update(DEFAULT_HEADER)
+        response = requests.get(url, headers=self.headers, params=params)
+        if raise_for_status:
+            response.raise_for_status()
+        return response.text
 
     def post(self, url: str, data: Dict[str, Any]) -> str:
         """POST to the URL and return the text."""
