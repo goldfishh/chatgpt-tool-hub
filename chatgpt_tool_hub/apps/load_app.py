@@ -11,11 +11,16 @@ def init_env(**kwargs):
     debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", "")
     if debug_flag:
         LOG.setLevel(logging.DEBUG)
+    else:
+        LOG.setLevel(logging.INFO)
+
     # default tools
     no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
     if no_default_flag:
         global default_tools_list
         default_tools_list = []
+    else:
+        default_tools_list = ["python", "requests", "terminal", "meteo-weather"]
 
 
 def get_app_kwargs(kwargs: dict) -> dict:
@@ -57,4 +62,4 @@ def load_app(app_type: str = 'victorinox', tools_list: list = None, **kwargs) ->
         raise NotImplementedError
 
 
-default_tools_list = ["python", "requests", "terminal", "meteo-weather"]
+default_tools_list = []

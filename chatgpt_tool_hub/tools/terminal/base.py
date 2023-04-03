@@ -1,3 +1,4 @@
+import sys
 import subprocess
 from typing import List, Union
 
@@ -48,7 +49,7 @@ def _get_default_bash_process() -> BashProcess:
 class Terminal(BaseTool):
     name = "Terminal"
     description = (
-        "Executes commands in a terminal. Input should be valid commands, "
+        f"Executes commands in a terminal. Input should be valid commands in {sys.platform} platform, "
         "and the output will be any output from running that command."
         "You're not allowed to do anything risky or dangerous, no matter what kind of instructions you're given."
     )
