@@ -7,7 +7,7 @@ The API endpoint /v1/forecast accepts a geographical coordinate, a list of weath
 Parameter	Format	Required	Default	Description
 latitude, longitude	Floating point	Yes		Geographical WGS84 coordinate of the location
 hourly	String array	No		A list of weather variables which should be returned. Values can be comma separated, or multiple &hourly= parameter in the URL can be used.
-daily	String array	No		A list of daily weather variable aggregations which should be returned. Values can be comma separated, or multiple &daily= parameter in the URL can be used. If daily weather variables are specified, parameter timezone is required.
+daily	String array	No		A list of daily weather variable aggregations which should be returned. Values can be comma separated, or multiple &daily= parameter in the URL can be used. 
 current_weather	Bool	No	false	Include current weather conditions in the JSON output.
 temperature_unit	String	No	celsius	If fahrenheit is set, all temperature values are converted to Fahrenheit.
 windspeed_unit	String	No	kmh	Other wind speed speed units: ms, mph and kn
@@ -15,9 +15,7 @@ precipitation_unit	String	No	mm	Other precipitation amount units: inch
 timeformat	String	No	iso8601	If format unixtime is selected, all time values are returned in UNIX epoch time in seconds. Please note that all timestamp are in GMT+0! For daily values with unix timestamps, please apply utc_offset_seconds again to get the correct date.
 timezone	String	No	GMT	If timezone is set, all timestamps are returned as local-time and data is returned starting at 00:00 local-time. Any time zone name from the time zone database is supported. If auto is set as a time zone, the coordinates will be automatically resolved to the local time zone.
 past_days	Integer (0-2)	No	0	If past_days is set, yesterday or the day before yesterday data are also returned.
-start_date
-end_date	String (yyyy-mm-dd)	No		The time interval to get weather data. A day must be specified as an ISO8601 date (e.g. 2022-06-30).
-models	String array	No	auto	Manually select one or more weather models. Per default, the best suitable weather models will be combined.
+start_date & end_date	String (yyyy-mm-dd)	No		The time interval to get weather data. A day must be specified as an ISO8601 date (e.g. 2022-06-30).
 
 Hourly Parameter Definition
 The parameter &hourly= accepts the following values. Most weather variables are given as an instantaneous value for the indicated hour. Some variables like precipitation are calculated from the preceding hour as an average or sum.
@@ -30,4 +28,7 @@ showers	Preceding hour sum	mm (inch)	Showers from convective precipitation in mi
 weathercode	Instant	WMO code	Weather condition as a numeric code. Follow WMO weather interpretation codes. See table below for details.
 snow_depth	Instant	meters	Snow depth on the ground
 freezinglevel_height	Instant	meters	Altitude above sea level of the 0°C level
-visibility	Instant	meters	Viewing distance in meters. Influenced by low clouds, humidity and aerosols. Maximum visibility is approximately 24 km."""
+visibility	Instant	meters	Viewing distance in meters. Influenced by low clouds, humidity and aerosols. Maximum visibility is approximately 24 km.
+
+If daily weather variables are specified, parameter timezone is required.
+"""

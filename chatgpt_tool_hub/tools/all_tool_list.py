@@ -3,6 +3,7 @@ from typing import Any, List
 from chatgpt_tool_hub.chains.api.base import APIChain
 from chatgpt_tool_hub.models.base import BaseLLM
 from chatgpt_tool_hub.tools.base_tool import BaseTool
+from chatgpt_tool_hub.tools.debug import DebugTool
 from chatgpt_tool_hub.tools.meteo.api_docs_prompts import OPEN_METEO_DOCS
 from chatgpt_tool_hub.tools.meteo.meteo_weather import MeteoWeatherTool
 from chatgpt_tool_hub.tools.python.python_repl import PythonREPLTool
@@ -22,6 +23,10 @@ def _get_requests() -> BaseTool:
     return RequestsGetTool(requests_wrapper=RequestsWrapper())
 
 
+def _get_debug() -> BaseTool:
+    return DebugTool()
+
+
 def _get_open_meteo_api(llm: BaseLLM) -> BaseTool:
     return MeteoWeatherTool(api_chain=APIChain.from_llm_and_api_docs(llm, OPEN_METEO_DOCS))
 
@@ -33,7 +38,7 @@ def _get_wolfram_alpha(**kwargs: Any) -> BaseTool:
 
 
 def _get_google_search(**kwargs: Any) -> BaseTool:
-    from chatgpt_tool_hub.tools.google_search.google_search import GoogleSearch, GoogleSearchJson, GoogleSearchAPIWrapper
+    from chatgpt_tool_hub.tools.google_search.google_search import GoogleSearchJson, GoogleSearchAPIWrapper
 
     return GoogleSearchJson(api_wrapper=GoogleSearchAPIWrapper(**kwargs))
 
@@ -62,6 +67,7 @@ BASE_TOOLS = {
     "python": _get_python_repl,
     "requests": _get_requests,
     "terminal": _get_terminal,
+    "debug": _get_debug,
 }
 
 BOT_TOOLS = {
