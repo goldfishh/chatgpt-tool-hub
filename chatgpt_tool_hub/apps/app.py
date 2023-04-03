@@ -1,5 +1,7 @@
 from abc import abstractmethod
 
+from typing import List
+
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.common.log import LOG
 
@@ -47,5 +49,5 @@ class App:
                 return False
         return True
 
-    def get_tool_list(self) -> list[str]:
+    def get_tool_list(self) -> List[str]:
         return list(self.tools)
