@@ -16,8 +16,8 @@ def init_env(**kwargs):
 
     # default tools
     no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
+    global default_tools_list
     if no_default_flag:
-        global default_tools_list
         default_tools_list = []
     else:
         default_tools_list = ["python", "requests", "terminal", "meteo-weather"]

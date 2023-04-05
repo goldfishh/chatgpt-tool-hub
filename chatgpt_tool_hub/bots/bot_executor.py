@@ -151,7 +151,7 @@ class BotExecutor(Chain, BaseModel):
         iterations = 0
         # We now enter the bot loop (until it returns something).
         while self._should_continue(iterations):
-            LOG.info("CoT 迭代次数: {}\n".format(str(iterations+1)))
+            LOG.debug("CoT 迭代次数: {}\n".format(str(iterations+1)))
             next_step_output = self._take_next_step(
                 name_to_tool_map,
                 color_mapping,

@@ -57,7 +57,12 @@ def load_tools(
                 tool.callback_manager = callback_manager
             tools.append(tool)
         elif name in CUSTOM_TOOL:
-            tools.append(CUSTOM_TOOL[name]())
+            _get_tool_func, extra_keys = CUSTOM_TOOL[name]
+            sub_kwargs = {k: kwargs[k] for k in extra_keys if k in kwargs}
+            tool = _get_tool_func(**sub_kwargs)
+            if callback_manager is not None:
+                tool.callback_manager = callback_manager
+            tools.append(tool)
         else:
             LOG.error("现在支持的工具有："+str(get_all_tool_names()))
             raise ValueError(f"Got unknown tool {name}")

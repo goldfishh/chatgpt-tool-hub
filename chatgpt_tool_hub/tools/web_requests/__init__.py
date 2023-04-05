@@ -22,7 +22,7 @@ def filter_text(html: str) -> str:
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
     # compress text size
-    text = text[:600]
+    text = text[:500]
 
     return text.encode('utf-8').decode()
 
@@ -53,9 +53,6 @@ from chatgpt_tool_hub.tools.web_requests.post import RequestsPostTool
 from chatgpt_tool_hub.tools.web_requests.put import RequestsPutTool
 
 __all__ = (
-    "DEFAULT_HEADER",
-    "_parse_input",
-    "filter_text",
     "BaseRequestsTool",
     "RequestsWrapper",
     "RequestsDeleteTool",

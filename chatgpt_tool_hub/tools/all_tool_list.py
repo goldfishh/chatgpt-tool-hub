@@ -42,6 +42,11 @@ def _get_google_search(**kwargs: Any) -> BaseTool:
 
     return GoogleSearchJson(api_wrapper=GoogleSearchAPIWrapper(**kwargs))
 
+def _get_searxng_search(**kwargs: Any) -> BaseTool:
+    from chatgpt_tool_hub.tools.dev.searxng_search import SearxSearchTool, SearxSearchWrapper
+
+    return SearxSearchTool(api_wrapper=SearxSearchWrapper(**kwargs))
+
 
 def _get_bing_search(**kwargs: Any) -> BaseTool:
     from chatgpt_tool_hub.tools.bing_search import BingSearch, BingSearchAPIWrapper
@@ -50,9 +55,9 @@ def _get_bing_search(**kwargs: Any) -> BaseTool:
 
 
 def _get_wikipedia(**kwargs: Any) -> BaseTool:
-    from chatgpt_tool_hub.tools.wikipedia.wikipedia import WikipediaQuery, WikipediaAPIWrapper
+    from chatgpt_tool_hub.tools.wikipedia.wikipedia import WikipediaTool, WikipediaAPIWrapper
 
-    return WikipediaQuery(api_wrapper=WikipediaAPIWrapper(**kwargs))
+    return WikipediaTool(api_wrapper=WikipediaAPIWrapper(**kwargs))
 
 
 def _get_news_api(llm: BaseLLM, **kwargs: Any) -> BaseTool:
@@ -61,6 +66,12 @@ def _get_news_api(llm: BaseLLM, **kwargs: Any) -> BaseTool:
     return NewsTool(api_chain=APIChain.from_llm_and_api_docs(
         llm, NEWS_DOCS, headers={"X-Api-Key": kwargs["news_api_key"]}
     ))
+
+
+def _get_browser(**kwargs: Any) -> BaseTool:
+    from chatgpt_tool_hub.tools.web_requests.browser import BrowserTool
+
+    return BrowserTool(requests_wrapper=RequestsWrapper(**kwargs))
 
 
 BASE_TOOLS = {
@@ -82,14 +93,16 @@ OPTIONAL_ADVANCED_TOOLS = {
     "wolfram-alpha": (_get_wolfram_alpha, ["wolfram_alpha_appid"]),
     "google-search": (_get_google_search, ["google_api_key", "google_cse_id"]),
     "bing-search": (_get_bing_search, ["bing_subscription_key"]),
+    "searxng-search": (_get_searxng_search, ["searx_host"]),
     "wikipedia": (_get_wikipedia, ["top_k_results"]),
 }
 
 CUSTOM_TOOL = {
-
+    "browser": (_get_browser, ["phantomjs_exec_path", "proxy"])
 }
 
 
+# used by chatgpt-on-wechat now , don't move it
 def get_all_tool_names() -> List[str]:
     """Get a list of all possible tool names."""
     return (

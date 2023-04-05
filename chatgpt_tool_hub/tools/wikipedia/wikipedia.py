@@ -4,7 +4,7 @@ from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.wikipedia.wrapper import WikipediaAPIWrapper
 
 
-class WikipediaQuery(BaseTool):
+class WikipediaTool(BaseTool):
     """Tool that adds the capability to search using the Wikipedia API."""
 
     name = "Wikipedia"
