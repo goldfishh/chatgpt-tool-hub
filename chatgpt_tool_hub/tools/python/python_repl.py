@@ -19,15 +19,19 @@ class PythonREPL(BaseModel):
         """Run command with own globals/locals and returns anything printed."""
         old_stdout = sys.stdout
         sys.stdout = mystdout = StringIO()
+
+        # 过滤markdown
+        command = "\n".join(filter(lambda s: "```" not in s, command.split("\n"))).strip()
+
         try:
             exec(command, self.globals, self.locals)
             sys.stdout = old_stdout
             output = mystdout.getvalue()
-            LOG.debug("[terminal] output: " + str(output))
+            LOG.debug("[python] output: " + str(output))
         except Exception as e:
             output = repr(e)
             sys.stdout = old_stdout
-            LOG.error("[terminal] " + str(output))
+            LOG.error("[python] " + str(output))
         return output
 
 

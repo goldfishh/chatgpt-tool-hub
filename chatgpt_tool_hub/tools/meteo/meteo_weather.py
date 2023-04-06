@@ -9,7 +9,6 @@ default_description = (
         "The input should be a question in natural language that this API can answer."
     )
 
-
 class MeteoWeatherTool(Tool):
     name: str
     description: str

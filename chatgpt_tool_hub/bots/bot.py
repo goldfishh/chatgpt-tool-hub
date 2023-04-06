@@ -75,14 +75,16 @@ class Bot(BaseModel):
                 return _input_list[0][:BOT_SCRATCHPAD_MAX_TOKENS_NUM]
 
             _input = "\n".join(_input_list[1:])
-        else:
-            LOG.debug("\nafter crop: " + str(_input))
+        # else:
+        #     LOG.debug("\nafter crop: " + str(_input))
         return _input
 
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
         full_output = self.llm_chain.predict(**full_inputs)
         parsed_output = self._extract_tool_and_input(full_output)
-        LOG.info(f"行动输入: {parsed_output[1]}")
+
+        action_input = "None" if parsed_output is None else parsed_output[1]
+        LOG.info(f"行动输入: {action_input}")
         retry_num = 0
         while parsed_output is None:
             retry_num += 1

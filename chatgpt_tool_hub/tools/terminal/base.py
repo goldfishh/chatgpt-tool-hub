@@ -19,8 +19,11 @@ class BashProcess:
     def run(self, commands: Union[str, List[str]]) -> str:
         """Run commands and return final output."""
         if isinstance(commands, str):
+            # 过滤markdown
+            commands = "\n".join(filter(lambda s: "```" not in s, commands.split("\n"))).strip()
             commands = [commands]
         commands = ";".join(commands)
+
         try:
             output = subprocess.run(
                 commands,

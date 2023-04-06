@@ -27,6 +27,11 @@ def _get_debug() -> BaseTool:
     return DebugTool()
 
 
+def _get_arxiv() -> BaseTool:
+    from chatgpt_tool_hub.tools.dev.arxiv_search import ArxivTool, ArxivAPIWrapper
+    return ArxivTool(api_wrapper=ArxivAPIWrapper())
+
+
 def _get_open_meteo_api(llm: BaseLLM) -> BaseTool:
     return MeteoWeatherTool(api_chain=APIChain.from_llm_and_api_docs(llm, OPEN_METEO_DOCS))
 
@@ -79,6 +84,7 @@ BASE_TOOLS = {
     "requests": _get_requests,
     "terminal": _get_terminal,
     "debug": _get_debug,
+    "arxiv": _get_arxiv
 }
 
 BOT_TOOLS = {

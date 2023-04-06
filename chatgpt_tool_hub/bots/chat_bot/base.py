@@ -90,7 +90,7 @@ class ChatBot(Bot):
         if f"{self.ai_prefix}:" in llm_output:
             return self.ai_prefix, llm_output.split(f"{self.ai_prefix}:")[-1].strip()
         regex = r"Action: (.*?)[\n]*Action Input: (.*)"
-        match = re.search(regex, llm_output)
+        match = re.search(regex, llm_output, re.DOTALL)
         if not match:
             return None
 
