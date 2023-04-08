@@ -43,7 +43,7 @@
 - 支持多种工具： 
   - terminal
   - python
-  - requests
+  - url-get
   - wikipedia
   - meteo-weather
   - news
@@ -65,7 +65,7 @@ app = load_app()
 reply = app.ask(YOUR_QUESTION_TO_HERE)
 print(reply)
 ```
-PS: 默认加载：python、requests、terminal、meteo-weather工具
+PS: 默认加载：python、url-get、terminal、meteo-weather工具
 ## 工具指南
 
 ---
@@ -90,7 +90,7 @@ python解释器，使用它来解释执行python指令，可以配合你想要Ch
 2. eval this expression: hex(123456)-123    
 ```
 
-#### 3. requests
+#### 3. url-get
 
 往往用来获取某个网站具体内容，结果可能会被反爬策略影响
 
@@ -152,7 +152,7 @@ bing搜索引擎，从此你不用再烦恼搜索要用哪些关键词
 
 #### 1. 事务型工具（如terminal、python）是在哪运行，以及如何执行的
 
-事务型工具是在你本地运行的，事务型工具本质是一个python编写的函数，terminal、python、requests工具分别用到了封装调用subprocess库、python解释器和request库的函数
+事务型工具是在你本地运行的，事务型工具本质是一个python编写的函数，terminal、python、url-get工具分别用到了封装调用subprocess库、python解释器和requests库的函数
 
 --- 
 
@@ -168,7 +168,7 @@ TOOLS:
 You have access to the following tools:  
 
 > Python REPL: A Python shell. Use this to execute python commands. 
-> requests_get: A portal to the internet. Use this when you need to get specific content from a website. 
+> url-get: A portal to the internet. Use this when you need to get specific content from a website. 
 > Terminal: Executes commands in a terminal. 
 > Bing Search: A wrapper around Bing Search. Useful for when you need to answer questions about current events. 
 ```
@@ -188,7 +188,7 @@ To use a tool, please use the following format:
 
 
 Thought: Do I need to use a tool? Yes
-Action: the action to take, should be one of [Python REPL, requests_get, Terminal, Bing Search]
+Action: the action to take, should be one of [Python REPL, url-get, Terminal, Bing Search]
 Action Input: the input to the action
 Observation: the result of the action
 ```

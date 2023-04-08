@@ -2,7 +2,7 @@ from chatgpt_tool_hub.apps.app import App
 from chatgpt_tool_hub.apps.load_app import load_app
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.models.chatgpt import ChatOpenAI
+from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.prompts import PromptTemplate
 
 
@@ -11,8 +11,7 @@ class LiteApp(App):
     def __init__(self, **app_kwargs):
         super().__init__()
         if not self.init_flag:
-
-            self.llm = ChatOpenAI(temperature=0.9, **app_kwargs)
+            self.llm = ModelFactory.create_llm_model(temperature=0.9, **app_kwargs)
 
             self.prompt = PromptTemplate(
                 input_variables=["question"],

@@ -10,10 +10,10 @@ from chatgpt_tool_hub.tools.web_requests import filter_text
 class GoogleSearchAPIWrapper(BaseModel):
     """Wrapper for Google Search API."""
 
-    search_engine: Any  #: :meta private:
+    search_engine: Any
     google_api_key: Optional[str] = None
     google_cse_id: Optional[str] = None
-    k: int = 2
+    top_k_results: int = 2
 
     class Config:
         """Configuration for this pydantic object."""
@@ -51,12 +51,16 @@ class GoogleSearchAPIWrapper(BaseModel):
         service = build("customsearch", "v1", developerKey=google_api_key)
         values["search_engine"] = service
 
+        values["top_k_results"] = get_from_dict_or_env(
+            values, 'top_k_results', "TOP_K_RESULTS", 2
+        )
+
         return values
 
     def run(self, query: str) -> str:
         """(for normal result): Run query through GoogleSearch and parse result."""
         snippets = []
-        results = self._google_search_results(query, num=self.k)
+        results = self._google_search_results(query, num=self.top_k_results)
         if len(results) == 0:
             return "No good Google Search Result was found"
 
@@ -66,7 +70,7 @@ class GoogleSearchAPIWrapper(BaseModel):
         LOG.debug("[GoogleSearch] output: " + str(snippets))
         return " ".join(snippets)
 
-    def results(self, query: str, num_results: int) -> List[Dict]:
+    def results(self, query: str) -> List[Dict]:
         """(for json result): Run query through GoogleSearch and return metadata.
 
         Args:
@@ -80,7 +84,7 @@ class GoogleSearchAPIWrapper(BaseModel):
                 link - The link to the result.
         """
         metadata_results = []
-        results = self._google_search_results(query, num=num_results)
+        results = self._google_search_results(query, num=self.top_k_results)
         if len(results) == 0:
             return [{"Result": "No good Google Search Result was found"}]
 

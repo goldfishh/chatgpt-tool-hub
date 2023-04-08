@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, Extra, root_validator
 
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 
 
 class WikipediaAPIWrapper(BaseModel):
@@ -20,7 +21,6 @@ class WikipediaAPIWrapper(BaseModel):
 
     class Config:
         """Configuration for this pydantic object."""
-
         extra = Extra.forbid
 
     @root_validator()
@@ -28,9 +28,12 @@ class WikipediaAPIWrapper(BaseModel):
         """Validate that the python package exists in environment."""
         try:
             import wikipedia
-
+            # 本土化
             wikipedia.set_lang("zh")
 
+            values["top_k_results"] = get_from_dict_or_env(
+                values, 'top_k_results', "TOP_K_RESULTS", 2
+            )
             values["wiki_client"] = wikipedia
         except ImportError:
             raise ValueError(

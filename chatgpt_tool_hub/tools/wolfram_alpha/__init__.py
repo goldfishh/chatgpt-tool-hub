@@ -1,2 +1,2 @@
-from chatgpt_tool_hub.tools.wolfram_alpha.wolfram_alpha import WolframAlphaQueryRun
+from chatgpt_tool_hub.tools.wolfram_alpha.wolfram_alpha import WolframAlphaTool
 from chatgpt_tool_hub.tools.wolfram_alpha.wolfram_alpha import WolframAlphaAPIWrapper

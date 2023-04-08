@@ -1,11 +1,12 @@
 """Lightweight wrapper around requests library, with async support."""
+import logging
 from typing import Any, Dict, Optional
 
 import aiohttp
 import requests
 from pydantic import BaseModel, Extra, root_validator
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-
 from chatgpt_tool_hub.tools.web_requests import DEFAULT_HEADER
 
 
@@ -15,7 +16,7 @@ class RequestsWrapper(BaseModel):
     headers: Optional[Dict[str, str]] = dict()
     aiosession: Optional[aiohttp.ClientSession] = None
 
-    browser: Any  # PhantomJSWebDriver or None
+    browser: Any = None  # PhantomJSWebDriver or None
     phantomjs_exec_path: Optional[str]  # download link: https://phantomjs.org/download.html
 
     proxy: Optional[str]
@@ -32,12 +33,14 @@ class RequestsWrapper(BaseModel):
         phantomjs_exec_path = get_from_dict_or_env(
             values, "phantomjs_exec_path", "PHANTOMJS_EXEC_PATH", ""
         )
-        if not phantomjs_exec_path:
-            values["browser"] = None
-            return values
         proxy = get_from_dict_or_env(
             values, 'proxy', "PROXY", ""
         )
+
+        if not phantomjs_exec_path:
+            values["browser"] = None
+            return values
+
         try:
             from selenium import webdriver
 
@@ -47,8 +50,6 @@ class RequestsWrapper(BaseModel):
                 "selenium is not installed. "
                 "Please install it with `pip install selenium==2.48.0`"
             )
-
-
         return values
 
     @classmethod
@@ -56,7 +57,6 @@ class RequestsWrapper(BaseModel):
         from selenium import webdriver
 
         from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-        from selenium.webdriver.common.proxy import ProxyType
 
         dcap = dict(DesiredCapabilities.PHANTOMJS)
 
@@ -80,17 +80,19 @@ class RequestsWrapper(BaseModel):
 
         return browser
 
-    def get(self, url: str, params: Dict[str, Any] = None, raise_for_status: bool = False) -> str:
+    def get(self, url: str, params: Dict[str, Any] = None, raise_for_status: bool = False, **kwargs) -> str:
         """GET the URL and return the text."""
         if self.browser:
             self.browser.get(url)
             _content = self.browser.page_source
+            # todo raise_for_status?
             self.browser.close()  # 退出当前页面, 节省内存
             return _content
         else:
             self.headers.update(DEFAULT_HEADER)
-            response = requests.get(url, headers=self.headers, params=params)
+            response = requests.get(url, headers=self.headers, params=params, **kwargs)
             if raise_for_status:
+                LOG.error("RequestsWrapper.get status_code is not good. ")
                 response.raise_for_status()
             return response.text
 

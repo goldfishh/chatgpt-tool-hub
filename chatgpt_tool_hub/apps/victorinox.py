@@ -4,7 +4,7 @@ from chatgpt_tool_hub.bots.initialize import initialize_bot
 from chatgpt_tool_hub.common.constants import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.database import ConversationTokenBufferMemory
-from chatgpt_tool_hub.models.chatgpt import ChatOpenAI
+from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.load_tools import load_tools
 
 
@@ -12,8 +12,7 @@ class Victorinox(App):
     def __init__(self, **app_kwargs):
         super().__init__()
         if not self.init_flag:
-
-            self.llm = ChatOpenAI(temperature=0, **app_kwargs)
+            self.llm = ModelFactory().create_llm_model(**app_kwargs)
 
             self.memory = ConversationTokenBufferMemory(llm=self.llm, memory_key="chat_history",
                                                         output_key='output', max_token_limit=MEMORY_MAX_TOKENS_NUM)
@@ -31,7 +30,7 @@ class Victorinox(App):
         self.tools_kwargs = tools_kwargs
 
         try:
-            tools = load_tools(tools_list, llm=self.llm, **tools_kwargs)
+            tools = load_tools(tools_list, **tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
             return "load_tools failed"
@@ -55,7 +54,7 @@ class Victorinox(App):
             self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
 
         try:
-            new_tools_list = load_tools(list(self.tools), llm=self.llm, **self.tools_kwargs)
+            new_tools_list = load_tools(list(self.tools), **self.tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
             return "load_tools failed"

@@ -18,7 +18,7 @@ class ChatBot(Bot):
     """An bot designed to hold a conversation in addition to using tools."""
 
     ai_prefix: str = "AI"
-
+    # todo
     instruction_text: str = f"{ai_prefix}: the response to the original input question in chinese"
 
     @property

@@ -15,7 +15,7 @@ class BingSearchAPIWrapper(BaseModel):
 
     bing_subscription_key: str
     bing_search_url: str
-    k: int = 2
+    top_k_results: int = 2
 
     class Config:
         """Configuration for this pydantic object."""
@@ -44,26 +44,28 @@ class BingSearchAPIWrapper(BaseModel):
     @root_validator(pre=True)
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that api key and endpoint exists in environment."""
-        bing_subscription_key = get_from_dict_or_env(
+
+        values["bing_subscription_key"] = get_from_dict_or_env(
             values, "bing_subscription_key", "BING_SUBSCRIPTION_KEY"
         )
-        values["bing_subscription_key"] = bing_subscription_key
 
-        bing_search_url = get_from_dict_or_env(
+        values["bing_search_url"] = get_from_dict_or_env(
             values,
             "bing_search_url",
             "BING_SEARCH_URL",
             default="https://api.bing.microsoft.com/v7.0/search",
         )
 
-        values["bing_search_url"] = bing_search_url
+        values["top_k_results"] = get_from_dict_or_env(
+            values, 'top_k_results', "TOP_K_RESULTS", 2
+        )
 
         return values
 
     def run(self, query: str) -> str:
         """Run query through BingSearch and parse result."""
         snippets = []
-        results = self._bing_search_results(query, count=self.k)
+        results = self._bing_search_results(query, count=self.top_k_results)
         if len(results) == 0:
             return "No good Bing Search Result was found"
 

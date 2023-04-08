@@ -22,6 +22,7 @@ def filter_text(html: str) -> str:
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
     # compress text size
+    # todo gpt-index
     text = text[:500]
 
     return text.encode('utf-8').decode()
@@ -46,6 +47,7 @@ class BaseRequestsTool(BaseModel):
     requests_wrapper: RequestsWrapper
 
 
+from chatgpt_tool_hub.tools.web_requests.browser import BrowserTool
 from chatgpt_tool_hub.tools.web_requests.delete import RequestsDeleteTool
 from chatgpt_tool_hub.tools.web_requests.get import RequestsGetTool
 from chatgpt_tool_hub.tools.web_requests.patch import RequestsPatchTool

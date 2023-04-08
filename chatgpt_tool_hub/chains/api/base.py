@@ -10,7 +10,7 @@ from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.chains.llm import LLMChain
 from chatgpt_tool_hub.common.schema import BaseLanguageModel
 from chatgpt_tool_hub.prompts import BasePromptTemplate
-from chatgpt_tool_hub.tools.web_requests.wrapper import RequestsWrapper
+from chatgpt_tool_hub.tools.web_requests import RequestsWrapper
 
 
 class APIChain(Chain, BaseModel):

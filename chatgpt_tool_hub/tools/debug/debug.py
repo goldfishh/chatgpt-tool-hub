@@ -2,7 +2,10 @@ from typing import Callable
 
 from pydantic import Field
 
+from chatgpt_tool_hub.tools.all_tool_list import register_tool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
+
+default_tool_name = "debug"
 
 
 def _print_func(text: str) -> None:
@@ -13,7 +16,7 @@ def _print_func(text: str) -> None:
 class DebugTool(BaseTool):
     """Tool for asking for help."""
 
-    name = "Helper"
+    name = default_tool_name
     description = (
         "You can ask a helper for guidance when you think you "
         "got stuck or you are not sure what to do next. "
@@ -30,3 +33,6 @@ class DebugTool(BaseTool):
     async def _arun(self, query: str) -> str:
         """Use the DebugTool asynchronously."""
         raise NotImplementedError("DebugTool does not support async")
+
+
+register_tool(default_tool_name, lambda _: DebugTool(), [])

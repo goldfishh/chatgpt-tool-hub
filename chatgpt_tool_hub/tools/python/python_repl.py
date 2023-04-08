@@ -5,9 +5,13 @@ from io import StringIO
 from typing import Dict, Optional
 
 from pydantic import Field, BaseModel
+
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.tools.all_tool_list import register_tool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
+
+default_tool_name = "python"
 
 class PythonREPL(BaseModel):
     """Simulates a standalone Python REPL."""
@@ -42,7 +46,7 @@ def _get_default_python_repl() -> PythonREPL:
 class PythonREPLTool(BaseTool):
     """A tool for running python code in a REPL."""
 
-    name = "Python REPL"
+    name = default_tool_name
     description = (
         "A Python shell. Use this to execute python commands. "
         "Input should be a valid python command. "
@@ -57,3 +61,6 @@ class PythonREPLTool(BaseTool):
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("PythonReplTool does not support async")
+
+
+register_tool(default_tool_name, lambda _: PythonREPLTool(), [])

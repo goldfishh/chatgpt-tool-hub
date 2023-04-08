@@ -7,7 +7,10 @@ from pydantic import Field
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.tools.all_tool_list import register_tool
 
+
+default_tool_name = "terminal"
 
 class BashProcess:
     """Executes bash commands and returns the output."""
@@ -30,11 +33,11 @@ class BashProcess:
             _commands = _commands.replace(i, ' ')
 
         command_ban_set = {"halt", "poweroff", "shutdown", "reboot", "rm", "kill",
-                             "exit", "sudo", "su", "userdel", "groupdel", "logout", "alias"}
+                           "exit", "sudo", "su", "userdel", "groupdel", "logout", "alias"}
         _both_have = command_ban_set.intersection(set(_commands.split()))
         if len(_both_have) > 0:
             LOG.info("[terminal] nsfc_filter: unsupported command: " + repr(_both_have))
-            return False, "this command: " + repr(_both_have) + " is dangerous for you, you are not allow to use it"
+            return False, "this command: " + repr(_both_have) + " is dangerous for you, you are not allowed to use it"
         else:
             return True, "success"
 
@@ -73,7 +76,7 @@ class BashProcess:
                 stderr=subprocess.STDOUT,
                 timeout=self.timeout  # raises TimeoutExpired after running 20s
             ).stdout.decode()
-        except (subprocess.CalledProcessError, ) as error:
+        except subprocess.CalledProcessError as error:
             LOG.error("[Terminal] " + str(error))
             if self.return_err_output:
                 return error.stdout.decode()
@@ -91,7 +94,7 @@ def _get_default_bash_process() -> BashProcess:
 
 
 class Terminal(BaseTool):
-    name = "Terminal"
+    name = default_tool_name
     description = (
         f"Executes commands in a terminal. Input should be valid commands in {sys.platform} platform, "
         "and the output will be any output from running that command."
@@ -107,6 +110,9 @@ class Terminal(BaseTool):
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("[Terminal] does not support async")
+
+
+register_tool(default_tool_name, lambda _: Terminal(), [])
 
 
 if __name__ == "__main__":
