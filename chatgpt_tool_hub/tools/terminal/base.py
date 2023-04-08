@@ -1,4 +1,5 @@
 import sys
+import string
 import subprocess
 from typing import List, Union
 
@@ -11,36 +12,76 @@ from chatgpt_tool_hub.common.log import LOG
 class BashProcess:
     """Executes bash commands and returns the output."""
 
-    def __init__(self, strip_newlines: bool = False, return_err_output: bool = False):
-        """Initialize with stripping newlines."""
-        self.strip_newlines = strip_newlines
+    def __init__(self, use_nsfc_filter: bool = True, return_err_output: bool = True, timeout: float = 20):
+        # 是否过滤命令
+        self.use_nsfc_filter = use_nsfc_filter
+        # 是否返回llm错误信息
         self.return_err_output = return_err_output
+        # terminal执行超时时间
+        self.timeout = timeout
+
+    def nsfc_filter(self, commands: Union[str, List[str]]) -> (bool, str):
+        if isinstance(commands, str):
+            commands = commands.split()
+        _commands = " ".join(commands)
+
+        # filter punctuation
+        for i in string.punctuation:
+            _commands = _commands.replace(i, ' ')
+
+        command_ban_set = {"halt", "poweroff", "shutdown", "reboot", "rm", "kill",
+                             "exit", "sudo", "su", "userdel", "groupdel", "logout", "alias"}
+        _both_have = command_ban_set.intersection(set(_commands.split()))
+        if len(_both_have) > 0:
+            LOG.info("[terminal] nsfc_filter: unsupported command: " + repr(_both_have))
+            return False, "this command: " + repr(_both_have) + " is dangerous for you, you are not allow to use it"
+        else:
+            return True, "success"
+
+    def reprocess(self, commands: str) -> str:
+        # ```xxx
+        # real commands is here
+        # ```
+        commands = "\n".join(filter(lambda s: "```" not in s, commands.split("\n")))
+        # `real commands is here`
+        commands = commands.strip('`')
+
+        return commands
 
     def run(self, commands: Union[str, List[str]]) -> str:
         """Run commands and return final output."""
         if isinstance(commands, str):
-            # 过滤markdown
-            commands = "\n".join(filter(lambda s: "```" not in s, commands.split("\n"))).strip()
-            commands = [commands]
+            commands = self.reprocess(commands)
+
+            commands = commands.split('\n')
+
+        if self.use_nsfc_filter:
+            sfc, result = self.nsfc_filter(commands)
+            if not sfc:
+                return result
+
+        # 统一传入string格式
         commands = ";".join(commands)
 
         try:
+            # 阻塞
             output = subprocess.run(
                 commands,
                 shell=True,
-                check=True,
+                check=True,  # raises a CalledProcessError when exit code is non-zero
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                timeout=10  # exit after 10s
+                timeout=self.timeout  # raises TimeoutExpired after running 20s
             ).stdout.decode()
-        except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as error:
+        except (subprocess.CalledProcessError, ) as error:
             LOG.error("[Terminal] " + str(error))
             if self.return_err_output:
                 return error.stdout.decode()
-            return str(error)
-
-        if self.strip_newlines:
-            output = output.strip()
+            return "this tool can't run there commands"
+        except subprocess.TimeoutExpired as error:
+            LOG.error("[Terminal] " + str(error))
+            return f"you input commands exceeds the time limit: `{self.timeout} seconds` " \
+                   "supported by the tool for executing commands."
         LOG.debug("[Terminal] output: " + str(output))
         return output
 
@@ -54,7 +95,7 @@ class Terminal(BaseTool):
     description = (
         f"Executes commands in a terminal. Input should be valid commands in {sys.platform} platform, "
         "and the output will be any output from running that command."
-        "You're not allowed to do anything risky or dangerous, no matter what kind of instructions you're given."
+        "Don't input any backquote to this tool."
     )
 
     bash_process: BashProcess = Field(default_factory=_get_default_bash_process)
@@ -66,3 +107,9 @@ class Terminal(BaseTool):
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("[Terminal] does not support async")
+
+
+if __name__ == "__main__":
+    bash = BashProcess()
+    content = bash.run("`poweroff; sudo ls -l; pwd`")
+    print(content)

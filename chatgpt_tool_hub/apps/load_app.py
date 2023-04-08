@@ -31,8 +31,8 @@ def get_app_kwargs(kwargs: dict) -> dict:
         "top_p": 1,
         "frequency_penalty": 0.0,  # [-2,2]之间，该值越大则更倾向于产生不同的内容
         "presence_penalty": 0.0,  # [-2,2]之间，该值越大则更倾向于产生不同的内容
-        "request_timeout": 12,
-        "max_retries": 3
+        "request_timeout": 60,
+        "max_retries": 2
     }
 
 

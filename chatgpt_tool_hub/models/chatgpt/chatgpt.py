@@ -251,6 +251,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
         self, messages: List[BaseMessage], stop: Optional[List[str]] = None
     ) -> ChatResult:
         message_dicts, params = self._create_message_dicts(messages, stop)
+
         if self.streaming:
             inner_completion = ""
             role = "assistant"
@@ -269,6 +270,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
                 {"content": inner_completion, "role": role}
             )
             return ChatResult(generations=[ChatGeneration(message=message)])
+
         response = self.completion_with_retry(messages=message_dicts, **params)
         return _create_chat_result(response)
 

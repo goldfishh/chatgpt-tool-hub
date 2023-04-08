@@ -47,6 +47,7 @@ def _get_google_search(**kwargs: Any) -> BaseTool:
 
     return GoogleSearchJson(api_wrapper=GoogleSearchAPIWrapper(**kwargs))
 
+
 def _get_searxng_search(**kwargs: Any) -> BaseTool:
     from chatgpt_tool_hub.tools.dev.searxng_search import SearxSearchTool, SearxSearchWrapper
 

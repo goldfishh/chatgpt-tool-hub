@@ -46,8 +46,10 @@ def load_tools(
                 )
             sub_kwargs = {k: kwargs[k] for k in extra_keys}
             tool = _get_llm_tool_func(llm=llm, **sub_kwargs)
+
             if callback_manager is not None:
                 tool.callback_manager = callback_manager
+
             tools.append(tool)
         elif name in OPTIONAL_ADVANCED_TOOLS:
             _get_tool_func, extra_keys = OPTIONAL_ADVANCED_TOOLS[name]

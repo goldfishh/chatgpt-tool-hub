@@ -14,10 +14,10 @@ Action Input: the input to the action
 Observation: the result of the action
 ```
 
-When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
+When you know the final answer or if you do not need to use a tool, you MUST use the format:
 ```
 Thought: Do I need to use a tool? No
-{ai_prefix}: the response to the original input question in chinese.   
+{ai_prefix}: the final answer to the original input question. the final answer MUST be in chinese all the time!   
 ```
 """
 
@@ -29,5 +29,7 @@ Previous conversation history:
 New input: {input}
 {bot_scratchpad}
 
-You should explain what you have done and what you have seen to the Human. Don't make up you response.
+You should provide feedback on whether the task has been completed, 
+explain what you have done, what you have seen and what the outcome was to the Human. 
+Don't make up you response.
 """

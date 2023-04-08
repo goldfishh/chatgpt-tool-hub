@@ -134,6 +134,7 @@ class BotExecutor(Chain, BaseModel):
                 llm_prefix="",
                 observation_prefix=self.bot.observation_prefix,
             )
+        LOG.debug("llm received: `" + str(observation.strip()) + f"` from [{output.tool}]")
         return output, observation
 
     def _call(self, inputs: Dict[str, str]) -> Dict[str, Any]:

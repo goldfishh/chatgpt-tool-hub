@@ -10,3 +10,9 @@ dist/
 .idea/
 *.pyc
 **.log
+
+# dev
+Dockerfile
+terminal_io.py
+requirements_all.txt
+build.sh

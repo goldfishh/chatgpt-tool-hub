@@ -21,7 +21,7 @@ class PythonREPL(BaseModel):
         sys.stdout = mystdout = StringIO()
 
         # 过滤markdown
-        command = "\n".join(filter(lambda s: "```" not in s, command.split("\n"))).strip()
+        command = "\n".join(filter(lambda s: "```" not in s, command.split("\n"))).replace("`", "").strip()
 
         try:
             exec(command, self.globals, self.locals)
