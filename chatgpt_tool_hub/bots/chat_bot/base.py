@@ -18,8 +18,6 @@ class ChatBot(Bot):
     """An bot designed to hold a conversation in addition to using tools."""
 
     ai_prefix: str = "AI"
-    # todo
-    instruction_text: str = f"{ai_prefix}: the response to the original input question in chinese"
 
     @property
     def _bot_type(self) -> str:
@@ -33,7 +31,7 @@ class ChatBot(Bot):
 
     def _fix_text(self, text: str) -> str:
         return (f"Observation: You told me: {text}, but it doesn't meet the format I mentioned to you. "
-                f"Please try again: {self.instruction_text}")
+                "review the rule I told you and try again.")
 
     @property
     def llm_prefix(self) -> str:
@@ -70,10 +68,10 @@ class ChatBot(Bot):
         )
         tool_names = ", ".join([tool.name for tool in tools])
 
-        cls.instruction_text = format_instructions.format(
+        instruction_text = format_instructions.format(
             tool_names=tool_names, ai_prefix=ai_prefix, human_prefix=human_prefix
         )
-        template = "\n\n".join([prefix, tool_strings, cls.instruction_text, suffix])
+        template = "\n\n".join([prefix, tool_strings, instruction_text, suffix])
         if input_variables is None:
             input_variables = ["input", "chat_history", "bot_scratchpad"]
         prompt = PromptTemplate(template=template, input_variables=input_variables)

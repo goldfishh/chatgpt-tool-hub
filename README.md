@@ -284,7 +284,7 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
 ### tool todolist  
    
 [○] stable-diffusion 中文prompt翻译    
-[○] ImageCaptioning   
+[✓] ImageCaptioning   
 [○] 小米智能家居控制   
 [○] 支持ChatGPT官方插件  
 [○] 支持图片处理工具   

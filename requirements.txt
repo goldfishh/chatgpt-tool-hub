@@ -1,38 +1,33 @@
-# for prompt syntax check
+# build Python packages for developer
+setuptools~=65.6.3
+
+# data validation
 pydantic~=1.10.7
 
-google-api-python-client
+# fix: google-search error,
+# reference: https://segmentfault.com/q/1010000043296765?bd_source_light=4746641
+pyopenssl
 
+# for save config
+pyyaml~=6.0
+
+# for crop html
+beautifulsoup4~=4.12.0
+
+# for openai
+tenacity~=8.2.2
+openai~=0.27.2
+tiktoken~=0.3.2
+
+# all tool dependencies
+arxiv
 wikipedia
-
 wolframalpha
-
 # for web-request tool
 aiohttp~=3.8.4
 requests~=2.28.2
-pyyaml~=6.0
-beautifulsoup4~=4.12.0
+# for google-search
+google-api-python-client
 
-# PhantomJS need old version of selenium
-selenium==2.48.0
-
-# google fix https://segmentfault.com/q/1010000043296765?bd_source_light=4746641
-pyopenssl
-# for models openai
-tenacity~=8.2.2
-
-openai~=0.27.2
-
+# todo decouple it
 SQLAlchemy~=2.0.7
-
-tiktoken~=0.3.2
-
-arxiv
-
-setuptools~=65.6.3
-pyperclip~=1.8.2
-python-dotenv~=1.0.0
-rich~=13.3.3
-pillow~=9.5.0
-transformers~=4.27.4
-torch~=2.0.0

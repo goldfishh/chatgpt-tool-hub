@@ -1,13 +1,13 @@
 """Util that calls Bing Search."""
+import json
 from typing import Dict, List
 
-import json
-import requests
 from pydantic import BaseModel, Extra, root_validator
-from chatgpt_tool_hub.tools.web_requests.wrapper import RequestsWrapper
+
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.tools.web_requests import filter_text
+from chatgpt_tool_hub.tools.web_requests.wrapper import RequestsWrapper
 
 
 class BingSearchAPIWrapper(BaseModel):
