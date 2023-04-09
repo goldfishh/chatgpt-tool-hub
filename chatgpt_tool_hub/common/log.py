@@ -1,17 +1,21 @@
-import logging
+import os
 import sys
-
-from chatgpt_tool_hub.common.constants import LOGGING_LEVEL
+import logging
+from chatgpt_tool_hub.common.constants import LOGGING_LEVEL, LOGGING_FMT, LOGGING_DATEFMT
 
 
 def _get_logger():
-    logger = logging.getLogger(__package__)
+    logger = logging.getLogger("tool")
+
     logger.setLevel(LOGGING_LEVEL)
     ch = logging.StreamHandler(sys.stdout)
-    formatter = logging.Formatter('[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d] - %(message)s',
-                                  datefmt='%Y-%m-%d %H:%M:%S')
-    ch.setFormatter(formatter)
+    ch.setFormatter(logging.Formatter(LOGGING_FMT, datefmt=LOGGING_DATEFMT))
+
+    fh = logging.FileHandler(f'{os.getcwd()}/run.log', encoding='utf-8')
+    fh.setFormatter(logging.Formatter(LOGGING_FMT, datefmt=LOGGING_DATEFMT))
+
     logger.addHandler(ch)
+    logger.addHandler(fh)
     return logger
 
 

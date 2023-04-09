@@ -1,9 +1,11 @@
+from datetime import datetime
+
 from chatgpt_tool_hub.chains.api import APIChain
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
+from chatgpt_tool_hub.tools.all_tool_list import register_tool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.meteo.api_docs_prompts import OPEN_METEO_DOCS
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
 
 default_tool_name = "meteo-weather"
 
@@ -27,6 +29,8 @@ class MeteoWeatherTool(BaseTool):
             return "the input of tool is empty"
         if not self.api_chain:
             return "the tool was not initialized"
+
+        query += f"\nThe current time is {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} in UTC+8."
 
         return self.api_chain.run(query)
 

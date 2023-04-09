@@ -40,11 +40,11 @@ class InvalidTool(BaseTool):
 
     def _run(self, tool_name: str) -> str:
         """Use the tool."""
-        return f"{tool_name} is not a valid tool, try another one."
+        return f"`{tool_name}` is not a valid tool, try another one."
 
     async def _arun(self, tool_name: str) -> str:
         """Use the tool asynchronously."""
-        return f"{tool_name} is not a valid tool, try another one."
+        return f"`{tool_name}` is not a valid tool, try another one."
 
 
 def tool(*args: Union[str, Callable], return_direct: bool = False, **kwargs) -> Callable:

@@ -77,6 +77,7 @@ class APIChain(Chain, BaseModel):
         )
         # api_docs chunking
         self.api_docs = "Here represents the API documentation that you previously used to generate API url."
+
         answer = self.api_answer_chain.predict(
             question=question,
             api_docs=self.api_docs,

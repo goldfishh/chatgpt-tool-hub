@@ -1,4 +1,3 @@
-
 OPEN_METEO_DOCS = """BASE URL: https://api.open-meteo.com/
 
 API Documentation
@@ -22,13 +21,24 @@ The parameter &hourly= accepts the following values. Most weather variables are 
 
 Variable	Valid time	Unit	Description
 temperature_2m	Instant	°C (°F)	Air temperature at 2 meters above ground
+cloudcover	Instant	%	Total cloud cover as an area fraction
+precipitation	Preceding hour sum	mm (inch)	Total precipitation (rain, showers, snow) sum of the preceding hour
 snowfall	Preceding hour sum	cm (inch)	Snowfall amount of the preceding hour in centimeters. For the water equivalent in millimeter, divide by 7. E.g. 7 cm snow = 10 mm precipitation water equivalent
 rain	Preceding hour sum	mm (inch)	Rain from large scale weather systems of the preceding hour in millimeter
-showers	Preceding hour sum	mm (inch)	Showers from convective precipitation in millimeters from the preceding hour
-weathercode	Instant	WMO code	Weather condition as a numeric code. Follow WMO weather interpretation codes. See table below for details.
+weathercode	Instant	WMO code	Weather condition as a numeric code. Follow WMO weather interpretation codes. 0: Clear sky; 1: Mainly clear; 2: partly cloudy; 3: overcast;   
 snow_depth	Instant	meters	Snow depth on the ground
-freezinglevel_height	Instant	meters	Altitude above sea level of the 0°C level
 visibility	Instant	meters	Viewing distance in meters. Influenced by low clouds, humidity and aerosols. Maximum visibility is approximately 24 km.
 
+Daily Parameter Definition
+Aggregations are a simple 24 hour aggregation from hourly values. The parameter &daily= accepts the following values:
+
+Variable	Unit	Description
+temperature_2m_max & temperature_2m_min	°C (°F)	Maximum and minimum daily air temperature at 2 meters above ground
+precipitation_sum	mm	Sum of daily precipitation (including rain, showers and snowfall)
+rain_sum	mm	Sum of daily rain
+weathercode	WMO code	The most severe weather condition on a given day
+sunrise & sunset	iso8601	Sun rise and set times
+
 If daily weather variables are specified, parameter timezone is required.
+Parameter past_days is mutually exclusive with start_date and end_date.
 """

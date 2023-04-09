@@ -30,8 +30,9 @@ class ChatBot(Bot):
         return "Observation: "
 
     def _fix_text(self, text: str) -> str:
-        return (f"Observation: You told me: {text}, but it doesn't meet the format I mentioned to you. "
-                "review the rule I told you and try again.")
+        return (f"You just told me: {text}, but it doesn't meet the format I mentioned to you. "
+                f"format: {FORMAT_INSTRUCTIONS}\n"
+                "you should find what the mistake is, correct it and try again.\n")
 
     @property
     def llm_prefix(self) -> str:

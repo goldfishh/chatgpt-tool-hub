@@ -26,12 +26,13 @@ Here is the response from the API:
 
 {api_response}
 
+You can answer my question step by step according to api response.
+
 You should provide feedback on whether the question can be answered, 
 explain what you have done, what you have seen and what the outcome was to the Human. 
 Don't make up you response!
 
-Summarize this response to answer the original question.
-Summary:"""
+Your final answer:"""
 )
 
 API_RESPONSE_PROMPT = PromptTemplate(
