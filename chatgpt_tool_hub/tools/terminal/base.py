@@ -12,6 +12,7 @@ from chatgpt_tool_hub.tools.all_tool_list import register_tool
 
 default_tool_name = "terminal"
 
+
 class BashProcess:
     """Executes bash commands and returns the output."""
 

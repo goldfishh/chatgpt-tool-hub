@@ -1,12 +1,12 @@
-import chatgpt_tool_hub.tools.arxiv_search
-import chatgpt_tool_hub.tools.bing_search
-import chatgpt_tool_hub.tools.debug
-import chatgpt_tool_hub.tools.google_search
-import chatgpt_tool_hub.tools.meteo
-import chatgpt_tool_hub.tools.news
-import chatgpt_tool_hub.tools.python
-import chatgpt_tool_hub.tools.searxng_search
-import chatgpt_tool_hub.tools.terminal
-import chatgpt_tool_hub.tools.web_requests
-import chatgpt_tool_hub.tools.wikipedia
-import chatgpt_tool_hub.tools.wolfram_alpha
+import importlib
+
+from chatgpt_tool_hub.common.log import LOG
+
+all_tool_package_list = ["arxiv_search", "bing_search", "debug", "google_search", "meteo", "news", "visual_dl",
+                         "python", "searxng_search", "terminal", "web_requests", "wikipedia", "wolfram_alpha"]
+
+for package_name in all_tool_package_list:
+    try:
+        importlib.import_module("chatgpt_tool_hub.tools." + package_name)
+    except Exception as e:
+        LOG.error(f"[{package_name}] init failed\nerror_info: " + repr(e))

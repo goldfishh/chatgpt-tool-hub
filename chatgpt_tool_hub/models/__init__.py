@@ -16,7 +16,7 @@ def build_model_params(kwargs: dict) -> dict:
         "top_p": 1,
         "frequency_penalty": 0.0,  # [-2,2]之间，该值越大则更倾向于产生不同的内容
         "presence_penalty": 0.0,  # [-2,2]之间，该值越大则更倾向于产生不同的内容
-        "request_timeout": get_from_dict_or_env(kwargs, "request_timeout", "REQUESST_TIMEOUT", 60),
+        "request_timeout": get_from_dict_or_env(kwargs, "request_timeout", "REQUEST_TIMEOUT", 60),
         "max_retries": 2
     }
 

@@ -44,7 +44,7 @@ def load_tools(
             tools.append(tool)
         else:
             LOG.error("All the tools currently supported are："+str(list(all_tool_dict)))
-            raise ValueError(f"Got unknown tool {name}")
+            raise ValueError(f"Got unknown tool: {name}")
     filter_tools = crop_tools(tools)
     return filter_tools
 

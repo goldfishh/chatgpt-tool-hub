@@ -26,14 +26,14 @@ class Victorinox(App):
         if self.tools or self.tools_kwargs:
             LOG.warning("refresh the config of tools")
 
-        [self.tools.add(tool) for tool in tools_list]
+        map(self.tools.add, tools_list)
         self.tools_kwargs = tools_kwargs
 
         try:
             tools = load_tools(tools_list, **tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
-            return "load_tools failed"
+            raise RuntimeError("tool初始化失败")
 
         # loading tools from config.
         LOG.info(f"Initializing {self.get_class_name()} success, "
@@ -49,7 +49,7 @@ class Victorinox(App):
             LOG.info("no tool to add")
             return
 
-        [self.tools.add(tool) for tool in tools_list]
+        map(self.tools.add, tools_list)
         for tool_key in tools_kwargs:
             self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
 
@@ -57,7 +57,7 @@ class Victorinox(App):
             new_tools_list = load_tools(list(self.tools), **self.tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
-            return "load_tools failed"
+            raise RuntimeError("tool初始化失败")
 
         # loading tools from config.
         LOG.info(f"add_tool {self.get_class_name()} success, "
@@ -70,7 +70,7 @@ class Victorinox(App):
     def ask(self, query: str, chat_history: list = None, retry_num: int = 0) -> str:
         if self.bot is None:
             LOG.error("before calling the ask method, you should use create bot firstly")
-            raise RuntimeError("初始化失败")
+            raise RuntimeError("app初始化失败")
 
         if not query:
             LOG.warning("[APP]: query is zero value")
