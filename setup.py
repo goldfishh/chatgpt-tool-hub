@@ -39,7 +39,7 @@ setup(
         "tiktoken~=0.3.2",
         "arxiv",
         "wikipedia",
-        "wolframalpha"
+        "wolframalpha",
         'aiohttp~=3.8.4',
         'requests~=2.28.2',
         "google-api-python-client",
