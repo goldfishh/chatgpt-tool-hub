@@ -30,9 +30,19 @@ class ChatBot(Bot):
         return "Observation: "
 
     def _fix_text(self, text: str) -> str:
-        return (f"You just told me: {text}, but it doesn't meet the format I mentioned to you. "
-                f"format: {FORMAT_INSTRUCTIONS}\n"
-                "you should find what the mistake is, correct it and try again.\n")
+        if not self.allowed_tools:
+            tool_names = ""
+        else:
+            tool_names = ", ".join([tool for tool in self.allowed_tools])
+        instruction_text = FORMAT_INSTRUCTIONS.format(
+            tool_names=tool_names, ai_prefix=self.ai_prefix
+        )
+        _text = ("\n\n"
+                 f"You just told me: {text}, but it doesn't meet the format I mentioned to you. \n\n"
+                 f"format: {instruction_text}. \n\n"
+                 "You should understand why you did not input the correct format, correct it and try again. \n\n")
+        LOG.debug("(fix_text): fix_text: " + repr(_text))
+        return _text
 
     @property
     def llm_prefix(self) -> str:
@@ -41,14 +51,14 @@ class ChatBot(Bot):
 
     @classmethod
     def create_prompt(
-        cls,
-        tools: Sequence[BaseTool],
-        prefix: str = PREFIX,
-        suffix: str = SUFFIX,
-        format_instructions: str = FORMAT_INSTRUCTIONS,
-        ai_prefix: str = "AI",
-        human_prefix: str = "Human",
-        input_variables: Optional[List[str]] = None,
+            cls,
+            tools: Sequence[BaseTool],
+            prefix: str = PREFIX,
+            suffix: str = SUFFIX,
+            format_instructions: str = FORMAT_INSTRUCTIONS,
+            ai_prefix: str = "AI",
+            human_prefix: str = "Human",
+            input_variables: Optional[List[str]] = None,
     ) -> PromptTemplate:
         """Create prompt in the style of the zero shot bot.
 
@@ -70,7 +80,7 @@ class ChatBot(Bot):
         tool_names = ", ".join([tool.name for tool in tools])
 
         instruction_text = format_instructions.format(
-            tool_names=tool_names, ai_prefix=ai_prefix, human_prefix=human_prefix
+            tool_names=tool_names, ai_prefix=ai_prefix
         )
         template = "\n\n".join([prefix, tool_strings, instruction_text, suffix])
         if input_variables is None:
@@ -86,6 +96,7 @@ class ChatBot(Bot):
         return self.ai_prefix
 
     def _extract_tool_and_input(self, llm_output: str) -> Optional[Tuple[str, str]]:
+        # this is bad parsing rule
         if f"{self.ai_prefix}:" in llm_output:
             return self.ai_prefix, llm_output.split(f"{self.ai_prefix}:")[-1].strip()
         regex = r"Action: (.*?)[\n]*Action Input: (.*)"
@@ -100,17 +111,17 @@ class ChatBot(Bot):
 
     @classmethod
     def from_llm_and_tools(
-        cls,
-        llm: BaseLLM,
-        tools: Sequence[BaseTool],
-        callback_manager: Optional[BaseCallbackManager] = None,
-        prefix: str = PREFIX,
-        suffix: str = SUFFIX,
-        format_instructions: str = FORMAT_INSTRUCTIONS,
-        ai_prefix: str = "AI",
-        human_prefix: str = "Human",
-        input_variables: Optional[List[str]] = None,
-        **kwargs: Any,
+            cls,
+            llm: BaseLLM,
+            tools: Sequence[BaseTool],
+            callback_manager: Optional[BaseCallbackManager] = None,
+            prefix: str = PREFIX,
+            suffix: str = SUFFIX,
+            format_instructions: str = FORMAT_INSTRUCTIONS,
+            ai_prefix: str = "AI",
+            human_prefix: str = "Human",
+            input_variables: Optional[List[str]] = None,
+            **kwargs: Any,
     ) -> Bot:
         """Construct an bot from an LLM and tools."""
         prompt = cls.create_prompt(

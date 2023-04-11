@@ -92,8 +92,11 @@ class RequestsWrapper(BaseModel):
             self.headers.update(DEFAULT_HEADER)
             response = requests.get(url, headers=self.headers, params=params, **kwargs)
             if raise_for_status:
-                LOG.error("RequestsWrapper.get status_code is not good. ")
-                response.raise_for_status()
+                try:
+                    response.raise_for_status()
+                except Exception as e:
+                    LOG.error("RequestsWrapper.get status_code is not good: " + repr(e))
+
             return response.text
 
     def post(self, url: str, data: Dict[str, Any]) -> str:

@@ -47,6 +47,7 @@
   - wikipedia
   - meteo-weather
   - news
+  - morning-news
   - bing-search
   - wolfram-alpha
 
@@ -54,8 +55,53 @@
 ## 快速开始
 
 ---
+### 1.  使用shell运行demo
 
-`pip install chatgpt-tool-hub`
+#### (1). 克隆源代码
+
+```bash
+git clone git@github.com:goldfishh/chatgpt-tool-hub.git
+```
+
+#### (2). `pip install -r requirements.txt`
+
+#### (3). 编辑config.json，填入你的openai_api_key
+
+```json
+{
+  "tools": [],  // 这里填入你想加载的工具名，默认工具无需填入自动加载
+  "kwargs": {
+      "openai_api_key": "",  // 必填
+      "proxy": "",  // 代理配置，国外ip可忽略
+      "debug": false,  // 当你遇到问题提issue前请设置debug为true，提交输出日志
+      "no_default": false,  // 控制是否加载默认工具
+      "model_name": "gpt-3.5-turbo"  // 默认，其他模型暂未测试
+  }
+}
+```
+
+#### (4). `python3 run.py 你的问题1 [你的问题2 ......]`
+
+> chatgpt判断回复是否使用工具，你可要求chatgpt使用工具（更进一步地使用哪个工具）来帮助它更好回答你的问题
+
+#### (5). 给项目点个star & 有能力pr，支持项目作者继续开发...
+
+--- 
+
+### 2. 去[chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat)使用本项目开发的tool插件：[tool README](https://github.com/goldfishh/chatgpt-on-wechat/blob/master/plugins/tool/README.md)
+
+> 你可以在微信用到本项目为chatgpt提供的工具能力
+
+---
+
+### 3. 你是其他项目开发者，想要接入本工具引擎
+
+#### (1). 安装chatgpt-tool-hub包
+
+`pip install -i https://pypi.python.org/simple chatgpt-tool-hub`
+
+#### (2). 示例代码：
+
 ```python
 import os
 from chatgpt_tool_hub.apps import load_app
@@ -65,7 +111,11 @@ app = load_app()
 reply = app.ask(YOUR_QUESTION_TO_HERE)
 print(reply)
 ```
-PS: 默认加载：python、url-get、terminal、meteo-weather工具
+  
+> 如果有需求，我会更新接入的文档，欢迎提issue
+
+---
+
 ## 工具指南
 
 ---

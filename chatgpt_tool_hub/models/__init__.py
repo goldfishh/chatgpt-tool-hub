@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from chatgpt_tool_hub.common.cache import BaseCache
@@ -8,9 +9,12 @@ llm_cache: Optional[BaseCache] = None
 
 
 def build_model_params(kwargs: dict) -> dict:
+    _openai_api_key = get_from_dict_or_env(kwargs, "openai_api_key", "OPENAI_API_KEY")
+    # tool llm need it
+    os.environ["OPENAI_API_KEY"] = _openai_api_key
     return {
         "temperature": get_from_dict_or_env(kwargs, "temperature", "TEMPERATURE", 0),
-        "openai_api_key": get_from_dict_or_env(kwargs, "openai_api_key", "OPENAI_API_KEY"),
+        "openai_api_key": _openai_api_key,
         "proxy": get_from_dict_or_env(kwargs, "proxy", "PROXY", ""),
         "model_name": get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo"),  # 对话模型的名称
         "top_p": 1,

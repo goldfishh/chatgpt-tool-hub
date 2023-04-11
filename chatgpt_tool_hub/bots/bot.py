@@ -94,8 +94,9 @@ class Bot(BaseModel):
             full_output = self._fix_text(full_output)
             full_inputs["bot_scratchpad"] += full_output
             output = self.llm_chain.predict(**full_inputs)
-            full_output += output
-            parsed_output = self._extract_tool_and_input(full_output)
+            LOG.debug("(fix_text): retry response: " + str(output))
+            # full_output += output
+            parsed_output = self._extract_tool_and_input(output)
         return BotAction(
             tool=parsed_output[0], tool_input=parsed_output[1], log=full_output
         )
@@ -220,7 +221,8 @@ class Bot(BaseModel):
                 )
             # Adding to the previous steps, we now tell the LLM to make a final pred
             thoughts += (
-                "\n\nI now need to return a final answer based on the previous steps:"
+                "\n\nI have exceeded the limit of tool usage and "
+                "now need to summarize all the information collected so far to generate a final answer:"
             )
             new_inputs = {"bot_scratchpad": thoughts, "stop": self._stop}
             full_inputs = {**kwargs, **new_inputs}

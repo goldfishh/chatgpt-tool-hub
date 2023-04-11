@@ -1,0 +1,1 @@
+from chatgpt_tool_hub.tools.morning_news.morning_news import MorningNewsTool

@@ -16,8 +16,10 @@ timezone	String	No	GMT	If timezone is set, all timestamps are returned as local-
 past_days	Integer (0-2)	No	0	If past_days is set, yesterday or the day before yesterday data are also returned.
 start_date & end_date	String (yyyy-mm-dd)	No		The time interval to get weather data. A day must be specified as an ISO8601 date (e.g. 2022-06-30).
 
-Hourly Parameter Definition
-The parameter &hourly= accepts the following values. Most weather variables are given as an instantaneous value for the indicated hour. Some variables like precipitation are calculated from the preceding hour as an average or sum.
+Hourly Parameter Definition:
+The parameter &hourly= accepts the following values; note that you cannot use Daily Parameter in &hourly=.
+Most weather variables are given as an instantaneous value for the indicated hour. 
+Some variables like precipitation are calculated from the preceding hour as an average or sum.
 
 Variable	Valid time	Unit	Description
 temperature_2m	Instant	°C (°F)	Air temperature at 2 meters above ground
@@ -25,20 +27,36 @@ cloudcover	Instant	%	Total cloud cover as an area fraction
 precipitation	Preceding hour sum	mm (inch)	Total precipitation (rain, showers, snow) sum of the preceding hour
 snowfall	Preceding hour sum	cm (inch)	Snowfall amount of the preceding hour in centimeters. For the water equivalent in millimeter, divide by 7. E.g. 7 cm snow = 10 mm precipitation water equivalent
 rain	Preceding hour sum	mm (inch)	Rain from large scale weather systems of the preceding hour in millimeter
-weathercode	Instant	WMO code	Weather condition as a numeric code. Follow WMO weather interpretation codes. 0: Clear sky; 1: Mainly clear; 2: partly cloudy; 3: overcast;   
+weathercode	Instant	WMO code	Weather condition as a numeric code. Follow WMO weather interpretation codes.   
+windspeed_10m & windspeed_80m & windspeed_120m & windspeed_180m	Instant	km/h (mph, m/s, knots)	Wind speed at 10, 80, 120 or 180 meters above ground. Wind speed on 10 meters is the standard level.
 snow_depth	Instant	meters	Snow depth on the ground
 visibility	Instant	meters	Viewing distance in meters. Influenced by low clouds, humidity and aerosols. Maximum visibility is approximately 24 km.
 
-Daily Parameter Definition
-Aggregations are a simple 24 hour aggregation from hourly values. The parameter &daily= accepts the following values:
+Daily Parameter Definition:
+The parameter &daily= accepts the following values:
+Aggregations are a simple 24 hour aggregation from hourly values.  
+note that you cannot use Hourly Parameter in &daily=.
 
 Variable	Unit	Description
 temperature_2m_max & temperature_2m_min	°C (°F)	Maximum and minimum daily air temperature at 2 meters above ground
 precipitation_sum	mm	Sum of daily precipitation (including rain, showers and snowfall)
 rain_sum	mm	Sum of daily rain
-weathercode	WMO code	The most severe weather condition on a given day
+weathercode	WMO code	The most severe weather condition on a given day. Follow WMO weather interpretation codes. 
 sunrise & sunset	iso8601	Sun rise and set times
+windspeed_10m_max & windgusts_10m_max	km/h (mph, m/s, knots)	Maximum wind speed and gusts on a day
+winddirection_10m_dominant	°	Dominant wind direction
+
+
+WMO Weather interpretation codes (WW)
+Code	Description
+0	Clear sky
+1, 2, 3	Mainly clear, partly cloudy, and overcast
+45, 48	Fog and depositing rime fog
+51, 53, 55	Drizzle: Light, moderate, and dense intensity
+56, 57	Freezing Drizzle: Light and dense intensity
 
 If daily weather variables are specified, parameter timezone is required.
 Parameter past_days is mutually exclusive with start_date and end_date.
+
+Your output can only be a URL, no need for explanation.
 """

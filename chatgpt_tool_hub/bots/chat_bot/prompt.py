@@ -1,12 +1,12 @@
 
 PREFIX = """You are a helpful assistant.
 
+Assistant has access to the following tools:
+
 TOOLS:
-------
+------"""
 
-Assistant has access to the following tools:"""
-
-FORMAT_INSTRUCTIONS = """To use a tool, please use the following format:
+FORMAT_INSTRUCTIONS = """To use a tool, you MUST use the following format:
 ```
 Thought: Do I need to use a tool? Yes
 Action: the action to take, should be one of [{tool_names}]

@@ -5,5 +5,4 @@ print("chatgpt-tool-hub version: " + str(__version__))
 
 
 # todo remove it in the future
-print_text("[warning]chatgpt-tool-hub 0.3.8后，部分工具名将变更：requests -> url-get", color="red", end="\n")
-
+print_text("chatgpt-tool-hub 0.3.8后，部分工具名将变更：requests -> url-get", color="red", end="\n")

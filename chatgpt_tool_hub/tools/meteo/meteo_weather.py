@@ -15,6 +15,7 @@ class MeteoWeatherTool(BaseTool):
     description: str = (
         "Useful for when you want to get weather information from the OpenMeteo API. "
         "The input should be a question in natural language that this API can answer."
+        "Add a granularity description to input for the weather information to be returned: daily and hourly."
     )
     api_chain: APIChain = None
 
