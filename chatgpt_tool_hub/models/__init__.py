@@ -12,7 +12,7 @@ def build_model_params(kwargs: dict) -> dict:
     _api_key = get_from_dict_or_env(kwargs, "openai_api_key", "OPENAI_API_KEY")
     _proxy = get_from_dict_or_env(kwargs, "proxy", "PROXY", "")
     _model = get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo")
-    _timeout = get_from_dict_or_env(kwargs, "request_timeout", "REQUEST_TIMEOUT", 60)
+    _timeout = get_from_dict_or_env(kwargs, "request_timeout", "REQUEST_TIMEOUT", "60")
     # tool llm need it
     os.environ["OPENAI_API_KEY"] = _api_key
     os.environ["PROXY"] = _proxy
