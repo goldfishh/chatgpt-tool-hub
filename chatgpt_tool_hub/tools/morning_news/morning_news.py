@@ -1,6 +1,7 @@
 from typing import Any
 
 from chatgpt_tool_hub.chains import LLMChain
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
@@ -9,7 +10,6 @@ from chatgpt_tool_hub.tools.all_tool_list import register_tool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.morning_news.summary_prompt import SUMMARY_DOCS
 from chatgpt_tool_hub.tools.web_requests.get import RequestsWrapper
-from chatgpt_tool_hub.common.log import LOG
 
 default_tool_name = "morning-news"
 
