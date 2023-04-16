@@ -48,6 +48,13 @@ class AppFactory:
             app = Victorinox(**build_model_params(kwargs))
             app.create(tools_list, **kwargs)
             return app
+        elif app_type == 'auto':
+            from chatgpt_tool_hub.apps.auto_app import AutoApp
 
+            # todo no default
+
+            app = AutoApp(**build_model_params(kwargs))
+            app.create(tools_list, **kwargs)
+            return app
         else:
             raise NotImplementedError
