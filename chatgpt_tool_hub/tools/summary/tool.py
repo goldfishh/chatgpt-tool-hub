@@ -100,10 +100,13 @@ class SummaryTool(BaseTool):
         self.map_bot = LLMChain(llm=llm, prompt=MAP_PROMPT)
         self.reduce_bot = LLMChain(llm=llm, prompt=REDUCE_PROMPT)
 
-    async def _amap(self, bot: LLMChain, clip_text: str):
-        resp = await bot.arun(text=clip_text)
-        LOG.debug(f"[summary] map async output: {resp}")
-        return resp
+    async def _amap(self, clip_text_list: List[str]):
+        tasks = []
+        for text in clip_text_list:
+            resp = await self.map_bot.arun(text=text)
+            tasks.append(resp)
+        map_text_list = await asyncio.gather(*tasks)
+        return map_text_list
 
     def _run(self, tool_input: str) -> str:
         """run the tool"""
@@ -126,8 +129,9 @@ class SummaryTool(BaseTool):
             source_text = f.read()
             _clipper = TextClipper(self.max_segment_length)
             _clip_text_list = _clipper.clip(source_text, self.message_num)
-            tasks = [self._amap(self.map_bot, text) for text in _clip_text_list]
-            map_text_list = await asyncio.gather(*tasks)
+
+
+
             map_text = _clipper.seperator.join(map_text_list)
             reduce_text = self.reduce_bot.run(text=map_text)
             # todo reduce_text token_num > max_segment_length
@@ -136,3 +140,9 @@ class SummaryTool(BaseTool):
     async def _arun(self, file_path: str) -> str:
         """use this tool async."""
         raise NotImplementedError("summary tool not support async yet")
+
+
+if __name__ == "__main__":
+    tool = SummaryTool()
+    content = tool.run("/Users/goldfish/Desktop/chat.log, 200")
+    print(content)

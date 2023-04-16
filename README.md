@@ -80,7 +80,7 @@ git clone git@github.com:goldfishh/chatgpt-tool-hub.git
 }
 ```
 
-#### (4). `python3 run.py 你的问题1 [你的问题2 ......]`
+#### (4). `python3 test.py 你的问题1 [你的问题2 ......]`
 
 > chatgpt判断回复是否使用工具，你可要求chatgpt使用工具（更进一步地使用哪个工具）来帮助它更好回答你的问题
 
