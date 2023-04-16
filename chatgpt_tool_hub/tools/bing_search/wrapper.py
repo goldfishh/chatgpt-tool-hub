@@ -30,7 +30,7 @@ class BingSearchAPIWrapper(BaseModel):
             "textDecorations": True,
             "textFormat": "HTML",
         }
-        response = RequestsWrapper(headers=headers).get(self.bing_search_url, params, raise_for_status=True)
+        response = RequestsWrapper(headers=headers).get(self.bing_search_url, params=params, raise_for_status=True)
 
         search_results = json.loads(response)
         try:

@@ -29,4 +29,6 @@ Response object
     content | string | The unformatted content of the article, where available. This is truncated to 200 chars.
 
 Use page size: 2
+the endpoint and prefix of the document are absolutely correct, and that other URL prefixes should not be fabricated.
+If the information requested is not found, you should use other tools.
 """

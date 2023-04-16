@@ -23,7 +23,8 @@ def filter_text(html: str) -> str:
     text = '\n'.join(chunk for chunk in chunks if chunk)
 
     # compress text size
-    # text = text[:500]
+    # todo summary it
+    text = text[:800]
 
     return text.encode('utf-8').decode()
 

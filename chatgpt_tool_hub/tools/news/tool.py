@@ -1,7 +1,8 @@
 from typing import Any
 
-from chatgpt_tool_hub.engine import ToolEngine
 from chatgpt_tool_hub.bots import initialize_bot
+from chatgpt_tool_hub.bots.chat_bot.base import ChatBot
+from chatgpt_tool_hub.engine import ToolEngine
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.all_tool_list import register_tool
@@ -18,16 +19,18 @@ class NewsTool(BaseTool):
         "Use this when you want to get information about current news stories. "
         "This tool has sub-tools that are used to obtain financial news, daily morning reports and other news."
         "The input should be a question in natural language that this API can answer."
+        "The tool can only use once!"
     )
     bot: ToolEngine = Any
 
     def __init__(self, **tool_kwargs: Any):
-        super().__init__()
+        # 这个工具直接返回内容
+        super().__init__(return_direct=True)
 
         tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register.get_registered_tool, **tool_kwargs)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
 
-        self.bot = initialize_bot(tools, llm, bot="chat-bot", verbose=True,
+        self.bot = initialize_bot(tools, llm, bot="qa-bot", verbose=True,
                                   max_iterations=3, early_stopping_method="generate")
 
     def _run(self, query: str) -> str:
@@ -37,11 +40,13 @@ class NewsTool(BaseTool):
         if not self.bot:
             return "the tool was not initialized"
 
-        return self.bot.run(query)
+        # todo should connect to parent bot
+        parent_bot_prefix = str(ChatBot.finish_tool_name) + ": "
+        return parent_bot_prefix + self.bot.run(query)
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("NewsTool does not support async")
 
 
-register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), [])
+register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), ["news_api_key", "zaobao_api_key"])

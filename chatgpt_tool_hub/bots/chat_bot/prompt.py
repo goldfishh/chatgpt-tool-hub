@@ -31,5 +31,6 @@ New input: {input}
 
 You should provide feedback on whether the task has been completed, 
 explain what you have done, what you have seen and what the outcome was to the Human. 
+Please note that the prefix "AI:" is very important for me to parse your response, so please be sure to add this prefix.
 Don't make up you response.
 """

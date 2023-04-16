@@ -11,13 +11,14 @@ from chatgpt_tool_hub.tools.web_requests import DEFAULT_HEADER
 from webdriver_manager.chrome import ChromeDriverManager
 
 
+browser: Any = None  # PhantomJSWebDriver or None
+
+
 class RequestsWrapper(BaseModel):
     """Lightweight wrapper around requests library."""
 
     headers: Optional[Dict[str, str]] = dict()
     aiosession: Optional[aiohttp.ClientSession] = None
-
-    browser: Any = None  # PhantomJSWebDriver or None
 
     proxy: Optional[str]
 
@@ -37,7 +38,9 @@ class RequestsWrapper(BaseModel):
         try:
             from selenium import webdriver
 
-            values["browser"] = cls._build_browser_option(proxy)
+            global browser
+            if browser is None:
+                browser = cls._build_browser_option(proxy)
         except ImportError:
             raise ImportError(
                 "selenium is not installed. "
@@ -46,9 +49,9 @@ class RequestsWrapper(BaseModel):
         return values
 
     @classmethod
-    def _build_browser_option(self, proxy: str = ""):
-        from selenium.webdriver.chrome.options import Options
+    def _build_browser_option(cls, proxy: str = ""):
         from selenium import webdriver
+        from selenium.webdriver.chrome.options import Options
 
         options = Options()
         options.add_argument(
@@ -67,13 +70,18 @@ class RequestsWrapper(BaseModel):
 
         return browser
 
-    def get(self, url: str, params: Dict[str, Any] = None, raise_for_status: bool = False, **kwargs) -> str:
+    def get(self, url: str, use_browser: bool = False, params: Dict[str, Any] = None, raise_for_status: bool = False, **kwargs) -> str:
         """GET the URL and return the text."""
-        if self.browser:
-            self.browser.get(url)
-            _content = self.browser.page_source
+        if browser and use_browser:
+
+            # Network.setExtraHTTPHeaders command to the browser's DevTools.
+            # This method allows setting multiple headers at once.
+            browser.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": self.headers})
+
+            browser.get(url)
+            _content = browser.page_source
             # todo raise_for_status?
-            self.browser.close()  # 退出当前页面, 节省内存
+            browser.close()  # 退出当前页面, 节省内存
             return _content
         else:
             self.headers.update(DEFAULT_HEADER)

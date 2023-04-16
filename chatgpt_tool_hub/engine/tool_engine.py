@@ -3,12 +3,12 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, root_validator
 
-from chatgpt_tool_hub.bots import Bot
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.input import get_color_mapping
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.schema import BotAction, BotFinish
+from chatgpt_tool_hub.engine import Bot
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.tool import InvalidTool
 

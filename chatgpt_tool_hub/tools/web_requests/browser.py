@@ -20,7 +20,7 @@ class BrowserTool(BaseRequestsTool, BaseTool):
     def _run(self, url: str) -> str:
         """Run the tool."""
         try:
-            html = self.requests_wrapper.get(url)
+            html = self.requests_wrapper.get(url, use_browser=True)
             _content = filter_text(html)
             LOG.debug("[browser] output: " + str(_content))
         except Exception as e:

@@ -24,12 +24,11 @@ class FinanceNewsTool(BaseTool):
     jin10_url: str = "https://www.jin10.com/example/jin10.com.html"
 
     def __init__(self, **tool_kwargs: Any):
-        super().__init__()
+        super().__init__(return_direct=True, **tool_kwargs)
 
     def _run(self, tool_input: str) -> str:
         # browser
-        requests_wrapper = RequestsWrapper()
-        _response = BrowserTool(requests_wrapper=requests_wrapper).run(self.jin10_url)
+        _response = BrowserTool(requests_wrapper=RequestsWrapper()).run(self.jin10_url)
 
         # create temp file
         temp_file = tempfile.mkstemp()

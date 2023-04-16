@@ -12,6 +12,7 @@ def load_tools(
     tool_names: List[str],
     get_tool_list: Callable = get_all_tool_dict,
     callback_manager: Optional[BaseCallbackManager] = None,
+    check_tool_params: bool = False,
     **kwargs: Any,
 ) -> List[BaseTool]:
     """Load tools based on their name.
@@ -29,9 +30,10 @@ def load_tools(
         if name in all_tool_dict:
             _get_tool_func, extra_keys = all_tool_dict[name]
 
+            # tool in tool cannot use it
             # consistency validation between input and required params
             missing_keys = set(extra_keys).difference(kwargs)
-            if missing_keys:
+            if check_tool_params and missing_keys:
                 raise ValueError(
                     f"Tool {name} requires some parameters that were not "
                     f"provided: {missing_keys}"
@@ -45,7 +47,7 @@ def load_tools(
 
             tools.append(tool)
         else:
-            LOG.error("All the tools currently supported are："+str(list(all_tool_dict)))
+            LOG.error("Now registered tools are："+str(list(all_tool_dict)))
             raise ValueError(f"Got unknown tool: {name}")
     filter_tools = crop_tools(tools)
     return filter_tools
