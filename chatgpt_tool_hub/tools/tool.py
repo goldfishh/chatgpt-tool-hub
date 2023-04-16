@@ -4,7 +4,7 @@ from typing import Any, Callable, Optional
 from typing import Awaitable, Union
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-
+from chatgpt_tool_hub.tools.all_tool_list import get_all_tool_dict
 
 class Tool(BaseTool):
     """Tool that takes in function or coroutine directly."""

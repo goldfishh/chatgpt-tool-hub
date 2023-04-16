@@ -1,14 +1,13 @@
-import sys
 import string
 import subprocess
+import sys
 from typing import List, Union
 
 from pydantic import Field
 
-from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools.all_tool_list import register_tool
-
+from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 default_tool_name = "terminal"
 
@@ -94,7 +93,7 @@ def _get_default_bash_process() -> BashProcess:
     return BashProcess()
 
 
-class Terminal(BaseTool):
+class TerminalTool(BaseTool):
     name = default_tool_name
     description = (
         f"Executes commands in a terminal. Input should be valid commands in {sys.platform} platform, "
@@ -113,7 +112,7 @@ class Terminal(BaseTool):
         raise NotImplementedError("[Terminal] does not support async")
 
 
-register_tool(default_tool_name, lambda _: Terminal(), [])
+register_tool(default_tool_name, lambda _: TerminalTool(), [])
 
 
 if __name__ == "__main__":

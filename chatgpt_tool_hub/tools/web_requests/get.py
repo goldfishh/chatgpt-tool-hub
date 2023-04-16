@@ -47,5 +47,5 @@ if __name__ == "__main__":
     LOG.setLevel(logging.DEBUG)
     requests_wrapper = RequestsWrapper()
     tool = RequestsGetTool(requests_wrapper=requests_wrapper)
-    content = tool.run("https://github.com/goldfishh/chatgpt-tool-hub")
+    content = tool.run("https://www.jin10.com/example/jin10.com.html")
     print(content)

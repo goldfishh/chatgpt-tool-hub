@@ -1,47 +1,47 @@
 from typing import Any
 
-from chatgpt_tool_hub.chains.api import APIChain
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
+from chatgpt_tool_hub.engine import ToolEngine
+from chatgpt_tool_hub.bots import initialize_bot
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
+from chatgpt_tool_hub.tools.all_tool_list import register_tool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.news.news_api.docs_prompts import NEWS_DOCS
+from chatgpt_tool_hub.tools.load_tools import load_tools
 from chatgpt_tool_hub.tools.news import news_tool_register
 
-default_tool_name = "news-api"
+default_tool_name = "news"
 
 
-class NewsApiTool(BaseTool):
+class NewsTool(BaseTool):
     name: str = default_tool_name
     description: str = (
-        "Use this when you want to get information about the top headlines of current news stories. "
+        "Use this when you want to get information about current news stories. "
+        "This tool has sub-tools that are used to obtain financial news, daily morning reports and other news."
         "The input should be a question in natural language that this API can answer."
     )
-    api_chain: APIChain = None
+    bot: ToolEngine = Any
 
     def __init__(self, **tool_kwargs: Any):
         super().__init__()
 
-        news_api_key = get_from_dict_or_env(tool_kwargs, "news_api_key", "NEWS_API_KEY")
-
+        tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register.get_registered_tool, **tool_kwargs)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
 
-        self.api_chain = APIChain.from_llm_and_api_docs(
-            llm, NEWS_DOCS, headers={"X-Api-Key": news_api_key}
-        )
+        self.bot = initialize_bot(tools, llm, bot="chat-bot", verbose=True,
+                                  max_iterations=3, early_stopping_method="generate")
 
     def _run(self, query: str) -> str:
         """Use the tool."""
         if not query:
             return "the input of tool is empty"
-        if not self.api_chain:
+        if not self.bot:
             return "the tool was not initialized"
 
-        return self.api_chain.run(query)
+        return self.bot.run(query)
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("NewsTool does not support async")
 
 
-news_tool_register.register_tool(default_tool_name, lambda kwargs: NewsApiTool(**kwargs), ["news_api_key"])
+register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), [])

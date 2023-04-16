@@ -1,15 +1,16 @@
 """Load tools."""
-from typing import Any, List
+from typing import Any, List, Callable
 from typing import Optional
 
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools.all_tool_list import get_all_tool_dict
 from chatgpt_tool_hub.tools.base_tool import BaseTool
+from chatgpt_tool_hub.tools.all_tool_list import get_all_tool_dict
 
 
 def load_tools(
     tool_names: List[str],
+    get_tool_list: Callable = get_all_tool_dict,
     callback_manager: Optional[BaseCallbackManager] = None,
     **kwargs: Any,
 ) -> List[BaseTool]:
@@ -17,12 +18,13 @@ def load_tools(
 
     Args:
         tool_names: name of tools to load.
+        get_tool_list: the function to get all tools, default is main tool list get function.
         callback_manager: Optional callback manager. If not provided, default global callback manager will be used.
     Returns:
         List of tools.
     """
     tools = []
-    all_tool_dict = get_all_tool_dict()
+    all_tool_dict = get_tool_list()
     for name in tool_names:
         if name in all_tool_dict:
             _get_tool_func, extra_keys = all_tool_dict[name]

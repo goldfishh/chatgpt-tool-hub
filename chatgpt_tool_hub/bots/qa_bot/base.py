@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import Any, List, Optional, Sequence, Tuple
 
-from chatgpt_tool_hub.bots.bot import Bot
+from chatgpt_tool_hub.bots import Bot
 from chatgpt_tool_hub.bots.qa_bot.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.chains import LLMChain

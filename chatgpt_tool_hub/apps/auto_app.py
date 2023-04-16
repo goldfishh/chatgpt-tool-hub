@@ -1,5 +1,5 @@
 from chatgpt_tool_hub.apps.app import App
-from chatgpt_tool_hub.apps.load_app import load_app
+from chatgpt_tool_hub.apps.app_factory import AppFactory
 from chatgpt_tool_hub.bots import initialize_bot
 from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.common.log import LOG
@@ -9,7 +9,7 @@ from chatgpt_tool_hub.tools.load_tools import load_tools
 from chatgpt_tool_hub.tools.all_tool_list import get_all_tool_dict
 
 
-class Victorinox(App):
+class AutoApp(App):
     def __init__(self, **app_kwargs):
         super().__init__()
         if not self.init_flag:
@@ -42,31 +42,7 @@ class Victorinox(App):
 
         # create bots
         self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,
-                                  memory=self.memory, max_iterations=3, early_stopping_method="generate")
-
-    def add_tool(self, tools_list: list, **tools_kwargs):
-        """todo: I think there have better way to implement"""
-        if not tools_list:
-            LOG.info("no tool to add")
-            return
-
-        map(self.tools.add, tools_list)
-        for tool_key in tools_kwargs:
-            self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
-
-        try:
-            new_tools_list = load_tools(list(self.tools), get_all_tool_dict, **self.tools_kwargs)
-        except ValueError as e:
-            LOG.error(str(e))
-            raise RuntimeError("tool初始化失败")
-
-        # loading tools from config.
-        LOG.info(f"add_tool {self.get_class_name()} success, "
-                 f"use_tools={new_tools_list}, params: {str(self.tools_kwargs)}")
-
-        # create bots
-        self.bot = initialize_bot(new_tools_list, self.llm, bot="chat-bot", verbose=True,
-                                  memory=self.memory, max_iterations=2, early_stopping_method="generate")
+                                  memory=self.memory, max_iterations=10, early_stopping_method="generate")
 
     def ask(self, query: str, chat_history: list = None, retry_num: int = 0) -> str:
         if self.bot is None:
@@ -111,6 +87,6 @@ class Victorinox(App):
 
 
 if __name__ == "__main__":
-    bot = load_app(tools_list=["wikipedia"])
+    bot = AppFactory().create_app("auto", tools_list=["wikipedia"])
     content = bot.ask("")
     print(content)

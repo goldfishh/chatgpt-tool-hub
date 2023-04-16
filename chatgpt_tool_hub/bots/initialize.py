@@ -2,7 +2,7 @@
 from typing import Any, Optional, Sequence
 
 from chatgpt_tool_hub.bots.all_bot_list import BOT_TO_CLASS
-from chatgpt_tool_hub.bots.bot_executor import BotExecutor
+from chatgpt_tool_hub.engine import ToolEngine
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.callbacks import get_callback_manager
 from chatgpt_tool_hub.models.base import BaseLanguageModel
@@ -16,7 +16,7 @@ def initialize_bot(
     callback_manager: Optional[BaseCallbackManager] = get_callback_manager(),
     bot_kwargs: Optional[dict] = None,
     **kwargs: Any,
-) -> BotExecutor:
+) -> ToolEngine:
     """Load an bot executor given tools and LLM.
 
     Args:
@@ -51,7 +51,7 @@ def initialize_bot(
         llm, tools, callback_manager=callback_manager, **bot_kwargs
     )
 
-    return BotExecutor.from_bot_and_tools(
+    return ToolEngine.from_bot_and_tools(
         bot=bot_obj,
         tools=tools,
         callback_manager=callback_manager,

@@ -21,9 +21,9 @@ def filter_text(html: str) -> str:
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
+
     # compress text size
-    # todo gpt-index
-    text = text[:500]
+    # text = text[:500]
 
     return text.encode('utf-8').decode()
 
