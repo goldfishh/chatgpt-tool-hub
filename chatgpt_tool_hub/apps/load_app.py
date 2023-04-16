@@ -1,9 +1,10 @@
 import logging
 
 from chatgpt_tool_hub.apps.app import App
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
+from chatgpt_tool_hub.tools import dynamic_tool_loader
 
 
 def init_env(**kwargs):
@@ -22,6 +23,8 @@ def init_env(**kwargs):
         default_tools_list = []
     else:
         default_tools_list = ["python", "url-get", "terminal", "meteo-weather"]
+    # dynamic loading tool
+    dynamic_tool_loader()
 
 
 def load_app(app_type: str = 'victorinox', tools_list: list = None, **kwargs) -> App:

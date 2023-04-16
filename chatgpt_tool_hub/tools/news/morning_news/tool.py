@@ -1,6 +1,4 @@
-from typing import Any, Dict
-
-from pydantic import root_validator
+from typing import Any
 
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.log import LOG
@@ -29,22 +27,16 @@ class MorningNewsTool(BaseTool):
         # 这个工具直接返回内容
         super().__init__(return_direct=True, **tool_kwargs)
 
+        self.zaobao_api_key = get_from_dict_or_env(
+            tool_kwargs, "zaobao_api_key", "ZAOBAO_API_KEY"
+        )
+
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
         prompt = PromptTemplate(
             input_variables=["morning_news"],
             template=SUMMARY_DOCS,
         )
         self.bot = LLMChain(llm=llm, prompt=prompt)
-
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that api key and python package exists in environment."""
-        zaobao_api_key = get_from_dict_or_env(
-            values, "zaobao_api_key", "ZAOBAO_API_KEY"
-        )
-        values["zaobao_api_key"] = zaobao_api_key
-
-        return values
 
     def _run(self, query: str) -> str:
         """Use the tool."""

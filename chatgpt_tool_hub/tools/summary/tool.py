@@ -8,6 +8,7 @@ from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
+from chatgpt_tool_hub.tools.all_tool_list import register_tool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.summary import MAP_PROMPT, REDUCE_PROMPT
 
@@ -154,6 +155,9 @@ class SummaryTool(BaseTool):
     async def _arun(self, file_path: str) -> str:
         """use this tool async."""
         raise NotImplementedError("summary tool not support async yet")
+
+
+register_tool(default_tool_name, lambda kwargs: SummaryTool(**kwargs), [])
 
 
 if __name__ == "__main__":
