@@ -4,8 +4,8 @@ from chatgpt_tool_hub.common.log import LOG
 
 
 class ToolRegister:
-
-    REGISTER_TOOLS = dict()
+    def __init__(self):
+        self.REGISTER_TOOLS = dict()
 
     def register_tool(self, name: str, function: callable, tool_input_keys: list):
         self.REGISTER_TOOLS[name] = (function, tool_input_keys)

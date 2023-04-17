@@ -27,21 +27,10 @@ class FinanceNewsTool(BaseTool):
         super().__init__(return_direct=True, **tool_kwargs)
 
     def _run(self, tool_input: str) -> str:
-        # browser
+        """ finance-news 仅仅是一个 browser tool 的封装吗？ """
         _response = BrowserTool(requests_wrapper=RequestsWrapper()).run(self.jin10_url)
 
-        # create temp file
-        temp_file = tempfile.mkstemp()
-        file_path = temp_file[1]
-        # LOG.debug(f"temp_file_path: {file_path}")
-
-        with open(file_path, "w") as f:
-            f.write(_response + "\n")
-        # summary
-        _summary = SummaryTool().run(str(file_path) + ", 0")
-
-        os.remove(file_path)
-        return _summary
+        return _response
 
     async def _arun(self, tool_input: str) -> str:
         pass

@@ -1,11 +1,15 @@
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.arxiv_search.wrapper import ArxivAPIWrapper
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 
-class ArxivTool(BaseTool):
-    """ a tool to call arxiv api: """
+default_tool_name = "arxiv"
 
-    name = "arxiv"
+
+class ArxivTool(BaseTool):
+    """ a tool to call arxiv api """
+
+    name = default_tool_name
     description = (
         "Useful for when you need to answer questions about scientific research or search for papers "
         "Like: which papers has a certain author published? what are some papers in a specific field? "
@@ -30,6 +34,9 @@ class ArxivTool(BaseTool):
     async def _arun(self, query: str) -> str:
         """Use the Arxiv tool asynchronously."""
         raise NotImplementedError("ArxivTool does not support async")
+
+
+main_tool_register.register_tool(default_tool_name, lambda kwargs: ArxivTool(**kwargs), [])
 
 
 if __name__ == "__main__":

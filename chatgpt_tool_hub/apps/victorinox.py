@@ -1,12 +1,11 @@
-from chatgpt_tool_hub.apps.app import App
-from chatgpt_tool_hub.apps.load_app import load_app
+from chatgpt_tool_hub.apps import App
+from chatgpt_tool_hub.apps import AppFactory
 from chatgpt_tool_hub.bots import initialize_bot
-from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.database import ConversationTokenBufferMemory
+from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.load_tools import load_tools
-from chatgpt_tool_hub.tools.all_tool_list import get_all_tool_dict
 
 
 class Victorinox(App):
@@ -31,7 +30,7 @@ class Victorinox(App):
         self.tools_kwargs = tools_kwargs
 
         try:
-            tools = load_tools(tools_list, get_all_tool_dict, **tools_kwargs)
+            tools = load_tools(tools_list, **tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
             raise RuntimeError("tool初始化失败")
@@ -55,7 +54,7 @@ class Victorinox(App):
             self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
 
         try:
-            new_tools_list = load_tools(list(self.tools), get_all_tool_dict, **self.tools_kwargs)
+            new_tools_list = load_tools(list(self.tools), **self.tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
             raise RuntimeError("tool初始化失败")
@@ -111,6 +110,6 @@ class Victorinox(App):
 
 
 if __name__ == "__main__":
-    bot = load_app(tools_list=["wikipedia"])
+    bot = AppFactory.create_app(tools_list=["wikipedia"])
     content = bot.ask("")
     print(content)

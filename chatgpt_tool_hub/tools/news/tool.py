@@ -5,7 +5,8 @@ from chatgpt_tool_hub.bots.chat_bot.base import ChatBot
 from chatgpt_tool_hub.engine import ToolEngine
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.load_tools import load_tools
 from chatgpt_tool_hub.tools.news import news_tool_register
@@ -19,13 +20,12 @@ class NewsTool(BaseTool):
         "Use this when you want to get information about current news stories. "
         "This tool has sub-tools that are used to obtain financial news, daily morning reports and other news."
         "The input should be a question in natural language that this API can answer."
-        "The tool can only use once!"
     )
     bot: ToolEngine = Any
 
     def __init__(self, **tool_kwargs: Any):
         # 这个工具直接返回内容
-        super().__init__(return_direct=True)
+        super().__init__(return_direct=False)
 
         tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register.get_registered_tool, **tool_kwargs)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
@@ -49,4 +49,4 @@ class NewsTool(BaseTool):
         raise NotImplementedError("NewsTool does not support async")
 
 
-register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), ["news_api_key", "zaobao_api_key"])
+main_tool_register.register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), ["news_api_key", "zaobao_api_key"])

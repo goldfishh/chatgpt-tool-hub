@@ -2,7 +2,7 @@
 import json
 from typing import Dict, List
 
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel, Extra, validator, root_validator
 
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env

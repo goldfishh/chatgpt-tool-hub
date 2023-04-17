@@ -5,12 +5,12 @@ from typing import Optional
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.all_tool_list import get_all_tool_dict
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 
 
 def load_tools(
     tool_names: List[str],
-    get_tool_list: Callable = get_all_tool_dict,
+    get_tool_list: Callable = main_tool_register.get_registered_tool,
     callback_manager: Optional[BaseCallbackManager] = None,
     check_tool_params: bool = False,
     **kwargs: Any,
@@ -54,9 +54,9 @@ def load_tools(
 
 
 def crop_tools(tools: List[BaseTool]) -> List[BaseTool]:
-    if len(tools) > 8:
-        LOG.warning(f"get too many tools, tools after {tools[8].name} will be ignored...")
-        return tools[:8]
+    if len(tools) > 10:
+        LOG.warning(f"get too many tools, tools after {tools[10].name} will be ignored...")
+        return tools[:10]
     # todo: 检查description是否超出限制
     for tool in tools:
         pass

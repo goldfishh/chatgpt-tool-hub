@@ -1,9 +1,9 @@
 """Tool for the Bing search API."""
 
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.bing_search.wrapper import BingSearchAPIWrapper
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 
+from chatgpt_tool_hub.tools.base_tool import BaseTool
+from chatgpt_tool_hub.tools.bing_search import BingSearchAPIWrapper
 
 default_tool_name = "bing-search"
 
@@ -32,5 +32,6 @@ class BingSearch(BaseTool):
         raise NotImplementedError("BingSearch does not support async")
 
 
-register_tool(default_tool_name, lambda kwargs: BingSearch(api_wrapper=BingSearchAPIWrapper(**kwargs)),
-              tool_input_keys=["bing_subscription_key"])
+main_tool_register.register_tool(default_tool_name,
+                                 lambda kwargs: BingSearch(api_wrapper=BingSearchAPIWrapper(**kwargs)),
+                                 tool_input_keys=["bing_subscription_key"])

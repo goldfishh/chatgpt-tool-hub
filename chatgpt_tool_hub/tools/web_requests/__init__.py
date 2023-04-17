@@ -1,9 +1,13 @@
 """Tools for making requests to an API endpoint."""
 import json
+import os
+import tempfile
 from typing import Any, Dict
 
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
+
+from chatgpt_tool_hub.tools import SummaryTool
 
 
 def filter_text(html: str) -> str:
@@ -23,10 +27,15 @@ def filter_text(html: str) -> str:
     text = '\n'.join(chunk for chunk in chunks if chunk)
 
     # compress text size
-    # todo summary it
-    text = text[:800]
+    temp_file = tempfile.mkstemp()
+    file_path = temp_file[1]
 
-    return text.encode('utf-8').decode()
+    with open(file_path, "w") as f:
+        f.write(text + "\n")
+    _summary = SummaryTool().run(str(file_path) + ", 0")
+    os.remove(file_path)
+
+    return _summary.encode('utf-8').decode()
 
 
 def _parse_input(text: str) -> Dict[str, Any]:
@@ -55,7 +64,9 @@ from chatgpt_tool_hub.tools.web_requests.patch import RequestsPatchTool
 from chatgpt_tool_hub.tools.web_requests.post import RequestsPostTool
 from chatgpt_tool_hub.tools.web_requests.put import RequestsPutTool
 
+
 __all__ = (
+    "BrowserTool",
     "BaseRequestsTool",
     "RequestsWrapper",
     "RequestsDeleteTool",

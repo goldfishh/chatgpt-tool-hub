@@ -6,7 +6,8 @@ from typing import List, Union
 from pydantic import Field
 
 from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 default_tool_name = "terminal"
@@ -112,7 +113,7 @@ class TerminalTool(BaseTool):
         raise NotImplementedError("[Terminal] does not support async")
 
 
-register_tool(default_tool_name, lambda _: TerminalTool(), [])
+main_tool_register.register_tool(default_tool_name, lambda _: TerminalTool(), [])
 
 
 if __name__ == "__main__":

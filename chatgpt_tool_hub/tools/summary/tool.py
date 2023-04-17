@@ -8,7 +8,8 @@ from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.summary import MAP_PROMPT, REDUCE_PROMPT
 
@@ -33,7 +34,7 @@ class TextClipper:
         clip_list = []
         while _iter < len(_cut_index) - 1:
             # todo: some words or sentences may be split in two parts
-            _clip_text = text[_cut_index[_iter]:_cut_index[_iter+1]]
+            _clip_text = text[_cut_index[_iter]:_cut_index[_iter + 1]]
             _cut_token_num = get_token_num(_clip_text)
             if _cut_token_num <= self.max_segment_length:
                 clip_list.append(_clip_text)
@@ -82,9 +83,14 @@ default_tool_name = "summary"
 
 
 class SummaryTool(BaseTool):
-
     name = default_tool_name
-    description = "input file_path, message_num"
+    description = (
+        "Useful when you want to summarize the content of a file. "
+        "The input is a comma-separated of file_path and a number. "
+        "The number represents summarizing only the first N lines of the file, "
+        "and when the number is 0, it means summarizing the entire file. "
+        "If you don't know what the file path is, you cannot use this tool."
+    )
 
     message_num: int = 100
     max_segment_length: int = 2500
@@ -115,11 +121,13 @@ class SummaryTool(BaseTool):
         try:
             file_path, message_num = tool_input.split(",", 1)
         except Exception as e:
-            LOG.error(e)
-            return "failing in parsing the input of SummaryTool, " \
-                   "you should use a comma to split file_path and message_num"
+            LOG.error("[summary] failing in parsing the input of SummaryTool, "
+                      "you should use a comma to split file_path and message_num"
+                      f"input: {tool_input}, error: {repr(e)}")
+            file_path = tool_input
+            message_num = self.message_num
 
-        if not os.path.isfile(file_path):
+        if not os.path.isfile(file_path.split(",")[0]):
             return f"no file in path: {file_path}, please double-check you file path is valid"
 
         try:
@@ -135,20 +143,20 @@ class SummaryTool(BaseTool):
         ctn = 0
         while get_token_num(_text) >= self.max_segment_length:
             ctn += 1
+            if ctn > 8:
+                LOG.warning(f"[summary] 我已经map-reduce {ctn}轮了，但是文本量还是很长，避免死循环我帮你关掉了~")
             # map
             _clip_text_list = _clipper.clip(_text, self.message_num)
             # async call llm to get summary of each clip_text
             map_text_list = asyncio.run(self._acall(self.map_bot, _clip_text_list))
             map_text = _clipper.seperator.join(map_text_list)
-            LOG.debug(f"round:{ctn}, map_list: {map_text}")
-            print(f"{map_text_list}")
+            LOG.debug(f"[summary] round:{ctn}, map_list: {map_text}")
             # reduce
             _clip_summary_list = _clipper.clip(map_text, self.message_num)
 
             reduce_text_list = asyncio.run(self._acall(self.reduce_bot, _clip_summary_list))
             reduce_text = _clipper.seperator.join(reduce_text_list)
-            LOG.debug(f"round:{ctn}, reduce_list: {reduce_text}")
-            print(f"{reduce_text_list}")
+            LOG.debug(f"[summary] round:{ctn}, reduce_list: {reduce_text}")
             _text = reduce_text
         return _text
 
@@ -157,8 +165,7 @@ class SummaryTool(BaseTool):
         raise NotImplementedError("summary tool not support async yet")
 
 
-register_tool(default_tool_name, lambda kwargs: SummaryTool(**kwargs), [])
-
+main_tool_register.register_tool(default_tool_name, lambda kwargs: SummaryTool(**kwargs), [])
 
 if __name__ == "__main__":
     tool = SummaryTool(**{})

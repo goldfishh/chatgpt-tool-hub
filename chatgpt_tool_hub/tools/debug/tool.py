@@ -2,7 +2,7 @@ from typing import Callable
 
 from pydantic import Field
 
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 default_tool_name = "debug"
@@ -35,4 +35,4 @@ class DebugTool(BaseTool):
         raise NotImplementedError("DebugTool does not support async")
 
 
-register_tool(default_tool_name, lambda _: DebugTool(), [])
+main_tool_register.register_tool(default_tool_name, lambda _: DebugTool(), [])

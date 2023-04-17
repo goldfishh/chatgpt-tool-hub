@@ -2,7 +2,8 @@
 
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.wolfram_alpha.wrapper import WolframAlphaAPIWrapper
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+
 
 
 default_tool_name = "wolfram-alpha"
@@ -28,5 +29,5 @@ class WolframAlphaTool(BaseTool):
         raise NotImplementedError("WolframAlphaTool does not support async")
 
 
-register_tool(default_tool_name, lambda kwargs: WolframAlphaTool(api_wrapper=WolframAlphaAPIWrapper(**kwargs)),
+main_tool_register.register_tool(default_tool_name, lambda kwargs: WolframAlphaTool(api_wrapper=WolframAlphaAPIWrapper(**kwargs)),
               tool_input_keys=["wolfram_alpha_appid"])

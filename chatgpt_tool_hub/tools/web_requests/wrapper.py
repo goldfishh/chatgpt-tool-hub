@@ -11,7 +11,7 @@ from chatgpt_tool_hub.tools.web_requests import DEFAULT_HEADER
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-browser: Any = None  # PhantomJSWebDriver or None
+browser: Any = None  # ChromeWebDriver or None
 
 
 class RequestsWrapper(BaseModel):
@@ -67,19 +67,28 @@ class RequestsWrapper(BaseModel):
         )
 
         # todo 设置代理
-
         return browser
 
     def get(self, url: str, use_browser: bool = False, params: Dict[str, Any] = None, raise_for_status: bool = False, **kwargs) -> str:
         """GET the URL and return the text."""
         if browser and use_browser:
+            from selenium.webdriver.support.wait import WebDriverWait
+            from selenium.webdriver.support import expected_conditions as EC
+            from selenium.webdriver.common.by import By
 
             # Network.setExtraHTTPHeaders command to the browser's DevTools.
             # This method allows setting multiple headers at once.
-            browser.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": self.headers})
+            # browser.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": self.headers})
 
             browser.get(url)
-            _content = browser.page_source
+
+            WebDriverWait(browser, 10).until(
+                EC.presence_of_element_located((By.TAG_NAME, "body"))
+            )
+
+            # Get the HTML content directly from the browser's DOM
+            _content = browser.execute_script("return document.body.outerHTML;")
+
             # todo raise_for_status?
             browser.close()  # 退出当前页面, 节省内存
             return _content

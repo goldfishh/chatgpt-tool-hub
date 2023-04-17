@@ -1,7 +1,7 @@
 import json
 import sys
 
-from chatgpt_tool_hub.apps.app_factory import AppFactory
+from chatgpt_tool_hub.apps import AppFactory
 from chatgpt_tool_hub.common.log import LOG
 
 if __name__ == "__main__":

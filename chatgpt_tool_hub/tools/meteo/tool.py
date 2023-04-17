@@ -3,9 +3,10 @@ from datetime import datetime
 from chatgpt_tool_hub.chains.api import APIChain
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.meteo.api_docs_prompts import OPEN_METEO_DOCS
+from chatgpt_tool_hub.tools.meteo.docs_prompt import OPEN_METEO_DOCS
 
 default_tool_name = "meteo-weather"
 
@@ -40,4 +41,4 @@ class MeteoWeatherTool(BaseTool):
         raise NotImplementedError("MeteoWeatherTool does not support async")
 
 
-register_tool(default_tool_name, lambda kwargs: MeteoWeatherTool(**kwargs), [])
+main_tool_register.register_tool(default_tool_name, lambda kwargs: MeteoWeatherTool(**kwargs), [])

@@ -1,11 +1,11 @@
 """Tool for the Wikipedia API."""
 
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.wikipedia.wrapper import WikipediaAPIWrapper
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
-
 
 default_tool_name = "wikipedia"
+
 
 class WikipediaTool(BaseTool):
     """Tool that adds the capability to search using the Wikipedia API."""
@@ -27,4 +27,4 @@ class WikipediaTool(BaseTool):
         raise NotImplementedError("WikipediaQueryRun does not support async")
 
 
-register_tool(default_tool_name, lambda kwargs: WikipediaTool(api_wrapper=WikipediaAPIWrapper(**kwargs)), [])
+main_tool_register.register_tool(default_tool_name, lambda kwargs: WikipediaTool(api_wrapper=WikipediaAPIWrapper(**kwargs)), [])

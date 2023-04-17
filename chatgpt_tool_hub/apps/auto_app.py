@@ -1,12 +1,11 @@
-from chatgpt_tool_hub.apps.app import App
-from chatgpt_tool_hub.apps.app_factory import AppFactory
+from chatgpt_tool_hub.apps import App
+from chatgpt_tool_hub.apps import AppFactory
 from chatgpt_tool_hub.bots import initialize_bot
 from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.database import ConversationTokenBufferMemory
 from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.load_tools import load_tools
-from chatgpt_tool_hub.tools.all_tool_list import get_all_tool_dict
 
 
 class AutoApp(App):
@@ -31,7 +30,7 @@ class AutoApp(App):
         self.tools_kwargs = tools_kwargs
 
         try:
-            tools = load_tools(tools_list, get_all_tool_dict, **tools_kwargs)
+            tools = load_tools(tools_list, **tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
             raise RuntimeError("tool初始化失败")

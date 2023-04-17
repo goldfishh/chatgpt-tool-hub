@@ -1,10 +1,11 @@
 import logging
 
-from chatgpt_tool_hub.apps.app import App
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
+from chatgpt_tool_hub.apps import App
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.tools import dynamic_tool_loader
+
 
 class AppFactory:
     def __init__(self):
@@ -25,7 +26,7 @@ class AppFactory:
         if no_default_flag:
             self.default_tools_list = []
         else:
-            self.default_tools_list = ["python", "url-get", "terminal", "meteo-weather"]
+            self.default_tools_list = ["python", "browser", "terminal", "meteo-weather", "news"]
 
         # dynamic loading tool
         dynamic_tool_loader()
