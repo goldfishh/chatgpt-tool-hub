@@ -3,9 +3,10 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Extra, root_validator
 
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.tools.web_requests import filter_text
+
 
 class GoogleSearchAPIWrapper(BaseModel):
     """Wrapper for Google Search API."""
@@ -18,7 +19,7 @@ class GoogleSearchAPIWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = Extra.ignore
 
     def _google_search_results(self, search_term: str, **kwargs: Any) -> List[dict]:
         res = (

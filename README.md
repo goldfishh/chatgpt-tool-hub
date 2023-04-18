@@ -104,11 +104,11 @@ git clone git@github.com:goldfishh/chatgpt-tool-hub.git
 
 ```python
 import os
-from chatgpt_tool_hub.apps import load_app
-os.environ["OPENAI_API_KEY"] = YOUR_OPENAI_API_KEY
-os.environ["PROXY"] = "http://192.168.7.1:7890"
-app = load_app()
-reply = app.ask(YOUR_QUESTION_TO_HERE)
+from chatgpt_tool_hub.apps import AppFactory
+os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"
+os.environ["PROXY"] = "YOUR_PROXY_ADDRESS"
+app = AppFactory().create_app()
+reply = app.ask("YOUR_QUESTION_TO_HERE")
 print(reply)
 ```
   

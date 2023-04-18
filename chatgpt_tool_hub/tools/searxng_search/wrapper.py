@@ -220,7 +220,7 @@ class SearxSearchWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = Extra.ignore
 
     def _searx_api_query(self, params: dict) -> SearxResults:
         """Actual request to searx API."""

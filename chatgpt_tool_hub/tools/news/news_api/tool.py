@@ -4,14 +4,14 @@ from chatgpt_tool_hub.chains.api import APIChain
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.news.api_docs_prompts import NEWS_DOCS
+from chatgpt_tool_hub.tools.news import news_tool_register
+from chatgpt_tool_hub.tools.news.news_api.docs_prompts import NEWS_DOCS
 
-default_tool_name = "news"
+default_tool_name = "news-api"
 
 
-class NewsTool(BaseTool):
+class NewsApiTool(BaseTool):
     name: str = default_tool_name
     description: str = (
         "Use this when you want to get information about the top headlines of current news stories. "
@@ -44,4 +44,4 @@ class NewsTool(BaseTool):
         raise NotImplementedError("NewsTool does not support async")
 
 
-register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), ["news_api_key"])
+news_tool_register.register_tool(default_tool_name, lambda kwargs: NewsApiTool(**kwargs), ["news_api_key"])

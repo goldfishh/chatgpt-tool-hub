@@ -2,7 +2,7 @@
 import json
 from typing import Dict, List
 
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel, Extra, validator, root_validator
 
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
@@ -20,7 +20,7 @@ class BingSearchAPIWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = Extra.ignore
 
     def _bing_search_results(self, search_term: str, count: int) -> List[dict]:
         headers = {"Ocp-Apim-Subscription-Key": self.bing_subscription_key}
@@ -30,7 +30,7 @@ class BingSearchAPIWrapper(BaseModel):
             "textDecorations": True,
             "textFormat": "HTML",
         }
-        response = RequestsWrapper(headers=headers).get(self.bing_search_url, params, raise_for_status=True)
+        response = RequestsWrapper(headers=headers).get(self.bing_search_url, params=params, raise_for_status=True)
 
         search_results = json.loads(response)
         try:

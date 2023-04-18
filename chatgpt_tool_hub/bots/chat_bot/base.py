@@ -4,14 +4,14 @@ from __future__ import annotations
 import re
 from typing import Any, List, Optional, Sequence, Tuple
 
-from chatgpt_tool_hub.bots.bot import Bot
 from chatgpt_tool_hub.bots.chat_bot.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
+from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.engine import Bot
 from chatgpt_tool_hub.models.base import BaseLLM
 from chatgpt_tool_hub.prompts import PromptTemplate
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.common.log import LOG
 
 
 class ChatBot(Bot):
@@ -41,7 +41,6 @@ class ChatBot(Bot):
                  f"You just told me: {text}, but it doesn't meet the format I mentioned to you. \n\n"
                  f"format: {instruction_text}. \n\n"
                  "You should understand why you did not input the correct format, correct it and try again. \n\n")
-        LOG.debug("(fix_text): fix_text: " + repr(_text))
         return _text
 
     @property
@@ -87,7 +86,6 @@ class ChatBot(Bot):
             input_variables = ["input", "chat_history", "bot_scratchpad"]
         prompt = PromptTemplate(template=template, input_variables=input_variables)
 
-        LOG.debug("\nprompt: " + str(prompt) + "\n")
         return prompt
 
     @property

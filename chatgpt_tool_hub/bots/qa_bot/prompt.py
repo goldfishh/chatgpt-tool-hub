@@ -12,4 +12,9 @@ Final Answer: the final answer to the original input question in chinese"""
 SUFFIX = """Begin!
 
 Question: {input}
-Thought:{bot_scratchpad}"""
+Thought:{bot_scratchpad}
+
+You should try to retain as much information as possible that you know.
+Please note that the prefix "Final Answer: " is very important for me to parse your response, remember to add this prefix.
+Don't make up you response.
+"""

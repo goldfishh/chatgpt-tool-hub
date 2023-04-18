@@ -1,5 +1,4 @@
 """Base implementation for tools."""
-
 from abc import abstractmethod
 from typing import Any, Optional
 

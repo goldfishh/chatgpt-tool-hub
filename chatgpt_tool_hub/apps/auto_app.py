@@ -9,7 +9,7 @@ from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.load_tools import load_tools
 
 
-class Victorinox(App):
+class AutoApp(App):
     def __init__(self, **app_kwargs):
         super().__init__()
         if not self.init_flag:
@@ -38,35 +38,12 @@ class Victorinox(App):
             raise RuntimeError("tool初始化失败")
 
         # loading tools from config.
-        LOG.info(f"use_tools={list(self.tools)}, params: {str(tools_kwargs)}")
+        LOG.info(f"Initializing {self.get_class_name()} success, "
+                 f"use_tools={list(self.tools)}, params: {str(tools_kwargs)}")
 
         # create bots
         self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,
-                                  memory=self.memory, max_iterations=3, early_stopping_method="generate")
-
-    def add_tool(self, tools_list: list, **tools_kwargs):
-        """todo: I think there have better way to implement"""
-        if not tools_list:
-            LOG.info("no tool to add")
-            return
-
-        map(self.tools.add, tools_list)
-        for tool_key in tools_kwargs:
-            self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
-
-        try:
-            new_tools_list = load_tools(list(self.tools), main_tool_register, **tools_kwargs)
-        except ValueError as e:
-            LOG.error(str(e))
-            raise RuntimeError("tool初始化失败")
-
-        # loading tools from config.
-        LOG.info(f"add_tool {self.get_class_name()} success, "
-                 f"use_tools={new_tools_list}, params: {str(self.tools_kwargs)}")
-
-        # create bots
-        self.bot = initialize_bot(new_tools_list, self.llm, bot="chat-bot", verbose=True,
-                                  memory=self.memory, max_iterations=2, early_stopping_method="generate")
+                                  memory=self.memory, max_iterations=10, early_stopping_method="generate")
 
     def ask(self, query: str, chat_history: list = None, retry_num: int = 0) -> str:
         if self.bot is None:
@@ -82,7 +59,6 @@ class Victorinox(App):
             self._refresh_memory(chat_history)
 
         try:
-            LOG.info(f"提问: {query}")
             return self.bot.run(query)
         except Exception as e:
             LOG.error(f"[APP] catch a Exception: {str(e)}")
@@ -112,6 +88,6 @@ class Victorinox(App):
 
 
 if __name__ == "__main__":
-    bot = AppFactory().create_app(tools_list=["wikipedia"])
+    bot = AppFactory().create_app("auto", tools_list=["wikipedia"])
     content = bot.ask("")
     print(content)

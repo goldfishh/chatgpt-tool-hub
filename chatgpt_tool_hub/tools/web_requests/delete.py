@@ -6,8 +6,10 @@ class RequestsDeleteTool(BaseRequestsTool, BaseTool):
     """Tool for making a DELETE request to an API endpoint."""
 
     name = "requests_delete"
-    description = "A portal to the internet. Use this when you need to make a DELETE request to a URL. Input should " \
-                  "be a specific url, and the output will be the text response of the DELETE request."
+    description = (
+        "A portal to the internet. Use this when you need to make a DELETE request to a URL. Input should "
+        "be a specific url, and the output will be the text response of the DELETE request."
+    )
 
     def _run(self, url: str) -> str:
         """Run the tool."""

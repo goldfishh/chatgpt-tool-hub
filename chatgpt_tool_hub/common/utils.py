@@ -1,5 +1,7 @@
 """Generic utility functions."""
 import os
+import random
+import string
 from typing import Any, Dict, Optional
 
 
@@ -19,3 +21,8 @@ def get_from_dict_or_env(
             f" `{env_key}` which contains it, or pass"
             f"  `{key}` as a named parameter."
         )
+
+
+def generate_random_filename(figure_num: int = 10):
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for _ in range(figure_num))

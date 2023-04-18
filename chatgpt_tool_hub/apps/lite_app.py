@@ -1,5 +1,5 @@
-from chatgpt_tool_hub.apps.app import App
-from chatgpt_tool_hub.apps.load_app import load_app
+from chatgpt_tool_hub.apps import App
+from chatgpt_tool_hub.apps import AppFactory
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.models.model_factory import ModelFactory
@@ -51,6 +51,6 @@ class LiteApp(App):
 
 
 if __name__ == "__main__":
-    bot = load_app('lite', tools_list=["wikipedia"])
+    bot = AppFactory().create_app('lite', tools_list=["wikipedia"])
     response = bot.ask("")
     print(response)

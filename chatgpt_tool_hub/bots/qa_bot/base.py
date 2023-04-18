@@ -3,10 +3,11 @@ from __future__ import annotations
 import re
 from typing import Any, List, Optional, Sequence, Tuple
 
-from chatgpt_tool_hub.bots.bot import Bot
 from chatgpt_tool_hub.bots.qa_bot.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.chains import LLMChain
+from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
+from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.engine import Bot
 from chatgpt_tool_hub.models.base import BaseLLM
 from chatgpt_tool_hub.prompts import PromptTemplate
 from chatgpt_tool_hub.tools.base_tool import BaseTool
@@ -31,6 +32,18 @@ class QABot(Bot):
     def llm_prefix(self) -> str:
         """Prefix to append the llm call with."""
         return "Thought:"
+
+    def _fix_text(self, text: str) -> str:
+        if not self.allowed_tools:
+            tool_names = ""
+        else:
+            tool_names = ", ".join([tool for tool in self.allowed_tools])
+        instruction_text = FORMAT_INSTRUCTIONS.format(tool_names=tool_names)
+        _text = ("\n\n"
+                 f"You just told me: {text}, but it doesn't meet the format I mentioned to you. \n\n"
+                 f"format: {instruction_text}. \n\n"
+                 "You should understand why you did not input the correct format, correct it and try again. \n\n")
+        return _text
 
     @classmethod
     def create_prompt(
@@ -112,8 +125,10 @@ class QABot(Bot):
         regex = r"Action: (.*?)[\n]*Action Input: (.*)"
         match = re.search(regex, text, re.DOTALL)
         if not match:
-            raise ValueError(f"Could not parse LLM output: `{text}`")
-            # todo 这里可以直接返回
+            return None
+
         action = match.group(1).strip()
         action_input = match.group(2)
+        LOG.info(f"执行Tool: {action}中...")
+
         return action, action_input.strip(" ").strip('"')

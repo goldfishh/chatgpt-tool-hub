@@ -7,9 +7,9 @@ from typing import Dict, Optional
 from pydantic import Field, BaseModel
 
 from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 
+from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 default_tool_name = "python"
 
@@ -64,4 +64,4 @@ class PythonREPLTool(BaseTool):
         raise NotImplementedError("PythonReplTool does not support async")
 
 
-register_tool(default_tool_name, lambda _: PythonREPLTool(), [])
+main_tool_register.register_tool(default_tool_name, lambda _: PythonREPLTool(), [])

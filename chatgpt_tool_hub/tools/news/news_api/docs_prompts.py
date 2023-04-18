@@ -29,4 +29,6 @@ Response object
     content | string | The unformatted content of the article, where available. This is truncated to 200 chars.
 
 Use page size: 2
+The endpoint and prefix of the document are absolutely correct, and that other URL prefixes should not be fabricated.
+the url must not contain apiKey param
 """

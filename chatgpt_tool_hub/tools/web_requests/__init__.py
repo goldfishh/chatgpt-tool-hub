@@ -1,9 +1,13 @@
 """Tools for making requests to an API endpoint."""
 import json
+import os
+import tempfile
 from typing import Any, Dict
 
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
+
+from chatgpt_tool_hub.tools import SummaryTool
 
 
 def filter_text(html: str) -> str:
@@ -21,11 +25,17 @@ def filter_text(html: str) -> str:
     chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
-    # compress text size
-    # todo gpt-index
-    text = text[:500]
 
-    return text.encode('utf-8').decode()
+    # compress text size
+    temp_file = tempfile.mkstemp()
+    file_path = temp_file[1]
+
+    with open(file_path, "w") as f:
+        f.write(text + "\n")
+    _summary = SummaryTool().run(str(file_path) + ", 0")
+    os.remove(file_path)
+
+    return _summary.encode('utf-8').decode()
 
 
 def _parse_input(text: str) -> Dict[str, Any]:
@@ -34,7 +44,8 @@ def _parse_input(text: str) -> Dict[str, Any]:
 
 
 DEFAULT_HEADER = {
-    'User-Agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.100 Safari/537.36",
+    'User-Agent': "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/54.0.2840.100 Safari/537.36",
     "Accept-Encoding": "*"
 }
 
@@ -54,7 +65,9 @@ from chatgpt_tool_hub.tools.web_requests.patch import RequestsPatchTool
 from chatgpt_tool_hub.tools.web_requests.post import RequestsPostTool
 from chatgpt_tool_hub.tools.web_requests.put import RequestsPutTool
 
+
 __all__ = (
+    "BrowserTool",
     "BaseRequestsTool",
     "RequestsWrapper",
     "RequestsDeleteTool",

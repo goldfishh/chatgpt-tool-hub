@@ -2,17 +2,18 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, root_validator
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.bots.bot import Bot
+
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.input import get_color_mapping
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.schema import BotAction, BotFinish
+from chatgpt_tool_hub.engine import Bot
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.tool import InvalidTool
 
 
-class BotExecutor(Chain, BaseModel):
+class ToolEngine(Chain, BaseModel):
     """Consists of an bot using tools."""
 
     bot: Bot
@@ -134,7 +135,8 @@ class BotExecutor(Chain, BaseModel):
                 llm_prefix="",
                 observation_prefix=self.bot.observation_prefix,
             )
-        LOG.debug("llm received: `" + str(observation.strip()) + f"` from [{output.tool}]")
+            # todo news tool catch `<property object at 0x7fcea0d914f0>`
+        LOG.debug("llm received: `" + repr(observation.strip()) + f"` from [{output.tool}]")
         return output, observation
 
     def _call(self, inputs: Dict[str, str]) -> Dict[str, Any]:
@@ -152,7 +154,7 @@ class BotExecutor(Chain, BaseModel):
         iterations = 0
         # We now enter the bot loop (until it returns something).
         while self._should_continue(iterations):
-            LOG.debug("CoT 迭代次数: {}\n".format(str(iterations+1)))
+            # LOG.debug("CoT 迭代次数: {}\n".format(str(iterations+1)))
             next_step_output = self._take_next_step(
                 name_to_tool_map,
                 color_mapping,
@@ -161,6 +163,13 @@ class BotExecutor(Chain, BaseModel):
             if isinstance(next_step_output, BotFinish):
                 return self._return(next_step_output, intermediate_steps)
 
+            # todo test below
+            try:
+                action, observation = next_step_output
+                LOG.info(f"[{action.tool}]输出: {observation}")
+            except Exception as e:
+                LOG.debug(f"parsing next_step_output error: {repr(e)}")
+
             intermediate_steps.append(next_step_output)
             # See if tool should return directly
             tool_return = self._get_tool_return(next_step_output)
@@ -168,7 +177,7 @@ class BotExecutor(Chain, BaseModel):
                 return self._return(tool_return, intermediate_steps)
             iterations += 1
         output = self.bot.return_stopped_response(
-            self.early_stopping_method, intermediate_steps, **inputs
+            self.early_stopping_method, intermediate_steps, self.max_iterations, **inputs
         )
         return self._return(output, intermediate_steps)
 
@@ -216,7 +225,7 @@ class BotExecutor(Chain, BaseModel):
 
             iterations += 1
         output = self.bot.return_stopped_response(
-            self.early_stopping_method, intermediate_steps, **inputs
+            self.early_stopping_method, intermediate_steps, self.max_iterations, **inputs
         )
         return await self._areturn(output, intermediate_steps)
 

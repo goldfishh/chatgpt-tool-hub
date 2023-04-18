@@ -6,7 +6,8 @@ from transformers import BlipProcessor, BlipForConditionalGeneration
 
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.tools.all_tool_list import register_tool
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 default_tool_name = "image2text"
@@ -46,7 +47,7 @@ class ImageCaptionTool(BaseTool):
         raise NotImplementedError("ImageCaptioningTool does not support async")
 
 
-register_tool(default_tool_name, lambda kwargs: ImageCaptionTool(**kwargs), [])
+main_tool_register.register_tool(default_tool_name, lambda kwargs: ImageCaptionTool(**kwargs), [])
 
 
 if __name__ == "__main__":

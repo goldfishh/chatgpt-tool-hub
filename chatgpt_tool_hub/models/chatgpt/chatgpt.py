@@ -31,8 +31,8 @@ from chatgpt_tool_hub.models.chatgpt.base import BaseChatModel
 def _create_retry_decorator(llm: ChatOpenAI) -> Callable[[Any], Any]:
     import openai
 
-    min_seconds = 4
-    max_seconds = 10
+    min_seconds = 15
+    max_seconds = 30
     # Wait 2^x * 1 second between each retry starting with
     # 4 seconds, then up to 10 seconds, then 10 seconds afterwards
     return retry(
@@ -205,8 +205,8 @@ class ChatOpenAI(BaseChatModel, BaseModel):
     def _create_retry_decorator(self) -> Callable[[Any], Any]:
         import openai
 
-        min_seconds = 4
-        max_seconds = 10
+        min_seconds = 15
+        max_seconds = 30
         # Wait 2^x * 1 second between each retry starting with
         # 4 seconds, then up to 10 seconds, then 10 seconds afterwards
         return retry(
