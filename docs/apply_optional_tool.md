@@ -145,3 +145,25 @@ API限制
 ```
 
 --- 
+
+### 6. searxng-search
+
+该工具需要本地部署  
+教程URL: https://docs.searxng.org/admin/installation.html
+
+```json
+{
+  "tools": ["searxng-search"],
+  "kwargs": {
+      "openai_api_key": "",
+      "proxy": "",
+      "debug": false,
+      "no_default": false,
+      "model_name": "gpt-3.5-turbo",
+      "searx_host": "http://192.168.7.3:7780"  // sample key
+  }
+}
+```
+
+
+---

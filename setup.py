@@ -44,6 +44,8 @@ setup(
         'requests~=2.28.2',
         "google-api-python-client",
         "SQLAlchemy~=2.0.7",
+        "selenium",
+        "webdriver_manager",
     ],
     classifiers=[
         'Intended Audience :: Developers',

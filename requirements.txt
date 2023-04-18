@@ -11,6 +11,10 @@ pyopenssl
 # for save config
 pyyaml~=6.0
 
+# browser tool
+selenium
+webdriver_manager
+
 # for crop html
 beautifulsoup4~=4.12.0
 

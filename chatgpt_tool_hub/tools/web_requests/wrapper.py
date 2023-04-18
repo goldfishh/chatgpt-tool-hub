@@ -8,8 +8,6 @@ from pydantic import BaseModel, Extra, root_validator
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.tools.web_requests import DEFAULT_HEADER
-from webdriver_manager.chrome import ChromeDriverManager
-
 
 browser: Any = None  # ChromeWebDriver or None
 
