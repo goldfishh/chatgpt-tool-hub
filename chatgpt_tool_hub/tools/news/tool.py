@@ -25,13 +25,13 @@ class NewsTool(BaseTool):
 
     def __init__(self, **tool_kwargs: Any):
         # 这个工具直接返回内容
-        super().__init__(return_direct=False)
+        super().__init__(return_direct=True)
 
-        tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register.get_registered_tool, **tool_kwargs)
+        tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register, **tool_kwargs)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
 
         self.bot = initialize_bot(tools, llm, bot="qa-bot", verbose=True,
-                                  max_iterations=3, early_stopping_method="generate")
+                                  max_iterations=2, early_stopping_method="force")
 
     def _run(self, query: str) -> str:
         """Use the tool."""
@@ -49,4 +49,4 @@ class NewsTool(BaseTool):
         raise NotImplementedError("NewsTool does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), ["news_api_key", "zaobao_api_key"])
+main_tool_register.register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), [])

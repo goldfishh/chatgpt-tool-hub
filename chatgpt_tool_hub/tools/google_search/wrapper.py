@@ -19,7 +19,7 @@ class GoogleSearchAPIWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = Extra.ignore
 
     def _google_search_results(self, search_term: str, **kwargs: Any) -> List[dict]:
         res = (

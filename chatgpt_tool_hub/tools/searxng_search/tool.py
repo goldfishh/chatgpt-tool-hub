@@ -43,7 +43,7 @@ class SearxSearchJsonTool(BaseTool):
     class Config:
         """Pydantic config."""
 
-        extra = Extra.allow
+        extra = Extra.ignore
 
     def _run(self, query: str) -> str:
         """Use the tool."""

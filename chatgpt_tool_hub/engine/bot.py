@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
@@ -10,7 +12,7 @@ import yaml
 from pydantic import BaseModel, root_validator
 
 from chatgpt_tool_hub.chains import LLMChain
-from chatgpt_tool_hub.common.calculate_token import count_message_tokens
+from chatgpt_tool_hub.common.calculate_token import count_string_tokens
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.schema import BotAction, BotFinish, BaseMessage
@@ -18,6 +20,7 @@ from chatgpt_tool_hub.models import ALL_MAX_TOKENS_NUM, BOT_SCRATCHPAD_MAX_TOKEN
 from chatgpt_tool_hub.models.base import BaseLLM
 from chatgpt_tool_hub.prompts import BasePromptTemplate
 from chatgpt_tool_hub.prompts import PromptTemplate
+from chatgpt_tool_hub.tools import SummaryTool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 
@@ -67,16 +70,17 @@ class Bot(BaseModel):
             return inputs
         _input = inputs
 
-        while count_message_tokens([{"user": "assistant", "content": _input}]) >= BOT_SCRATCHPAD_MAX_TOKENS_NUM:
-            _input_list = _input.split("\n")
+        while count_string_tokens(_input) >= BOT_SCRATCHPAD_MAX_TOKENS_NUM:
 
-            # 单个长文本处理
-            if len(_input_list) <= 2 and _input_list[0].startswith(self.observation_prefix):
-                return _input_list[0][:BOT_SCRATCHPAD_MAX_TOKENS_NUM]
+            # compress text size
+            temp_file = tempfile.mkstemp()
+            file_path = temp_file[1]
 
-            _input = "\n".join(_input_list[1:])
-        # else:
-        #     LOG.debug("\nafter crop: " + str(_input))
+            with open(file_path, "w") as f:
+                f.write(_input + "\n")
+            _input = SummaryTool(max_segment_length=2000).run(str(file_path) + ", 0")
+            os.remove(file_path)
+
         return _input
 
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
@@ -84,7 +88,7 @@ class Bot(BaseModel):
         parsed_output = self._extract_tool_and_input(full_output)
 
         action_input = "None" if parsed_output is None else parsed_output[1]
-        LOG.info(f"行动输入: {action_input}")
+        LOG.info(f"输入: {action_input}")
         retry_num = 0
         while parsed_output is None:
             retry_num += 1
@@ -94,8 +98,7 @@ class Bot(BaseModel):
             full_output = self._fix_text(full_output)
             full_inputs["bot_scratchpad"] += full_output
             output = self.llm_chain.predict(**full_inputs)
-            LOG.debug("(fix_text): retry response: " + str(output))
-            # full_output += output
+            # LOG.debug("(fix_text): retry response: " + str(output))
             parsed_output = self._extract_tool_and_input(output)
         return BotAction(
             tool=parsed_output[0], tool_input=parsed_output[1], log=full_output
@@ -205,6 +208,7 @@ class Bot(BaseModel):
         self,
         early_stopping_method: str,
         intermediate_steps: List[Tuple[BotAction, str]],
+        max_iterations: int,
         **kwargs: Any,
     ) -> BotFinish:
         """Return response when bot has been stopped due to max iterations."""
@@ -221,8 +225,9 @@ class Bot(BaseModel):
                 )
             # Adding to the previous steps, we now tell the LLM to make a final pred
             thoughts += (
-                "\n\nI have exceeded the limit of tool usage and "
-                "now need to summarize all the information collected so far to generate a final answer:"
+                f"你超过了tool使用次数限制: 最多{max_iterations}次。"
+                "你现在需要总结当前你了解到的所有信息，来反馈给人类。"
+                "你需要生成一个final answer:"
             )
             new_inputs = {"bot_scratchpad": thoughts, "stop": self._stop}
             full_inputs = {**kwargs, **new_inputs}

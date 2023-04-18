@@ -5,6 +5,7 @@ from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.database import ConversationTokenBufferMemory
 from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.models.model_factory import ModelFactory
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.load_tools import load_tools
 
 
@@ -26,18 +27,18 @@ class Victorinox(App):
         if self.tools or self.tools_kwargs:
             LOG.warning("refresh the config of tools")
 
-        map(self.tools.add, tools_list)
+        for tool in tools_list:
+            self.tools.add(tool)
         self.tools_kwargs = tools_kwargs
 
         try:
-            tools = load_tools(tools_list, **tools_kwargs)
+            tools = load_tools(list(self.tools), main_tool_register, **tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
             raise RuntimeError("tool初始化失败")
 
         # loading tools from config.
-        LOG.info(f"Initializing {self.get_class_name()} success, "
-                 f"use_tools={tools_list}, params: {str(tools_kwargs)}")
+        LOG.info(f"use_tools={list(self.tools)}, params: {str(tools_kwargs)}")
 
         # create bots
         self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,
@@ -54,7 +55,7 @@ class Victorinox(App):
             self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
 
         try:
-            new_tools_list = load_tools(list(self.tools), **self.tools_kwargs)
+            new_tools_list = load_tools(list(self.tools), main_tool_register, **tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
             raise RuntimeError("tool初始化失败")
@@ -81,6 +82,7 @@ class Victorinox(App):
             self._refresh_memory(chat_history)
 
         try:
+            LOG.info(f"提问: {query}")
             return self.bot.run(query)
         except Exception as e:
             LOG.error(f"[APP] catch a Exception: {str(e)}")
@@ -110,6 +112,6 @@ class Victorinox(App):
 
 
 if __name__ == "__main__":
-    bot = AppFactory.create_app(tools_list=["wikipedia"])
+    bot = AppFactory().create_app(tools_list=["wikipedia"])
     content = bot.ask("")
     print(content)

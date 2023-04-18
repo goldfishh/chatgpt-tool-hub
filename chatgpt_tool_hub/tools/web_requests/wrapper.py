@@ -25,83 +25,34 @@ class RequestsWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = Extra.ignore
         arbitrary_types_allowed = True
 
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that browser param exists in environment."""
+        """get proxy param from environment."""
         proxy = get_from_dict_or_env(
             values, 'proxy', "PROXY", ""
         )
+        values["proxy"] = proxy
 
-        try:
-            from selenium import webdriver
-
-            global browser
-            if browser is None:
-                browser = cls._build_browser_option(proxy)
-        except ImportError:
-            raise ImportError(
-                "selenium is not installed. "
-                "Please install it with `pip install selenium==2.48.0`"
-            )
         return values
 
-    @classmethod
-    def _build_browser_option(cls, proxy: str = ""):
-        from selenium import webdriver
-        from selenium.webdriver.chrome.options import Options
-
-        options = Options()
-        options.add_argument(
-            "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.49 Safari/537.36"
-        )
-        options.add_argument("--headless")
-        options.add_argument("--disable-gpu")
-        options.add_argument("--disable-extensions")
-        options.add_argument("--ignore-certificate-errors")
-        options.add_argument("--no-sandbox")
-        browser = webdriver.Chrome(
-            executable_path=ChromeDriverManager().install(), options=options
-        )
-
-        # todo 设置代理
-        return browser
-
-    def get(self, url: str, use_browser: bool = False, params: Dict[str, Any] = None, raise_for_status: bool = False, **kwargs) -> str:
+    def get(self, url: str, params: Dict[str, Any] = None, raise_for_status: bool = False, **kwargs) -> str:
         """GET the URL and return the text."""
-        if browser and use_browser:
-            from selenium.webdriver.support.wait import WebDriverWait
-            from selenium.webdriver.support import expected_conditions as EC
-            from selenium.webdriver.common.by import By
+        self.headers.update(DEFAULT_HEADER)
+        proxies = {
+            'http': self.proxy,
+            'https': self.proxy,
+        }
+        response = requests.get(url, headers=self.headers, params=params, proxies=proxies, **kwargs)
+        if raise_for_status:
+            try:
+                response.raise_for_status()
+            except Exception as e:
+                LOG.error("RequestsWrapper.get status_code is not good: " + repr(e))
 
-            # Network.setExtraHTTPHeaders command to the browser's DevTools.
-            # This method allows setting multiple headers at once.
-            # browser.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": self.headers})
-
-            browser.get(url)
-
-            WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located((By.TAG_NAME, "body"))
-            )
-
-            # Get the HTML content directly from the browser's DOM
-            _content = browser.execute_script("return document.body.outerHTML;")
-
-            # todo raise_for_status?
-            browser.close()  # 退出当前页面, 节省内存
-            return _content
-        else:
-            self.headers.update(DEFAULT_HEADER)
-            response = requests.get(url, headers=self.headers, params=params, **kwargs)
-            if raise_for_status:
-                try:
-                    response.raise_for_status()
-                except Exception as e:
-                    LOG.error("RequestsWrapper.get status_code is not good: " + repr(e))
-
-            return response.text
+        return response.text
 
     def post(self, url: str, data: Dict[str, Any]) -> str:
         """POST to the URL and return the text."""

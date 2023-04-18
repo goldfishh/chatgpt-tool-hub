@@ -25,13 +25,9 @@ class MorningNewsTool(BaseTool):
 
     def __init__(self, **tool_kwargs: Any):
         # 这个工具直接返回内容
-        super().__init__(return_direct=True, **tool_kwargs)
-        try:
-            self.zaobao_api_key = get_from_dict_or_env(tool_kwargs, "zaobao_api_key", "ZAOBAO_API_KEY")
-        except Exception as e:
-            LOG.info(f"[news.{default_tool_name}] init failed error_info: " + repr(e))
-            news_tool_register.unregister_tool(default_tool_name)
-            return
+        super().__init__(return_direct=True)
+
+        self.zaobao_api_key = get_from_dict_or_env(tool_kwargs, "zaobao_api_key", "ZAOBAO_API_KEY")
 
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
         prompt = PromptTemplate(

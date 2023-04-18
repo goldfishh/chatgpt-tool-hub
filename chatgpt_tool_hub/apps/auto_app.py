@@ -1,10 +1,11 @@
 from chatgpt_tool_hub.apps import App
 from chatgpt_tool_hub.apps import AppFactory
 from chatgpt_tool_hub.bots import initialize_bot
-from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.database import ConversationTokenBufferMemory
+from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.models.model_factory import ModelFactory
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.load_tools import load_tools
 
 
@@ -26,18 +27,19 @@ class AutoApp(App):
         if self.tools or self.tools_kwargs:
             LOG.warning("refresh the config of tools")
 
-        map(self.tools.add, tools_list)
+        for tool in tools_list:
+            self.tools.add(tool)
         self.tools_kwargs = tools_kwargs
 
         try:
-            tools = load_tools(tools_list, **tools_kwargs)
+            tools = load_tools(list(self.tools), main_tool_register, **tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
             raise RuntimeError("tool初始化失败")
 
         # loading tools from config.
         LOG.info(f"Initializing {self.get_class_name()} success, "
-                 f"use_tools={tools_list}, params: {str(tools_kwargs)}")
+                 f"use_tools={list(self.tools)}, params: {str(tools_kwargs)}")
 
         # create bots
         self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,

@@ -33,6 +33,18 @@ class QABot(Bot):
         """Prefix to append the llm call with."""
         return "Thought:"
 
+    def _fix_text(self, text: str) -> str:
+        if not self.allowed_tools:
+            tool_names = ""
+        else:
+            tool_names = ", ".join([tool for tool in self.allowed_tools])
+        instruction_text = FORMAT_INSTRUCTIONS.format(tool_names=tool_names)
+        _text = ("\n\n"
+                 f"You just told me: {text}, but it doesn't meet the format I mentioned to you. \n\n"
+                 f"format: {instruction_text}. \n\n"
+                 "You should understand why you did not input the correct format, correct it and try again. \n\n")
+        return _text
+
     @classmethod
     def create_prompt(
         cls,

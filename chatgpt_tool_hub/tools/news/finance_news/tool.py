@@ -1,13 +1,10 @@
 import logging
-import os
-import tempfile
 from typing import Any
 
 from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools import BrowserTool, SummaryTool
+from chatgpt_tool_hub.tools import BrowserTool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.news import news_tool_register
-from chatgpt_tool_hub.tools.web_requests import RequestsWrapper
 
 default_tool_name = "finance-news"
 
@@ -24,11 +21,11 @@ class FinanceNewsTool(BaseTool):
     jin10_url: str = "https://www.jin10.com/example/jin10.com.html"
 
     def __init__(self, **tool_kwargs: Any):
-        super().__init__(return_direct=True, **tool_kwargs)
+        super().__init__(return_direct=True)
 
     def _run(self, tool_input: str) -> str:
         """ finance-news 仅仅是一个 browser tool 的封装吗？ """
-        _response = BrowserTool(requests_wrapper=RequestsWrapper()).run(self.jin10_url)
+        _response = BrowserTool().run(self.jin10_url)
 
         return _response
 

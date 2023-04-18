@@ -15,7 +15,7 @@ class WolframAlphaAPIWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = Extra.ignore
 
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:

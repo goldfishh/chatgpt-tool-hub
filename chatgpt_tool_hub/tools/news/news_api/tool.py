@@ -5,9 +5,9 @@ from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.news.news_api.docs_prompts import NEWS_DOCS
 from chatgpt_tool_hub.tools.news import news_tool_register
-from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.tools.news.news_api.docs_prompts import NEWS_DOCS
+
 default_tool_name = "news-api"
 
 
@@ -21,12 +21,8 @@ class NewsApiTool(BaseTool):
 
     def __init__(self, **tool_kwargs: Any):
         super().__init__()
-        try:
-            news_api_key = get_from_dict_or_env(tool_kwargs, "news_api_key", "NEWS_API_KEY")
-        except Exception as e:
-            LOG.info(f"[news.{default_tool_name}] init failed error_info: " + repr(e))
-            news_tool_register.unregister_tool(default_tool_name)
-            return
+
+        news_api_key = get_from_dict_or_env(tool_kwargs, "news_api_key", "NEWS_API_KEY")
 
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
 

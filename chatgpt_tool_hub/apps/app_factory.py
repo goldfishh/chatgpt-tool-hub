@@ -26,7 +26,7 @@ class AppFactory:
         if no_default_flag:
             self.default_tools_list = []
         else:
-            self.default_tools_list = ["python", "browser", "terminal", "meteo-weather", "news"]
+            self.default_tools_list = ["python", "terminal", "url-get", "meteo-weather", "news"]
 
         # dynamic loading tool
         dynamic_tool_loader()
@@ -48,6 +48,9 @@ class AppFactory:
             for default_tool in self.default_tools_list:
                 if default_tool not in tools_list:
                     tools_list.append(default_tool)
+            # todo refactor
+            if "browser" in tools_list:
+                tools_list = list(filter(lambda tool: tool != "url-get", tools_list))
 
             app = Victorinox(**build_model_params(kwargs))
             app.create(tools_list, **kwargs)

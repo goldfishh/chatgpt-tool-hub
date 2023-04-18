@@ -20,7 +20,7 @@ class BingSearchAPIWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = Extra.ignore
 
     def _bing_search_results(self, search_term: str, count: int) -> List[dict]:
         headers = {"Ocp-Apim-Subscription-Key": self.bing_subscription_key}
