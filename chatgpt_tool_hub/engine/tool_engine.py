@@ -136,7 +136,6 @@ class ToolEngine(Chain, BaseModel):
                 observation_prefix=self.bot.observation_prefix,
             )
             # todo news tool catch `<property object at 0x7fcea0d914f0>`
-        LOG.debug("llm received: `" + repr(observation.strip()) + f"` from [{output.tool}]")
         return output, observation
 
     def _call(self, inputs: Dict[str, str]) -> Dict[str, Any]:
@@ -166,7 +165,7 @@ class ToolEngine(Chain, BaseModel):
             # todo test below
             try:
                 action, observation = next_step_output
-                LOG.info(f"[{action.tool}]输出: {observation}")
+                LOG.info(f"我从[{action.tool}]中获得了一些信息：`" + repr(observation.strip()))
             except Exception as e:
                 LOG.debug(f"parsing next_step_output error: {repr(e)}")
 

@@ -1,7 +1,7 @@
+import json
 from typing import Any
 
 from chatgpt_tool_hub.chains import LLMChain
-from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
@@ -18,16 +18,18 @@ class MorningNewsTool(BaseTool):
     name: str = default_tool_name
     description: str = (
         "Use this tool when you want to get information about Daily 60 seconds morning news today. "
-        "input is None."
+        "no input."
     )
     bot: Any = None
     zaobao_api_key: str = ""
+    zaobao_use_llm: bool = False
 
     def __init__(self, **tool_kwargs: Any):
         # 这个工具直接返回内容
         super().__init__(return_direct=True)
 
         self.zaobao_api_key = get_from_dict_or_env(tool_kwargs, "zaobao_api_key", "ZAOBAO_API_KEY")
+        self.zaobao_use_llm = get_from_dict_or_env(tool_kwargs, "zaobao_use_llm", "ZAOBAO_USE_LLM", False)
 
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
         prompt = PromptTemplate(
@@ -43,8 +45,19 @@ class MorningNewsTool(BaseTool):
 
         morning_news_url = "https://v2.alapi.cn/api/zaobao?token={}&format={}".format(self.zaobao_api_key, "json")
         _response = RequestsWrapper().get(morning_news_url)
-        LOG.debug("[morning-news]: api-response: " + str(_response))
-        _return = self.bot.run(_response)
+        _response_json = json.loads(_response)
+        if self.zaobao_use_llm:
+            _return = self.bot.run(_response)
+        elif _response_json.get("code") == 200 or _response_json.get("msg") == "success":
+            # 不使用llm，表明人类具有先天的优越性
+            _return_data = _response_json.get('data', {})
+            _date = _return_data.get('date')
+            _news_content = "\n".join(_return_data.get("news"))
+            _weiyu = _return_data.get('weiyu')
+            _image_url = _return_data.get('image')
+            _return = f"\n今日日期：{_date}\n今日早报：{_news_content}\n今日微语：{_weiyu}\nURL: {_image_url}"
+        else:
+            _return = f"[{default_tool_name}] api error, error_info: {_response_json.get('msg')}"
         return _return
 
     async def _arun(self, query: str) -> str:
@@ -56,7 +69,7 @@ news_tool_register.register_tool(default_tool_name, lambda kwargs: MorningNewsTo
 
 
 if __name__ == "__main__":
-    tool = MorningNewsTool(zaobao_api_key="xx")
+    tool = MorningNewsTool(zaobao_api_key="", zaobao_use_llm=False)
     content = tool.run("给我发一下早报？")
     print(content)
 

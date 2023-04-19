@@ -7,6 +7,7 @@ from typing import Any, Dict
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools import SummaryTool
 
 
@@ -33,7 +34,10 @@ def filter_text(html: str) -> str:
     with open(file_path, "w") as f:
         f.write(text + "\n")
     _summary = SummaryTool().run(str(file_path) + ", 0")
-    os.remove(file_path)
+    try:
+        os.remove(file_path)
+    except Exception as e:
+        LOG.info(f"remove {file_path} failed... error_info: {repr(e)}")
 
     return _summary.encode('utf-8').decode()
 

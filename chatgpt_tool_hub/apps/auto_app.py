@@ -38,8 +38,7 @@ class AutoApp(App):
             raise RuntimeError("tool初始化失败")
 
         # loading tools from config.
-        LOG.info(f"Initializing {self.get_class_name()} success, "
-                 f"use_tools={list(self.tools)}, params: {str(tools_kwargs)}")
+        LOG.info(f"use_tools={[tool.name for tool in tools]}, params: {str(tools_kwargs)}")
 
         # create bots
         self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,

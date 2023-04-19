@@ -17,9 +17,9 @@ default_tool_name = "news"
 class NewsTool(BaseTool):
     name: str = default_tool_name
     description: str = (
-        "Use this when you want to get information about current news stories. "
-        "This tool has sub-tools that are used to obtain financial news, daily morning reports and other news."
-        "The input should be a question in natural language that this API can answer."
+        "Useful when you want to get information about current news stories, "
+        "such as financial news, daily morning reports and any other news. "
+        "The input should be a description of your needs in natural language."
     )
     bot: ToolEngine = Any
 

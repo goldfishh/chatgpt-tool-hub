@@ -79,7 +79,10 @@ class Bot(BaseModel):
             with open(file_path, "w") as f:
                 f.write(_input + "\n")
             _input = SummaryTool(max_segment_length=2000).run(str(file_path) + ", 0")
-            os.remove(file_path)
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                LOG.info(f"remove {file_path} failed... error_info: {repr(e)}")
 
         return _input
 
