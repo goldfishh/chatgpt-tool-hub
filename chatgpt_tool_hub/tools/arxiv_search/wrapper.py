@@ -1,8 +1,7 @@
+import json
 from typing import Any, Dict
 
 from pydantic import BaseModel, Extra, root_validator
-
-from chatgpt_tool_hub.common.log import LOG
 
 
 class ArxivAPIWrapper(BaseModel):
@@ -39,16 +38,40 @@ class ArxivAPIWrapper(BaseModel):
             )
         return values
 
-    def run(self, query: str) -> str:
+    def run(self, query_json_str: str) -> str:
         import arxiv
-        # todo avoid it in future
-        query = query.replace("'", "").replace("\"", "").replace("+", " ")
 
-        search = arxiv.Search(query=query, max_results=self.top_k_results)
+        query_json = json.loads(query_json_str)
+
+        search_query = query_json.get("search_query", "")
+        max_results = query_json.get("max_results", self.top_k_results)
+        sort_by = query_json.get("sort_by", "relevance")
+        sort_order = query_json.get("sort_order", "descending")
+
+        # todo avoid it in future
+        query = search_query.replace("'", "").replace("\"", "").replace("+", " ")
+
+        if sort_by == "lastUpdatedDate":
+            sort_by_input = arxiv.SortCriterion.LastUpdatedDate
+        elif sort_by == "submittedDate":
+            sort_by_input = arxiv.SortCriterion.SubmittedDate
+        else:
+            sort_by_input = arxiv.SortCriterion.Relevance
+
+        if sort_order == "ascending":
+            sort_order_input = arxiv.SortOrder.Ascending
+        else:
+            sort_order_input = arxiv.SortOrder.Descending
+
+        search = arxiv.Search(query=query,
+                              max_results=max_results,
+                              sort_by=sort_by_input,
+                              sort_order=sort_order_input)
+
         _content = ""
         for idx, result in enumerate(self.arxiv_client.results(search)):
             # 标题、作者、published、总结、primary_category、comment、pdf_url
-            _content += f"--- 第{idx+1}篇：{repr(result.title)} ---\n"
+            _content += f"\n第{idx+1}篇：{repr(result.title)}\n"
             _content += f"作者: {[author.name for author in result.authors]}\n"
             try:
                 _content += f"发布时间: {result.published.strftime('%Y-%m-%d %H:%M:%S')}\n"
@@ -58,5 +81,6 @@ class ArxivAPIWrapper(BaseModel):
             _content += f"分类: {result.primary_category}\n"
             if result.comment:
                 _content += f"备注: {repr(result.comment)}\n"
-            _content += f"pdf: {result.pdf_url}\n\n"
+            _content += f"pdf: {result.pdf_url}\n"
+            _content += "\n---\n"
         return _content

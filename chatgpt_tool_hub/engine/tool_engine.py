@@ -165,7 +165,7 @@ class ToolEngine(Chain, BaseModel):
             # todo test below
             try:
                 action, observation = next_step_output
-                LOG.info(f"我从[{action.tool}]中获得了一些信息：`" + repr(observation.strip()))
+                LOG.info(f"我从[{action.tool}]中获得了一些信息：\n" + repr(observation.strip()))
             except Exception as e:
                 LOG.debug(f"parsing next_step_output error: {repr(e)}")
 
