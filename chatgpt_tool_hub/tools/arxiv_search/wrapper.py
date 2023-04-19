@@ -41,12 +41,22 @@ class ArxivAPIWrapper(BaseModel):
 
     def run(self, query: str) -> str:
         import arxiv
-
+        # todo avoid it in future
         query = query.replace("'", "").replace("\"", "").replace("+", " ")
 
         search = arxiv.Search(query=query, max_results=self.top_k_results)
         _content = ""
         for idx, result in enumerate(self.arxiv_client.results(search)):
-            LOG.debug(f"[arxiv] result {idx}: {str(result)}")
-            _content += result
+            # 标题、作者、published、总结、primary_category、comment、pdf_url
+            _content += f"--- 第{idx+1}篇：{repr(result.title)} ---\n"
+            _content += f"作者: {[author.name for author in result.authors]}\n"
+            try:
+                _content += f"发布时间: {result.published.strftime('%Y-%m-%d %H:%M:%S')}\n"
+            except Exception as e:
+                _content += f"发布时间: None\n"
+            _content += f"摘要: {result.summary}\n"
+            _content += f"分类: {result.primary_category}\n"
+            if result.comment:
+                _content += f"备注: {repr(result.comment)}\n"
+            _content += f"pdf: {result.pdf_url}\n\n"
         return _content

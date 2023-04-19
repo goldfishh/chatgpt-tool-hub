@@ -1,7 +1,17 @@
+import os
+import tempfile
+from typing import Any
+from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.chains import LLMChain
+from chatgpt_tool_hub.common.utils import get_from_dict_or_env
+from chatgpt_tool_hub.models import build_model_params
+from chatgpt_tool_hub.models.model_factory import ModelFactory
+from chatgpt_tool_hub.prompts import PromptTemplate
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+from chatgpt_tool_hub.tools.arxiv_search.api_prompt import ARXIV_PROMPT
 from chatgpt_tool_hub.tools.arxiv_search.wrapper import ArxivAPIWrapper
 from chatgpt_tool_hub.tools.base_tool import BaseTool
-
+from chatgpt_tool_hub.tools.summary.tool import SummaryTool
 
 default_tool_name = "arxiv"
 
@@ -12,24 +22,35 @@ class ArxivTool(BaseTool):
     name = default_tool_name
     description = (
         "Useful for when you need to answer questions about scientific research or search for papers "
-        "Like: which papers has a certain author published? what are some papers in a specific field? "
-        "Input should be a search_query in english. There is not any quotation marks in any search_query"
-        
-        "In the tool, each paper is divided up into a number of fields that can individually be searched. "
-        "A field consists of field prefix, a colon, and search term. Fields can be combined by a boolean operator. "
-        
-        "`field prefix` only can be: `ti` (Title), `au` (Author), `abs` (Abstract) and `co` (Comment). "
-        "`boolean operator` only can be: `AND`, `OR`, `ANDNOT`. "
-        
-        "Example: if we wanted all of the articles by the author Adrian DelMaestro "
-        "with titles that did not contain the computer vision. "
-        "A search_query should be au:del_maestro+ANDNOT+ti:computer+vision. "
+        "Like: which papers has a certain author published? "
+        "Input should be the title or abstract keywords or author names of a paper you want to search. "
     )
-    api_wrapper: ArxivAPIWrapper
+    bot: Any = None
+
+    api_wrapper: ArxivAPIWrapper = None
+
+    def __init__(self, **tool_kwargs: Any):
+        super().__init__(return_direct=True)
+
+        self.api_wrapper = ArxivAPIWrapper()
+
+        llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
+        prompt = PromptTemplate(
+            input_variables=["input"],
+            template=ARXIV_PROMPT,
+        )
+        self.bot = LLMChain(llm=llm, prompt=prompt)
 
     def _run(self, query: str) -> str:
         """Use the Arxiv tool."""
-        return self.api_wrapper.run(query)
+
+        _llm_response = self.bot.run(query)
+        LOG.info(f"[arxiv]: search_query: {_llm_response}")
+
+        _response = self.api_wrapper.run(_llm_response)
+
+        # 不使用llm，表明人类具有先天的优越性
+        return _response
 
     async def _arun(self, query: str) -> str:
         """Use the Arxiv tool asynchronously."""
@@ -40,6 +61,6 @@ main_tool_register.register_tool(default_tool_name, lambda kwargs: ArxivTool(**k
 
 
 if __name__ == "__main__":
-    tool = ArxivTool(api_wrapper=ArxivAPIWrapper())
-    content = tool.run("au:Adam Coates")
+    tool = ArxivTool()
+    content = tool.run("帮我找找吴恩达写的论文")
     print(content)

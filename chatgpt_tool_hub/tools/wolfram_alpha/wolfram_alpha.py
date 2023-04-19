@@ -1,12 +1,11 @@
 """Tool for the Wolfram Alpha API."""
 
+from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.wolfram_alpha.wrapper import WolframAlphaAPIWrapper
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-
-
 
 default_tool_name = "wolfram-alpha"
+
 
 class WolframAlphaTool(BaseTool):
     """Tool that adds the capability to query using the Wolfram Alpha SDK."""
