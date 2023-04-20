@@ -1,12 +1,10 @@
 from typing import Any
 
 from chatgpt_tool_hub.bots import initialize_bot
-from chatgpt_tool_hub.bots.chat_bot.base import ChatBot
 from chatgpt_tool_hub.engine import ToolEngine
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.load_tools import load_tools
 from chatgpt_tool_hub.tools.news import news_tool_register
@@ -41,8 +39,7 @@ class NewsTool(BaseTool):
             return "the tool was not initialized"
 
         # todo should connect to parent bot
-        parent_bot_prefix = str(ChatBot.finish_tool_name) + ": "
-        return parent_bot_prefix + self.bot.run(query)
+        return self.bot.run(query)
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
