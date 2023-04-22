@@ -1,4 +1,7 @@
 """Tool for the Google search API."""
+from typing import Any
+
+from rich.console import Console
 
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.base_tool import BaseTool
@@ -17,6 +20,9 @@ class GoogleSearch(BaseTool):
         "Input should be a search query."
     )
     api_wrapper: GoogleSearchAPIWrapper
+
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console)
 
     def _run(self, query: str) -> str:
         """Use the tool."""
@@ -38,6 +44,9 @@ class GoogleSearchJson(BaseTool):
     )
     api_wrapper: GoogleSearchAPIWrapper
 
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console)
+
     def _run(self, query: str) -> str:
         """Use the tool."""
         return str(self.api_wrapper.results(query))
@@ -47,5 +56,6 @@ class GoogleSearchJson(BaseTool):
         raise NotImplementedError("GoogleSearchRun does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: GoogleSearchJson(api_wrapper=GoogleSearchAPIWrapper(**kwargs)),
-              tool_input_keys=["google_api_key", "google_cse_id"])
+main_tool_register.register_tool(default_tool_name,
+                                 lambda console, kwargs: GoogleSearchJson(console, api_wrapper=GoogleSearchAPIWrapper(**kwargs)),
+                                 tool_input_keys=["google_api_key", "google_cse_id"])

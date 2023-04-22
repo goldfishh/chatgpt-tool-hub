@@ -1,6 +1,8 @@
 """Load bot."""
 from typing import Any, Optional, Sequence
 
+from rich.console import Console
+
 from chatgpt_tool_hub.bots.all_bot_list import BOT_TO_CLASS
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.callbacks import get_callback_manager
@@ -9,10 +11,11 @@ from chatgpt_tool_hub.models.base import BaseLanguageModel
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 
-def initialize_bot(
+def init_tool_engine(
     tools: Sequence[BaseTool],
     llm: BaseLanguageModel,
     bot: Optional[str] = None,
+    console: Console = Console(),
     callback_manager: Optional[BaseCallbackManager] = get_callback_manager(),
     bot_kwargs: Optional[dict] = None,
     **kwargs: Any,
@@ -28,6 +31,7 @@ def initialize_bot(
             `catgirl-bot`
            If None, will default to
             `qa-bot`.
+        console: rich.Console print rich text
         callback_manager: CallbackManager to use. Global callback manager is used if
             not provided. Defaults to None.
         bot_kwargs: Additional key word arguments to pass to the underlying bot
@@ -48,12 +52,13 @@ def initialize_bot(
 
     bot_kwargs = bot_kwargs or {}
     bot_obj = bot_cls.from_llm_and_tools(
-        llm, tools, callback_manager=callback_manager, **bot_kwargs
+        llm, tools, console, callback_manager=callback_manager, **bot_kwargs
     )
 
     return ToolEngine.from_bot_and_tools(
         bot=bot_obj,
         tools=tools,
+        console=console,
         callback_manager=callback_manager,
         **kwargs,
     )

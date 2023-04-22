@@ -2,6 +2,8 @@ import asyncio
 import os
 from typing import Any, List
 
+from rich.console import Console
+
 from chatgpt_tool_hub.chains.llm import LLMChain
 from chatgpt_tool_hub.common.calculate_token import count_string_tokens as get_token_num
 from chatgpt_tool_hub.common.log import LOG
@@ -97,8 +99,8 @@ class SummaryTool(BaseTool):
     map_bot: Any = None
     reduce_bot: Any = None
 
-    def __init__(self, **tool_kwargs: Any):
-        super().__init__()
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console)
         tool_kwargs = dict() if tool_kwargs is None else tool_kwargs
         self.message_num = get_from_dict_or_env(tool_kwargs, "message_num", "MESSAGE_NUM", 100)
         self.max_segment_length = get_from_dict_or_env(tool_kwargs, "max_segment_length", "MAX_SEGMENT_LENGTH", 2500)
@@ -164,7 +166,7 @@ class SummaryTool(BaseTool):
         raise NotImplementedError("summary tool not support async yet")
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: SummaryTool(**kwargs), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: SummaryTool(console, **kwargs), [])
 
 if __name__ == "__main__":
     tool = SummaryTool(**{})

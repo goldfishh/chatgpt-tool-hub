@@ -1,6 +1,8 @@
+from typing import Any
 from typing import Callable
 
 from pydantic import Field
+from rich.console import Console
 
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.base_tool import BaseTool
@@ -25,6 +27,9 @@ class DebugTool(BaseTool):
     prompt_func: Callable[[str], None] = Field(default_factory=lambda: _print_func)
     input_func: Callable = Field(default_factory=lambda: input)
 
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console)
+
     def _run(self, query: str) -> str:
         """Use the DebugTool tool."""
         self.prompt_func(query)
@@ -35,4 +40,4 @@ class DebugTool(BaseTool):
         raise NotImplementedError("DebugTool does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda _: DebugTool(), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: DebugTool(console, **kwargs), [])

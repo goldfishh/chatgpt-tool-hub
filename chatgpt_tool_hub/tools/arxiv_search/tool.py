@@ -1,5 +1,7 @@
 from typing import Any
 
+from rich.console import Console
+
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.models import build_model_params
@@ -26,8 +28,8 @@ class ArxivTool(BaseTool):
 
     api_wrapper: ArxivAPIWrapper = None
 
-    def __init__(self, **tool_kwargs: Any):
-        super().__init__(return_direct=True)
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console, return_direct=True)
 
         self.api_wrapper = ArxivAPIWrapper()
 
@@ -54,7 +56,7 @@ class ArxivTool(BaseTool):
         raise NotImplementedError("ArxivTool does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: ArxivTool(**kwargs), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: ArxivTool(console, **kwargs), [])
 
 
 if __name__ == "__main__":

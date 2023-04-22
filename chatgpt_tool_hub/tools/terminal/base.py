@@ -1,13 +1,14 @@
 import string
 import subprocess
 import sys
+from typing import Any
 from typing import List, Union
 
 from pydantic import Field
+from rich.console import Console
 
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 default_tool_name = "terminal"
@@ -104,6 +105,9 @@ class TerminalTool(BaseTool):
 
     bash_process: BashProcess = Field(default_factory=_get_default_bash_process)
 
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console)
+
     def _run(self, query: str) -> str:
         """Use the tool."""
         return self.bash_process.run(query)
@@ -113,7 +117,7 @@ class TerminalTool(BaseTool):
         raise NotImplementedError("[Terminal] does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda _: TerminalTool(), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: TerminalTool(console, **kwargs), [])
 
 
 if __name__ == "__main__":

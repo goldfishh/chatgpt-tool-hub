@@ -1,4 +1,7 @@
 import logging
+from typing import Any
+
+from rich.console import Console
 
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
@@ -17,6 +20,11 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         "Input should be a url (i.e. https://www.google.com). "
         "The output will be the text response of the GET request."
     )
+
+    def __init__(self, console: Console = Console(),
+                 requests_wrapper: RequestsWrapper = RequestsWrapper(), **tool_kwargs: Any):
+        # 这个工具直接返回内容
+        super().__init__(console=console, requests_wrapper=requests_wrapper, return_direct=False)
 
     def _run(self, url: str) -> str:
         """Run the tool."""
@@ -41,7 +49,7 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         return _content
 
 
-main_tool_register.register_tool(default_tool_name, lambda _: RequestsGetTool(requests_wrapper=RequestsWrapper()), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: RequestsGetTool(console, requests_wrapper=RequestsWrapper(**kwargs)), [])
 
 
 if __name__ == "__main__":

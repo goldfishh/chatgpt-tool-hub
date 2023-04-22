@@ -134,7 +134,7 @@ API限制：
       "debug": false,
       "no_default": false,
       "model_name": "gpt-3.5-turbo",
-      "zaobao_api_key": "s32C6sdfdsSPnn6wC"  // sample key
+      "morning_news_api_key": "s32C6sdfdsSPnn6wC"  // sample key
   }
 }
 ```
@@ -160,7 +160,7 @@ API限制
       "debug": false,
       "no_default": false,
       "model_name": "gpt-3.5-turbo",
-      "searx_host": "http://192.168.7.3:7780"  // sample key
+      "searx_search_host": "http://192.168.7.3:7780"  // sample key
   }
 }
 ```

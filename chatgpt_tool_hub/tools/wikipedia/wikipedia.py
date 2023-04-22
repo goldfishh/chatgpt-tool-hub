@@ -1,5 +1,9 @@
 """Tool for the Wikipedia API."""
 
+from typing import Any
+
+from rich.console import Console
+
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.wikipedia.wrapper import WikipediaAPIWrapper
@@ -18,6 +22,10 @@ class WikipediaTool(BaseTool):
     )
     api_wrapper: WikipediaAPIWrapper
 
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        # 这个工具直接返回内容
+        super().__init__(console=console, return_direct=False)
+
     def _run(self, query: str) -> str:
         """Use the Wikipedia tool."""
         return self.api_wrapper.run(query)
@@ -27,4 +35,4 @@ class WikipediaTool(BaseTool):
         raise NotImplementedError("WikipediaQueryRun does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: WikipediaTool(api_wrapper=WikipediaAPIWrapper(**kwargs)), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: WikipediaTool(console, api_wrapper=WikipediaAPIWrapper(**kwargs)), [])

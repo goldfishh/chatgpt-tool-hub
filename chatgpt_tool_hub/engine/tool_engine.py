@@ -2,6 +2,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, root_validator
+from rich.console import Console
+from rich.panel import Panel
 
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
@@ -22,20 +24,28 @@ class ToolEngine(Chain, BaseModel):
     max_iterations: Optional[int] = 10
     early_stopping_method: str = "force"
 
+    console: Console = None
+
+    class Config:
+        """Configuration for this pydantic object."""
+
+        arbitrary_types_allowed = True
+
     @classmethod
     def from_bot_and_tools(
         cls,
         bot: Bot,
         tools: Sequence[BaseTool],
+        console: Console = Console(),
         callback_manager: Optional[BaseCallbackManager] = None,
         **kwargs: Any,
     ):
         """Create from bot and tools."""
         return cls(
-            bot=bot, tools=tools, callback_manager=callback_manager, **kwargs
+            bot=bot, tools=tools, console=console, callback_manager=callback_manager, **kwargs
         )
 
-    @root_validator()
+    @root_validator(allow_reuse=True)
     def validate_tools(cls, values: Dict) -> Dict:
         """Validate that tools are compatible with bot."""
         bot = values["bot"]
@@ -110,11 +120,14 @@ class ToolEngine(Chain, BaseModel):
         # If the tool chosen is the finishing tool, then we end and return.
         if isinstance(output, BotFinish):
             return output
+
         self.callback_manager.on_bot_action(
             output, verbose=self.verbose, color="green"
         )
         # Otherwise we lookup the tool
         if output.tool in name_to_tool_map:
+            self.console.print(f"√ 我将给工具发送 [bold cyan]{output.tool_input}[/] 信息...\n")
+
             tool = name_to_tool_map[output.tool]
             return_direct = tool.return_direct
             # color = color_mapping[output.tool]
@@ -128,6 +141,8 @@ class ToolEngine(Chain, BaseModel):
                 observation_prefix=self.bot.observation_prefix,
             )
         else:
+            self.console.print(f"× 该工具 [bright_magenta]{output.tool}[/] 无效 \n")
+
             observation = InvalidTool().run(
                 output.tool,
                 verbose=self.verbose,
@@ -135,7 +150,12 @@ class ToolEngine(Chain, BaseModel):
                 llm_prefix="",
                 observation_prefix=self.bot.observation_prefix,
             )
-            # todo news tool catch `<property object at 0x7fcea0d914f0>`
+
+        self.console.print(Panel(observation + "\n",
+                                 title=f"工具 [bright_magenta]{output.tool}[/] 返回内容",
+                                 highlight=True, style='dim'))
+        self.console.print("\n")
+
         return output, observation
 
     def _call(self, inputs: Dict[str, str]) -> Dict[str, Any]:
@@ -175,6 +195,7 @@ class ToolEngine(Chain, BaseModel):
             if tool_return is not None:
                 return self._return(tool_return, intermediate_steps)
             iterations += 1
+        # 超出迭代次数
         output = self.bot.return_stopped_response(
             self.early_stopping_method, intermediate_steps, self.max_iterations, **inputs
         )

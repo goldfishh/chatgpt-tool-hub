@@ -2,13 +2,14 @@
 
 import sys
 from io import StringIO
+from typing import Any
 from typing import Dict, Optional
 
 from pydantic import Field, BaseModel
+from rich.console import Console
 
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 default_tool_name = "python"
@@ -55,6 +56,9 @@ class PythonREPLTool(BaseTool):
     )
     python_repl: PythonREPL = Field(default_factory=_get_default_python_repl)
 
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console)
+
     def _run(self, query: str) -> str:
         """Use the tool."""
         return self.python_repl.run(query)
@@ -64,4 +68,4 @@ class PythonREPLTool(BaseTool):
         raise NotImplementedError("PythonReplTool does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda _: PythonREPLTool(), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: PythonREPLTool(console, **kwargs), [])

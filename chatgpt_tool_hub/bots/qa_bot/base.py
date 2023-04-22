@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 from typing import Any, List, Optional, Sequence, Tuple
 
+from rich.console import Console
+
 from chatgpt_tool_hub.bots.qa_bot.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
@@ -79,6 +81,7 @@ class QABot(Bot):
         cls,
         llm: BaseLLM,
         tools: Sequence[BaseTool],
+        console: Console = Console(),
         callback_manager: Optional[BaseCallbackManager] = None,
         prefix: str = PREFIX,
         suffix: str = SUFFIX,
@@ -101,7 +104,7 @@ class QABot(Bot):
             callback_manager=callback_manager,
         )
         tool_names = [tool.name for tool in tools]
-        return cls(llm_chain=llm_chain, allowed_tools=tool_names, **kwargs)
+        return cls(llm_chain=llm_chain, console=console, allowed_tools=tool_names, **kwargs)
 
     @classmethod
     def _validate_tools(cls, tools: Sequence[BaseTool]) -> None:

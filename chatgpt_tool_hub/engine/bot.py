@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import yaml
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, root_validator, validator
+from rich.console import Console
 
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.calculate_token import count_string_tokens
@@ -38,6 +39,17 @@ class Bot(BaseModel):
     # 当bot未按要求回复时，最多重试次数
     max_parse_retry_num: int = 1
     max_token_num: int = ALL_MAX_TOKENS_NUM
+
+    console: Console = None
+
+    class Config:
+        """Configuration for this pydantic object."""
+
+        arbitrary_types_allowed = True
+
+    @validator("console")
+    def set_console(cls, console: Console) -> Console:
+        return console or Console()
 
     @abstractmethod
     def _extract_tool_and_input(self, text: str) -> Optional[Tuple[str, str]]:
@@ -78,6 +90,7 @@ class Bot(BaseModel):
 
             with open(file_path, "w") as f:
                 f.write(_input + "\n")
+            # 总结
             _input = SummaryTool(max_segment_length=2000).run(str(file_path) + ", 0")
             try:
                 os.remove(file_path)
@@ -153,7 +166,7 @@ class Bot(BaseModel):
         """
         return list(set(self.llm_chain.input_keys) - {"bot_scratchpad"})
 
-    @root_validator()
+    @root_validator(allow_reuse=True)
     def validate_prompt(cls, values: Dict) -> Dict:
         """Validate that prompt matches format."""
         prompt = values["llm_chain"].prompt
@@ -194,6 +207,7 @@ class Bot(BaseModel):
         cls,
         llm: BaseLLM,
         tools: Sequence[BaseTool],
+        console: Console = Console(),
         callback_manager: Optional[BaseCallbackManager] = None,
         **kwargs: Any,
     ) -> Bot:
@@ -205,7 +219,7 @@ class Bot(BaseModel):
             callback_manager=callback_manager,
         )
         tool_names = [tool.name for tool in tools]
-        return cls(llm_chain=llm_chain, allowed_tools=tool_names, **kwargs)
+        return cls(llm_chain=llm_chain, console=console, allowed_tools=tool_names, **kwargs)
 
     def return_stopped_response(
         self,
@@ -236,14 +250,15 @@ class Bot(BaseModel):
             full_inputs = {**kwargs, **new_inputs}
             full_output = self.llm_chain.predict(**full_inputs)
             # We try to extract a final answer
-            parsed_output = self._extract_tool_and_input(full_output)
-            if parsed_output is None:
+            action, action_input = self._extract_tool_and_input(full_output)
+
+            if not action:
                 # If we cannot extract, we just return the full output
                 return BotFinish({"output": full_output}, full_output)
-            tool, tool_input = parsed_output
-            if tool == self.finish_tool_name:
+
+            if action in ['bye', 'goodbye', 'end', 'exit', 'quit']:
                 # If we can extract, we send the correct stuff
-                return BotFinish({"output": tool_input}, full_output)
+                return BotFinish({"output": action_input}, full_output)
             else:
                 # If we can extract, but the tool is not the final tool,
                 # we just return the full output

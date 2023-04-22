@@ -1,6 +1,8 @@
 import logging
 from typing import Any
 
+from rich.console import Console
+
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools import BrowserTool
 from chatgpt_tool_hub.tools.base_tool import BaseTool
@@ -20,8 +22,8 @@ class FinanceNewsTool(BaseTool):
 
     jin10_url: str = "https://www.jin10.com/example/jin10.com.html"
 
-    def __init__(self, **tool_kwargs: Any):
-        super().__init__(return_direct=True)
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console, return_direct=True)
 
     def _run(self, tool_input: str) -> str:
         """ finance-news 仅仅是一个 browser tool 的封装吗？ """
@@ -33,7 +35,7 @@ class FinanceNewsTool(BaseTool):
         pass
 
 
-news_tool_register.register_tool(default_tool_name, lambda kwargs: FinanceNewsTool(**kwargs), [])
+news_tool_register.register_tool(default_tool_name, lambda console, kwargs: FinanceNewsTool(console, **kwargs), [])
 
 
 if __name__ == "__main__":

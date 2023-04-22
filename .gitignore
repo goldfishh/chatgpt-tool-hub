@@ -13,7 +13,6 @@ dist/
 
 # dev
 Dockerfile
-terminal_io.py
 .env
 build.sh
 *.self

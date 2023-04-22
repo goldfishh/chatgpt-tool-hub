@@ -1,5 +1,7 @@
 from typing import Any
 
+from rich.console import Console
+
 from chatgpt_tool_hub.chains.api import APIChain
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
@@ -19,8 +21,8 @@ class NewsApiTool(BaseTool):
     )
     api_chain: APIChain = None
 
-    def __init__(self, **tool_kwargs: Any):
-        super().__init__()
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console)
 
         news_api_key = get_from_dict_or_env(tool_kwargs, "news_api_key", "NEWS_API_KEY")
 
@@ -44,4 +46,4 @@ class NewsApiTool(BaseTool):
         raise NotImplementedError("NewsTool does not support async")
 
 
-news_tool_register.register_tool(default_tool_name, lambda kwargs: NewsApiTool(**kwargs), ["news_api_key"])
+news_tool_register.register_tool(default_tool_name, lambda console, kwargs: NewsApiTool(console, **kwargs), ["news_api_key"])

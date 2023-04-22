@@ -1,8 +1,11 @@
 """Generic utility functions."""
+import json
 import os
 import random
 import string
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
+
+from chatgpt_tool_hub.common.log import LOG
 
 
 def get_from_dict_or_env(

@@ -4,7 +4,7 @@ from chatgpt_tool_hub.common.log import LOG
 def dynamic_tool_loader():
     # dev tool: debug   visual_dl  searxng_search
     all_tool_package_list = ["bing_search", "google_search", "meteo", "news", "arxiv_search",
-                             "web_requests", "wikipedia", "wolfram_alpha"]
+                             "system", "web_requests", "wikipedia", "wolfram_alpha"]
 
     for package_name in all_tool_package_list:
         try:

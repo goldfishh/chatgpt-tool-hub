@@ -4,10 +4,12 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, root_validator
-from chatgpt_tool_hub.common.log import LOG
+from rich.console import Console
+
 from chatgpt_tool_hub.chains.api.prompt import API_RESPONSE_PROMPT, API_URL_PROMPT
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.chains.llm import LLMChain
+from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.schema import BaseLanguageModel
 from chatgpt_tool_hub.prompts import BasePromptTemplate
 from chatgpt_tool_hub.tools.web_requests import RequestsWrapper
@@ -20,6 +22,7 @@ class APIChain(Chain, BaseModel):
     api_answer_chain: LLMChain
     requests_wrapper: RequestsWrapper = Field(exclude=True)
     api_docs: str
+    console: Console = None
     question_key: str = "question"  #: :meta private:
     output_key: str = "output"  #: :meta private:
 
@@ -76,11 +79,11 @@ class APIChain(Chain, BaseModel):
             api_response, color="yellow", end="\n", verbose=self.verbose
         )
         # api_docs chunking
-        self.api_docs = "Here represents the API documentation that you previously used to generate API url."
+        api_docs = "Here represents the API documentation that you previously used to generate API url."
 
         answer = self.api_answer_chain.predict(
             question=question,
-            api_docs=self.api_docs,
+            api_docs=api_docs,
             api_url=api_url,
             api_response=api_response,
         )
@@ -91,6 +94,7 @@ class APIChain(Chain, BaseModel):
         cls,
         llm: BaseLanguageModel,
         api_docs: str,
+        console: Console = Console(),
         headers: Optional[dict] = None,
         api_url_prompt: BasePromptTemplate = API_URL_PROMPT,
         api_response_prompt: BasePromptTemplate = API_RESPONSE_PROMPT,
@@ -105,6 +109,7 @@ class APIChain(Chain, BaseModel):
         return cls(
             api_request_chain=get_request_chain,
             api_answer_chain=get_answer_chain,
+            console=console,
             requests_wrapper=requests_wrapper,
             api_docs=api_docs,
             **kwargs,

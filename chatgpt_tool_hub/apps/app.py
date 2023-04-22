@@ -4,13 +4,14 @@ from typing import List
 
 from chatgpt_tool_hub.chains.base import Chain
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 
 class App:
     _instance = None  # 存储单例实例
     init_flag = False  # 记录是否执行过初始化动作
 
-    bot: Chain = None
+    engine: Chain = None
 
     # 当前已加载工具
     tools: set = set()
@@ -37,6 +38,31 @@ class App:
     @abstractmethod
     def create(self, tools_list: list, **tools_kwargs):
         """overload this method to create a bot"""
+
+    def add_tool(self, tool: str, **tools_kwargs):
+        raise ValueError("add_tool not implemented for this app.")
+
+    def del_tool(self, tool: str, **tools_kwargs):
+        raise ValueError("del_tool not implemented for this app.")
+
+    def init_tool_engine(self, tools: List[BaseTool] = list):
+        raise ValueError("init_tool_engine not implemented for this app.")
+
+    def load_tools_into_bot(self, **tools_kwargs):
+        raise ValueError("load_tools_into_bot not implemented for this app.")
+
+
+    def update_tool_args(self, tools_list: list, is_del: bool = False, **tools_kwargs):
+        if is_del:
+            for tool in tools_list:
+                self.tools.remove(tool)
+            return
+
+        for tool in tools_list:
+            self.tools.add(tool)
+
+        for tool_key in tools_kwargs:
+            self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
 
     @abstractmethod
     def ask(self, query: str, chat_history: list = None, retry_num: int = 0) -> str:

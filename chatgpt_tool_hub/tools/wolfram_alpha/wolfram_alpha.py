@@ -1,5 +1,9 @@
 """Tool for the Wolfram Alpha API."""
 
+from typing import Any
+
+from rich.console import Console
+
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.wolfram_alpha.wrapper import WolframAlphaAPIWrapper
@@ -19,6 +23,10 @@ class WolframAlphaTool(BaseTool):
     )
     api_wrapper: WolframAlphaAPIWrapper
 
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        # 这个工具直接返回内容
+        super().__init__(console=console, return_direct=False)
+
     def _run(self, query: str) -> str:
         """Use the WolframAlpha tool."""
         return self.api_wrapper.run(query)
@@ -28,5 +36,5 @@ class WolframAlphaTool(BaseTool):
         raise NotImplementedError("WolframAlphaTool does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: WolframAlphaTool(api_wrapper=WolframAlphaAPIWrapper(**kwargs)),
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: WolframAlphaTool(console, api_wrapper=WolframAlphaAPIWrapper(**kwargs)),
               tool_input_keys=["wolfram_alpha_appid"])

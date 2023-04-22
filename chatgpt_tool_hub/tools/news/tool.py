@@ -1,7 +1,9 @@
 from typing import Any
 
-from chatgpt_tool_hub.bots import initialize_bot
+from rich.console import Console
+
 from chatgpt_tool_hub.engine import ToolEngine
+from chatgpt_tool_hub.engine.initialize import init_tool_engine
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
@@ -19,31 +21,31 @@ class NewsTool(BaseTool):
         "such as financial news, daily morning reports and any other news. "
         "The input should be a description of your needs in natural language."
     )
-    bot: ToolEngine = Any
+    engine: ToolEngine = Any
 
-    def __init__(self, **tool_kwargs: Any):
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容
-        super().__init__(return_direct=True)
+        super().__init__(console=console, return_direct=True)
 
-        tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register, **tool_kwargs)
+        tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register, console, **tool_kwargs)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
 
-        self.bot = initialize_bot(tools, llm, bot="qa-bot", verbose=True,
-                                  max_iterations=2, early_stopping_method="force")
+        self.engine = init_tool_engine(tools, llm, bot="qa-bot", verbose=True, console=self.console,
+                                       max_iterations=2, early_stopping_method="force")
 
     def _run(self, query: str) -> str:
         """Use the tool."""
         if not query:
             return "the input of tool is empty"
-        if not self.bot:
+        if not self.engine:
             return "the tool was not initialized"
 
         # todo should connect to parent bot
-        return self.bot.run(query)
+        return self.engine.run(query)
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("NewsTool does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: NewsTool(**kwargs), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: NewsTool(console, **kwargs), [])

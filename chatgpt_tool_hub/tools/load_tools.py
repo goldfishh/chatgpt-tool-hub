@@ -6,11 +6,13 @@ from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.tool_register import ToolRegister
+from rich.console import Console
 
 
 def load_tools(
     tool_names: List[str],
     tool_register: ToolRegister,
+    console: Console = Console(),
     callback_manager: Optional[BaseCallbackManager] = None,
     **kwargs: Any,
 ) -> List[BaseTool]:
@@ -19,6 +21,7 @@ def load_tools(
     Args:
         tool_names: name of tools to load.
         tool_register: the registered object of tools
+        console: rich console
         callback_manager: Optional callback manager. If not provided, default global callback manager will be used.
     Returns:
         List of tools.
@@ -46,7 +49,7 @@ def load_tools(
             #
             try:
                 # sub_kwargs = {k: kwargs[k] for k in extra_keys if k in kwargs}
-                tool = _get_tool_func(kwargs)
+                tool = _get_tool_func(console, kwargs)
             except Exception as e:
                 LOG.info(f"[{name}] init failed, error_info: {repr(e)}")
                 tool_register.unregister_tool(name)

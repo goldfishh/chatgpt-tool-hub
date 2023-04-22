@@ -1,23 +1,32 @@
 """An bot designed to hold a conversation in addition to using tools."""
 from __future__ import annotations
 
-import re
-from typing import Any, List, Optional, Sequence, Tuple
+import json
+import traceback
+from typing import Any, List, Optional, Sequence, Tuple, Union, Dict
 
+from rich.console import Console
+from rich.panel import Panel
 from chatgpt_tool_hub.bots.chat_bot.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
 from chatgpt_tool_hub.chains import LLMChain
+from chatgpt_tool_hub.common import json_utils
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.common.schema import BotAction, BotFinish
 from chatgpt_tool_hub.engine import Bot
 from chatgpt_tool_hub.models.base import BaseLLM
 from chatgpt_tool_hub.prompts import PromptTemplate
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
+default_ai_prefix = "LLM-OS"
+default_human_prefix = "user"
+
 
 class ChatBot(Bot):
     """An bot designed to hold a conversation in addition to using tools."""
 
-    ai_prefix: str = "AI"
+    ai_prefix: str = default_ai_prefix
+    human_prefix: str = default_human_prefix
 
     @property
     def _bot_type(self) -> str:
@@ -35,7 +44,7 @@ class ChatBot(Bot):
         else:
             tool_names = ", ".join([tool for tool in self.allowed_tools])
         instruction_text = FORMAT_INSTRUCTIONS.format(
-            tool_names=tool_names, ai_prefix=self.ai_prefix
+            tool_names=tool_names, human_prefix=self.human_prefix
         )
         _text = ("\n\n"
                  f"You just told me: {text}, but it doesn't meet the format I mentioned to you. \n\n"
@@ -55,8 +64,8 @@ class ChatBot(Bot):
             prefix: str = PREFIX,
             suffix: str = SUFFIX,
             format_instructions: str = FORMAT_INSTRUCTIONS,
-            ai_prefix: str = "AI",
-            human_prefix: str = "Human",
+            ai_prefix: str = default_ai_prefix,
+            human_prefix: str = default_human_prefix,
             input_variables: Optional[List[str]] = None,
     ) -> PromptTemplate:
         """Create prompt in the style of the zero shot bot.
@@ -78,9 +87,9 @@ class ChatBot(Bot):
         )
         tool_names = ", ".join([tool.name for tool in tools])
 
-        instruction_text = format_instructions.format(
-            tool_names=tool_names, ai_prefix=ai_prefix
-        )
+        instruction_text = format_instructions.format(human_prefix=human_prefix, tool_names=tool_names)
+        prefix = prefix.format(human_prefix=human_prefix)
+
         template = "\n\n".join([prefix, tool_strings, instruction_text, suffix])
         if input_variables is None:
             input_variables = ["input", "chat_history", "bot_scratchpad"]
@@ -88,36 +97,163 @@ class ChatBot(Bot):
 
         return prompt
 
+    def plan(
+        self, intermediate_steps: List[Tuple[BotAction, str]], **kwargs: Any
+    ) -> Union[BotAction, BotFinish]:
+        """Given input, decided what to do."""
+        full_inputs = self.get_full_inputs(intermediate_steps, **kwargs)
+        action = self._get_next_action(full_inputs)
+        if action.tool == "exit":
+            return BotFinish({"output": action.tool_input}, action.log)
+        return action
+
+    def get_full_inputs(
+        self, intermediate_steps: List[Tuple[BotAction, str]], **kwargs: Any
+    ) -> Dict[str, Any]:
+        """Create the full inputs for the LLMChain from intermediate steps."""
+        thoughts = self._construct_scratchpad(intermediate_steps)
+        # todo remove stop
+        new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
+        full_inputs = {**kwargs, **new_inputs}
+
+        return full_inputs
+
+    def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
+        llm_answer_str = self.llm_chain.predict(**full_inputs)
+
+        action, action_input = self._extract_tool_and_input(llm_answer_str)
+
+        LOG.info(f"输入: {action_input}")
+        
+        # json 解析错误重试
+        retry_num = 0
+        while not action:
+            retry_num += 1
+            if retry_num > self.max_parse_retry_num:
+                raise ValueError(f"Could not parse LLM output: `{llm_answer_str}`")
+
+            full_output = self._fix_text(llm_answer_str)
+            full_inputs["bot_scratchpad"] += full_output
+            output = self.llm_chain.predict(**full_inputs)
+
+            action, action_input = self._extract_tool_and_input(output)
+
+            LOG.info(f"重试输入: {action_input}")
+        return BotAction(
+            tool=action, tool_input=action_input, log=llm_answer_str
+        )
+
     @property
     def finish_tool_name(self) -> str:
         """Name of the tool to use to finish the chain."""
         return self.ai_prefix
 
     def _extract_tool_and_input(self, llm_output: str) -> Optional[Tuple[str, str]]:
-        # todo this is bad parsing rule
-        if f"{self.ai_prefix}:" in llm_output:
-            return self.ai_prefix, llm_output.split(f"{self.ai_prefix}:")[-1].strip()
-        regex = r"Action: (.*?)[\n]*Action Input: (.*)"
-        match = re.search(regex, llm_output, re.DOTALL)
-        if not match:
-            return None
+        # 1. json loads and 修复 & 错误处理
+        llm_reply_json = self.parse_reply_json(llm_output)
+        action, action_input = "", ""
 
-        action = match.group(1)
-        action_input = match.group(2)
+        try:
+            if not isinstance(llm_reply_json, dict):
+                return "Error:", f"'response_json' object is not dictionary {llm_reply_json}"
+
+            if "tool" not in llm_reply_json:
+                return "Error:", "Missing 'tool' object in JSON"
+
+            tool_dict = llm_reply_json["tool"]
+            if not isinstance(tool_dict, dict):
+                return "Error:", "'tool' object is not a dictionary"
+
+            if "name" not in tool_dict:
+                return "Error:", "Missing 'name' field in 'tool_dict' object"
+
+            action = tool_dict["name"]
+            action_input = tool_dict.get("input", "")
+
+        except json.decoder.JSONDecodeError:
+            LOG.error("Error:", "Invalid JSON")
+
+        except Exception as e:
+            LOG.error("Error:", str(e))
+
+        if action in ['bye', 'goodbye', 'end', 'exit', 'quit']:
+            return "exit", action_input
+
+        self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...\n")
+        # todo
         LOG.info(f"执行Tool: {action}中...")
         return action.strip(), action_input.strip(" ").strip('"')
+
+    def parse_reply_json(self, assistant_reply) -> dict:
+        """Prints the assistant's thoughts to the console"""
+        try:
+            try:
+                # Parse and print Assistant response
+                assistant_reply_json = json_utils.fix_and_parse_json(assistant_reply)
+            except json.JSONDecodeError as e:
+                LOG.error("Error: Invalid JSON in assistant thoughts\n", assistant_reply)
+                assistant_reply_json = json_utils.fix_json_by_finding_outermost_brackets(assistant_reply)
+
+                assistant_reply_json = json_utils.fix_and_parse_json(assistant_reply_json)
+
+            # Check if assistant_reply_json is a string and attempt to parse it into a
+            #  JSON object
+            if isinstance(assistant_reply_json, str):
+                try:
+                    assistant_reply_json = json.loads(assistant_reply_json)
+                except json.JSONDecodeError as e:
+                    LOG.error("Error: Invalid JSON\n", assistant_reply)
+                    assistant_reply_json = (
+                        json_utils.fix_json_by_finding_outermost_brackets(assistant_reply_json)
+                    )
+
+            assistant_thoughts = assistant_reply_json.get("thoughts", {})
+            assistant_thoughts_text = assistant_thoughts.get("text")
+            assistant_thoughts_reasoning = None
+            assistant_thoughts_criticism = None
+            assistant_thoughts_speak = None
+
+            if assistant_thoughts:
+                assistant_thoughts_reasoning = assistant_thoughts.get("reasoning")
+                assistant_thoughts_criticism = assistant_thoughts.get("criticism")
+                assistant_thoughts_speak = assistant_thoughts.get("speak")
+
+            thoughts_text = ""
+            if assistant_thoughts_reasoning:
+                thoughts_text += f"推理：{assistant_thoughts_reasoning}\n"
+            if assistant_thoughts_text:
+                thoughts_text += f"思考：{assistant_thoughts_text}\n"
+            if assistant_thoughts_criticism:
+                thoughts_text += f"反思：{assistant_thoughts_criticism}\n"
+
+            self.console.print(Panel(thoughts_text,
+                                     title=f"{self.ai_prefix.upper()}的内心独白",
+                                     highlight=True, style='dim'))
+            # it's useful for avoid splitting Panel
+            self.console.print("\n")
+            return assistant_reply_json
+        except json.decoder.JSONDecodeError:
+            call_stack = traceback.format_exc()
+            LOG.error("Error: Invalid JSON\n", assistant_reply)
+            LOG.error("Traceback: \n", call_stack)
+
+        # All other errors, return "Error: + error message"
+        except Exception:
+            call_stack = traceback.format_exc()
+            LOG.error("Error: \n", call_stack)
 
     @classmethod
     def from_llm_and_tools(
             cls,
             llm: BaseLLM,
             tools: Sequence[BaseTool],
+            console: Console = Console(),
             callback_manager: Optional[BaseCallbackManager] = None,
             prefix: str = PREFIX,
             suffix: str = SUFFIX,
             format_instructions: str = FORMAT_INSTRUCTIONS,
-            ai_prefix: str = "AI",
-            human_prefix: str = "Human",
+            ai_prefix: str = default_ai_prefix,
+            human_prefix: str = default_human_prefix,
             input_variables: Optional[List[str]] = None,
             **kwargs: Any,
     ) -> Bot:
@@ -138,5 +274,5 @@ class ChatBot(Bot):
         )
         tool_names = [tool.name for tool in tools]
         return cls(
-            llm_chain=llm_chain, allowed_tools=tool_names, ai_prefix=ai_prefix, **kwargs
+            llm_chain=llm_chain, console=console, allowed_tools=tool_names, ai_prefix=ai_prefix, **kwargs
         )

@@ -61,8 +61,12 @@ Code	Description
 80, 81, 82	Rain showers: Slight, moderate, and violent
 85, 86	Snow showers slight and heavy
 
-If daily weather variables are specified, parameter timezone is required.
-Parameter past_days is mutually exclusive with start_date and end_date.
+Pay attention: 
+1. You should only use the parameters described in this document to construct the API URL, 
+and should not make up parameters. If there is no parameter for daily granularity, 
+you can use the parameter for hourly granularity instead.
+2. If daily weather variables are specified, parameter timezone is required.
+3. Parameter past_days is mutually exclusive with start_date and end_date.
+4. Your output can only be a URL, no need for explanation.
 
-Your output can only be a URL, no need for explanation.
-"""
+URL: """

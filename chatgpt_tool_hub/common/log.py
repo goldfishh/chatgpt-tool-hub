@@ -11,7 +11,7 @@ def _get_logger():
     ch = logging.StreamHandler(sys.stdout)
     ch.setFormatter(logging.Formatter(LOGGING_FMT, datefmt=LOGGING_DATEFMT))
 
-    fh = logging.FileHandler(f'{os.getcwd()}/run.log', encoding='utf-8')
+    fh = logging.FileHandler(f'{os.getcwd()}/tool.log', encoding='utf-8')
     fh.setFormatter(logging.Formatter(LOGGING_FMT, datefmt=LOGGING_DATEFMT))
 
     logger.addHandler(ch)

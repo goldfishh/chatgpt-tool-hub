@@ -1,6 +1,8 @@
 import json
 from typing import Any
 
+from rich.console import Console
+
 from chatgpt_tool_hub.chains import LLMChain
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
@@ -21,15 +23,15 @@ class MorningNewsTool(BaseTool):
         "no input."
     )
     bot: Any = None
-    zaobao_api_key: str = ""
-    zaobao_use_llm: bool = False
+    morning_news_api_key: str = ""
+    morning_news_use_llm: bool = False
 
-    def __init__(self, **tool_kwargs: Any):
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容
-        super().__init__(return_direct=True)
+        super().__init__(console=console, return_direct=True)
 
-        self.zaobao_api_key = get_from_dict_or_env(tool_kwargs, "zaobao_api_key", "ZAOBAO_API_KEY")
-        self.zaobao_use_llm = get_from_dict_or_env(tool_kwargs, "zaobao_use_llm", "ZAOBAO_USE_LLM", False)
+        self.morning_news_api_key = get_from_dict_or_env(tool_kwargs, "morning_news_api_key", "MORNING_NEWS_API_KEY")
+        self.morning_news_use_llm = get_from_dict_or_env(tool_kwargs, "morning_news_use_llm", "MORNING_NEWS_USE_LLM", False)
 
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
         prompt = PromptTemplate(
@@ -43,10 +45,10 @@ class MorningNewsTool(BaseTool):
         if not query:
             return "the input of tool is empty"
 
-        morning_news_url = "https://v2.alapi.cn/api/zaobao?token={}&format={}".format(self.zaobao_api_key, "json")
+        morning_news_url = "https://v2.alapi.cn/api/zaobao?token={}&format={}".format(self.morning_news_api_key, "json")
         _response = RequestsWrapper().get(morning_news_url)
         _response_json = json.loads(_response)
-        if self.zaobao_use_llm:
+        if self.morning_news_use_llm:
             _return = self.bot.run(_response)
         elif _response_json.get("code") == 200 or _response_json.get("msg") == "success":
             # 不使用llm，表明人类具有先天的优越性
@@ -65,11 +67,11 @@ class MorningNewsTool(BaseTool):
         raise NotImplementedError("NewsTool does not support async")
 
 
-news_tool_register.register_tool(default_tool_name, lambda kwargs: MorningNewsTool(**kwargs), ["zaobao_api_key"])
+news_tool_register.register_tool(default_tool_name, lambda console, kwargs: MorningNewsTool(console, **kwargs), ["morning_news_api_key"])
 
 
 if __name__ == "__main__":
-    tool = MorningNewsTool(zaobao_api_key="", zaobao_use_llm=False)
+    tool = MorningNewsTool(morning_news_api_key="", morning_news_use_llm=False)
     content = tool.run("给我发一下早报？")
     print(content)
 

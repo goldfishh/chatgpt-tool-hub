@@ -1,8 +1,10 @@
 {
   "tools": [],
   "kwargs": {
+      "ai_prefix": "LLM-OS",
       "openai_api_key": "",
       "proxy": "",
+      "think_depth": 3,
       "debug": false,
       "request_timeout": 60,
       "no_default": false,

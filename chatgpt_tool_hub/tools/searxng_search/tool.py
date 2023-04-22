@@ -1,12 +1,15 @@
 """Tool for the SearxNG search API."""
+from typing import Any
+
 from pydantic import Extra
+from rich.console import Console
 
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.searxng_search.wrapper import SearxSearchWrapper
 
 default_tool_name = "searxng-search"
+
 
 class SearxSearchTool(BaseTool):
     """Tool that adds the capability to query a Searx instance."""
@@ -18,6 +21,9 @@ class SearxSearchTool(BaseTool):
         "Input should be a search query."
     )
     api_wrapper: SearxSearchWrapper
+
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console)
 
     def _run(self, query: str) -> str:
         """Use the tool."""
@@ -40,6 +46,9 @@ class SearxSearchJsonTool(BaseTool):
     api_wrapper: SearxSearchWrapper
     num_results: int = 4
 
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+        super().__init__(console=console, return_direct=True)
+
     class Config:
         """Pydantic config."""
 
@@ -54,5 +63,6 @@ class SearxSearchJsonTool(BaseTool):
         return (await self.api_wrapper.aresults(query, self.num_results)).__str__()
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: SearxSearchTool(api_wrapper=SearxSearchWrapper(**kwargs)),
-              tool_input_keys=["searx_host"])
+main_tool_register.register_tool(default_tool_name,
+                                 lambda console, kwargs: SearxSearchTool(console, api_wrapper=SearxSearchWrapper(**kwargs)),
+                                 tool_input_keys=["searx_search_host"])

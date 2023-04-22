@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Extra, root_validator
+from rich.console import Console
 
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
@@ -120,9 +121,9 @@ class BrowserTool(BaseTool):
 
     browser: ChromeBrowser = None
 
-    def __init__(self, **tool_kwargs: Any):
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容
-        super().__init__(return_direct=False)
+        super().__init__(console=console, return_direct=False)
 
         self.browser = ChromeBrowser()
 
@@ -142,7 +143,7 @@ class BrowserTool(BaseTool):
         raise NotImplementedError("not support run this tool in async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda _: BrowserTool(), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: BrowserTool(console, **kwargs), [])
 
 
 if __name__ == "__main__":

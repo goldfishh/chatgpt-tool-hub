@@ -5,18 +5,23 @@ from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.tools import dynamic_tool_loader
+from rich.console import Console
 
 
 class AppFactory:
-    def __init__(self):
+    def __init__(self, console=Console()):
         self.default_tools_list = []
+        self.console = console
         pass
 
     def init_env(self, **kwargs):
         """ 环境初始化 """
-        # debug mode
-        debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", "")
-        if debug_flag:
+        # set log level
+        nolog_flag = get_from_dict_or_env(kwargs, "nolog", "NOLOG", False)
+        debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", False)
+        if nolog_flag:
+            LOG.setLevel(logging.CRITICAL)
+        elif debug_flag:
             LOG.setLevel(logging.DEBUG)
         else:
             LOG.setLevel(logging.INFO)
@@ -24,9 +29,9 @@ class AppFactory:
         # default tools
         no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
         if no_default_flag:
-            self.default_tools_list = []
+            self.default_tools_list = ["exit"]
         else:
-            self.default_tools_list = ["python", "terminal", "url-get", "meteo-weather", "news"]
+            self.default_tools_list = ["exit", "python", "terminal", "url-get", "meteo-weather", "news"]
 
         # dynamic loading tool
         dynamic_tool_loader()

@@ -2,12 +2,12 @@ from typing import Any
 
 import torch
 from PIL import Image
+from rich.console import Console
 from transformers import BlipProcessor, BlipForConditionalGeneration
 
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
 default_tool_name = "image2text"
@@ -26,8 +26,8 @@ class ImageCaptionTool(BaseTool):
     processor: Any = None
     model: Any = None
 
-    def __init__(self, **tool_kwargs):
-        super().__init__()
+    def __init__(self, console: Console = Console(), **tool_kwargs):
+        super().__init__(console=console)
         self.device = get_from_dict_or_env(tool_kwargs, "cuda_device", "CUDA_DEVICE", "cpu")
         self.torch_dtype = torch.float16 if 'cuda' in self.device else torch.float32
         self.processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
@@ -47,7 +47,7 @@ class ImageCaptionTool(BaseTool):
         raise NotImplementedError("ImageCaptioningTool does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda kwargs: ImageCaptionTool(**kwargs), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: ImageCaptionTool(console, **kwargs), [])
 
 
 if __name__ == "__main__":

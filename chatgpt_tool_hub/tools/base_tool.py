@@ -3,6 +3,7 @@ from abc import abstractmethod
 from typing import Any, Optional
 
 from pydantic import BaseModel, Extra, Field, validator
+from rich.console import Console
 
 from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
 from chatgpt_tool_hub.common.callbacks import get_callback_manager
@@ -17,6 +18,7 @@ class BaseTool(BaseModel):
     author: str = ""
     return_direct: bool = False
     verbose: bool = False
+    console: Console = None
     callback_manager: BaseCallbackManager = Field(default_factory=get_callback_manager)
 
     class Config:

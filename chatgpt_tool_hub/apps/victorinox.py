@@ -1,22 +1,35 @@
+from typing import List
+
+from rich.console import Console
+
 from chatgpt_tool_hub.apps import App
 from chatgpt_tool_hub.apps import AppFactory
-from chatgpt_tool_hub.bots import initialize_bot
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.database import ConversationTokenBufferMemory
+from chatgpt_tool_hub.engine.initialize import init_tool_engine as init_engine
 from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
 from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.load_tools import load_tools
 
 
 class Victorinox(App):
-    def __init__(self, **app_kwargs):
+    def __init__(self, console=Console(), **app_kwargs):
         super().__init__()
         if not self.init_flag:
             self.llm = ModelFactory().create_llm_model(**app_kwargs)
 
             self.memory = ConversationTokenBufferMemory(llm=self.llm, memory_key="chat_history",
                                                         output_key='output', max_token_limit=MEMORY_MAX_TOKENS_NUM)
+            self.bot_type = "chat-bot"
+
+            self.think_depth = get_from_dict_or_env(app_kwargs, "think_depth", "THINK_DEPTH", 3)
+
+            self.console = console
+
+            # todo don't remove it
             self.init_flag = True
 
     def create(self, tools_list: list, **tools_kwargs):
@@ -27,49 +40,64 @@ class Victorinox(App):
         if self.tools or self.tools_kwargs:
             LOG.warning("refresh the config of tools")
 
-        for tool in tools_list:
-            self.tools.add(tool)
-        self.tools_kwargs = tools_kwargs
+        self.update_tool_args(tools_list, **tools_kwargs)
 
-        try:
-            tools = load_tools(list(self.tools), main_tool_register, **tools_kwargs)
-        except ValueError as e:
-            LOG.error(str(e))
-            raise RuntimeError("tool初始化失败")
+        self.load_tools_into_bot(**tools_kwargs)
 
-        # loading tools from config.
-        LOG.info(f"use_tools={[tool.name for tool in tools]}, params: {str(tools_kwargs)}")
-
-        # create bots
-        self.bot = initialize_bot(tools, self.llm, bot="chat-bot", verbose=True,
-                                  memory=self.memory, max_iterations=3, early_stopping_method="generate")
-
-    def add_tool(self, tools_list: list, **tools_kwargs):
-        """todo: I think there have better way to implement"""
-        if not tools_list:
+    def add_tool(self, tool: str, **tools_kwargs):
+        if not tool:
             LOG.info("no tool to add")
             return
 
-        map(self.tools.add, tools_list)
+        self.update_tool_args([tool], **tools_kwargs)
+
+        self.load_tools_into_bot()
+
+    def del_tool(self, tool: str, **tools_kwargs):
+        if not tool:
+            LOG.info("no tool to add")
+            return
+
+        self.update_tool_args([tool], is_del=True, **tools_kwargs)
+
+        self.load_tools_into_bot()
+
+    def update_tool_args(self, tools_list: list, is_del: bool = False, **tools_kwargs):
+        if len(tools_list) == 0:
+            return
+
+        if is_del:
+            for tool in tools_list:
+                self.tools.remove(tool)
+            return
+
+        for tool in tools_list:
+            self.tools.add(tool)
+
         for tool_key in tools_kwargs:
             self.tools_kwargs[tool_key] = tools_kwargs[tool_key]
 
+    def load_tools_into_bot(self, **tools_kwargs):
         try:
-            new_tools_list = load_tools(list(self.tools), main_tool_register, **tools_kwargs)
+            tools = load_tools(list(self.tools), main_tool_register, console=self.console, **self.tools_kwargs)
         except ValueError as e:
             LOG.error(str(e))
-            raise RuntimeError("tool初始化失败")
+            raise RuntimeError("loading tool failed")
 
         # loading tools from config.
-        LOG.info(f"add_tool {self.get_class_name()} success, "
-                 f"use_tools={new_tools_list}, params: {str(self.tools_kwargs)}")
+        LOG.info(f"use_tools={[tool.name for tool in tools]}, params: {str(self.tools_kwargs)}")
 
+        self.init_tool_engine(tools, **tools_kwargs)
+
+    def init_tool_engine(self, tools: List[BaseTool] = list, **bot_kwargs):
         # create bots
-        self.bot = initialize_bot(new_tools_list, self.llm, bot="chat-bot", verbose=True,
-                                  memory=self.memory, max_iterations=2, early_stopping_method="generate")
+        # todo fix verbose params
+        self.engine = init_engine(tools, self.llm, bot=self.bot_type, verbose=True, memory=self.memory,
+                                  max_iterations=self.think_depth, early_stopping_method="generate",
+                                  console=self.console, bot_kwargs=bot_kwargs)
 
     def ask(self, query: str, chat_history: list = None, retry_num: int = 0) -> str:
-        if self.bot is None:
+        if self.engine is None:
             LOG.error("before calling the ask method, you should use create bot firstly")
             raise RuntimeError("app初始化失败")
 
@@ -83,7 +111,7 @@ class Victorinox(App):
 
         try:
             LOG.info(f"提问: {query}")
-            return self.bot.run(query)
+            return self.engine.run(query)
         except Exception as e:
             LOG.error(f"[APP] catch a Exception: {str(e)}")
             if retry_num < 1:

@@ -213,6 +213,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
             reraise=True,
             stop=stop_after_attempt(self.max_retries),
             wait=wait_exponential(multiplier=1, min=min_seconds, max=max_seconds),
+            # todo RateLimitError
             retry=(
                 retry_if_exception_type(openai.error.Timeout)
                 | retry_if_exception_type(openai.error.APIError)
