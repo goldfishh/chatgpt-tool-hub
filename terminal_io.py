@@ -70,9 +70,9 @@ def read_config_json() -> dict:
     else:
         with open(config_path, "r") as f:
             tool_config = json.load(f)
+    # todo test it
+    tool_config.get("kwargs", {})["nolog"] = True
 
-    if not tool_config.get("nolog"):
-        LOG.warning("nolog should be true to ban logging in tool-hub")
     return tool_config
 
 
@@ -121,7 +121,6 @@ class LLMOS:
 
         self.app = self.create_app()
 
-        # todo remove it, store in config.json
         self.model = 'gpt-3.5-turbo'
         self.timeout = timeout
 
@@ -243,9 +242,8 @@ class LLMOS:
 
 class CustomCompleter(Completer):
     commands = [
-        '/debug', '/raw', '/multi', '/tool', '/add', '/del', '/depth', '/reset', '/model'
-                                                                                 '/last', '/save', '/clear', '/timeout',
-        '/undo', '/exit', '/copy', '/help'
+        '/debug', '/raw', '/multi', '/tool', '/add', '/del', '/depth', '/reset', '/model',
+        '/last', '/save', '/clear', '/timeout', '/undo', '/exit', '/copy', '/help'
     ]
 
     available_models = [
@@ -311,6 +309,7 @@ def handle_command(command: str, llm_os: LLMOS):
     elif command == '/debug':
         ChatMode.toggle_debug_mode()
         config["kwargs"]['nolog'] = not ChatMode.debug_mode
+        config["kwargs"]['debug'] = ChatMode.debug_mode
         llm_os.app = llm_os.create_app()
     elif command == '/tool':
         tools_list = llm_os.get_app.get_tool_list()
@@ -506,19 +505,28 @@ def main(args):
 
     if args.key:
         api_key = str(args.key)
+    elif config.get("kwargs", {}).get("openai_api_key", ""):
+        api_key = config["kwargs"]["openai_api_key"]
     else:
         api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         api_key = prompt("我没有找到OpenAI API Key, 请输入: ", style=style)
-    config["kwargs"]["openai_api_key"] = api_key
+    os.environ["OPENAI_API_KEY"] = api_key
 
     if args.timeout:
-        request_timeout = os.environ.get(args.timeout)
+        request_timeout = args.timeout
+    elif config.get("kwargs", {}).get("request_timeout", ""):
+        request_timeout = config["kwargs"]["request_timeout"]
     else:
-        request_timeout = int(os.environ.get("REQUEST_TIMEOUT", "90"))
-    config["kwargs"]["request_timeout"] = request_timeout
+        request_timeout = os.environ.get("REQUEST_TIMEOUT")
 
-    if args.debug or config.get('kwargs', {}).get('debug', False):
+    if not request_timeout:
+        request_timeout = 90  # 默认90s
+    else:
+        request_timeout = int(request_timeout)
+    os.environ["REQUEST_TIMEOUT"] = str(request_timeout)
+
+    if args.debug or str(os.environ.get("DEBUG")).lower() in ['true', 'enable', 'yes']:
         ChatMode.toggle_debug_mode()
 
     if args.multi:
@@ -588,7 +596,7 @@ def main(args):
             break
 
     save_config_json()
-    console.print("[dim]拜拜~ 👋🏻")
+    console.print("[bright_magenta]拜拜~ 👋🏻")
     # todo
     # LOG.info(f"这次互动用了 {llm_os.total_tokens_spent} tokens")
     # console.print(
@@ -597,11 +605,11 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Welcome to chat with LLM-OS.')
-    parser.add_argument('-k', '--key', type=str, help='choose the API key to load')
+    parser.add_argument('-k', '--key', type=str, help='OpenAI API key to load')
     parser.add_argument('-t', '--timeout', type=int, help='set llm request timeout')
+    parser.add_argument('--model', type=str, help='choose the AI model to use')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Enable debug mode')
-    parser.add_argument('--model', type=str, help='choose the AI model to use')
     parser.add_argument('-m', '--multi', action='store_true',
                         help='Enable multi-line mode')
     parser.add_argument('-r', '--raw', action='store_true',

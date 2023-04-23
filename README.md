@@ -3,7 +3,7 @@
 
 <p align="center">
   <a style="text-decoration:none" href="https://github.com/goldfishh" target="_blank">
-    <img src="https://img.shields.io/badge/language-python-blue" alt="Language" />
+    <img src="https://img.shields.io/pypi/pyversions/chatgpt-tool-hub" alt="Language" />
   </a>
   <a style="text-decoration:none" href="https://github.com/goldfishh" target="_blank">
     <img src="https://img.shields.io/github/license/goldfishh/chatgpt-tool-hub" alt="license " />
@@ -16,13 +16,13 @@
   </a>
 </p>
 
-
 ---
+
 简体中文 | [English](./docs/README_en.md)
 
 > 大语言模型涌现能力让人惊艳，ChatGPT出现给NLP技术带来革命，除此之外还让我意识到一种新的人机交互的可能性
 
-## 🌱 4.23 新增LLM-OS demo - [快速上手]()
+## 🌱 4.23 新增LLM-OS demo - [快速上手](#llm-os_jump)
 
 #### [更新日志](./docs/update_log.md) | [Q&A](./docs/q_and_a.md)
 
@@ -46,160 +46,133 @@
 
 ---
 
-- 支持中文输入输出
-- 支持上下文记忆
-- 支持proxy
-- 支持多种工具： 
-  - terminal
-  - python
-  - url-get
-  - wikipedia
-  - meteo-weather
-  - news
-  - morning-news
-  - bing-search
-  - wolfram-alpha
+#### 1. 可在 LLM-OS demo 单独使用tool-hub
+#### 2. tool-hub以插件形式为 [chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat) 提供工具能力. 详见 ([tool插件使用教程](https://github.com/goldfishh/chatgpt-on-wechat/tree/master/plugins/tool))
+#### 3. 支持中、英文互动
+#### 4. 支持上下文记忆
+#### 5. 支持proxy
+#### 6. 支持大量工具   [工具指南 快速更新中](./docs/tool_tutorial.md) 
+#### 7. 支持多种工具同时且自动调用、树状编排工具
 
+### ⛳ 看看tool-hub未来计划更新的特性：[tool-hub todo-list](#plan) 
+### 📭 去 [issues](https://github.com/goldfishh/chatgpt-tool-hub/issues) 提提建议 
 
-## 快速开始
+## ✈️ 快速开始
 
 ---
-### 1.  使用shell运行demo
 
-#### (1). 克隆源代码
+### 1.  LLM-OS demo
+
+<span id="llm-os_jump"></span>
+
+#### (1). 克隆仓库
 
 ```bash
-git clone git@github.com:goldfishh/chatgpt-tool-hub.git
+git clone https://github.com/goldfishh/chatgpt-tool-hub.git
+cd chatgpt-tool-hub
 ```
 
-#### (2). `pip install -r requirements.txt`
+#### (2). 使用pip安装本项目依赖
 
-#### (3). 编辑config.json，填入你的openai_api_key
+```bash
+pip3 install -r requirements.txt
+```
 
+#### (3). 重命名.env.template 和 config.json.template文件，去掉.template后缀 打开文件填入配置参数 
+
+`.env` 用于配置全局参数 文件配置示例
+```text
+OPENAI_API_KEY=sk-xx          // 必填，你的OPENAI API Key, 如何申请请见Q&A
+MODEL_NAME=gpt-3.5-turbo      // 选填，OPENAI LLM模型
+THINK_DEPTH=3                 // 选填，默认为3，控制LLM-OS的最大调用工具次数，过大不一定能提高回复质量
+REQUEST_TIMEOUT=90            // 选填，默认120，等待openai api回复的最大时间
+PROXY=http://192.168.7.1:7890 // 选填，当你需要代理访问openai时可填
+DEBUG=false                   // 选填，debug模式
+```
+
+`config.json` 用于配置工具参数 文件配置示例
 ```json
 {
-  "tools": [],  // 这里填入你想加载的工具名，默认工具无需填入自动加载
+  "tools": [],   // 填入你想用到的额外工具名
   "kwargs": {
-      "openai_api_key": "",  // 必填
-      "proxy": "",  // 代理配置，国外ip可忽略
-      "debug": false,  // 当你遇到问题提issue前请设置debug为true，提交输出日志
-      "no_default": false,  // 控制是否加载默认工具
-      "model_name": "gpt-3.5-turbo"  // 默认，其他模型暂未测试
+      "no_default": false,   // 是否不使用默认工具, 默认使用python, terminal, url-get, meteo-weather
+      "top_k_results": 2,  // 控制部分搜索工具(如arxiv、wikipedia)返回只前k条记录, 不建议过多
+      // 需要额外申请api-key的工具，在这里填入
   }
 }
 ```
 
-#### (4). `python3 test.py 你的问题1 [你的问题2 ......]`
+需要额外申请工具config.json配置示例见：[工具申请方法与配置说明](./docs/apply_optional_tool.md)
 
-> chatgpt判断回复是否使用工具，你可要求chatgpt使用工具（更进一步地使用哪个工具）来帮助它更好回答你的问题
+#### (4). 执行terminal_io.py
 
-#### (5). 给项目点个star & 有能力pr，支持项目作者继续开发...
+```bash
+python3 terminal_io.py
+```
+
+#### (5). 进入LLM-OS后你可以自行探索 或者进一步浏览详细教程：[LLM_OS demo使用说明](https://github.com/goldfishh/llm-os/blob/main/README.md)
 
 --- 
 
-### 2. 去[chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat)使用本项目开发的tool插件：[tool README](https://github.com/goldfishh/chatgpt-on-wechat/blob/master/plugins/tool/README.md)
+### 2. 我给[chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat)开发了tool插件
 
-> 你可以在微信用到本项目为chatgpt提供的工具能力
+> 使用本方法，你将可以用微信作为前端更方便地使用tool-hub
+
+#### 查阅chatgpt-on-wechat文档中的[项目简介](https://github.com/zhayujie/chatgpt-on-wechat#%E7%AE%80%E4%BB%8B) 和 [快速开始](https://github.com/zhayujie/chatgpt-on-wechat#%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
+
+#### Note: 你需要安装拓展依赖才能使用tool插件
+
+#### [tool插件教程](https://github.com/goldfishh/chatgpt-on-wechat/blob/master/plugins/tool/README.md)
 
 ---
 
 ### 3. 你是其他项目开发者，想要接入本工具引擎
 
+> 本项目已发布到PyPI上，你只需使用pip命令即可安装
+
 #### (1). 安装chatgpt-tool-hub包
 
-`pip install -i https://pypi.python.org/simple chatgpt-tool-hub`
+```bash
+pip install -i https://pypi.python.org/simple chatgpt-tool-hub
+```
 
-#### (2). 示例代码：
+#### (2). 快速开始
 
 ```python
 import os
 from chatgpt_tool_hub.apps import AppFactory
-os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"
-os.environ["PROXY"] = "YOUR_PROXY_ADDRESS"
-app = AppFactory().create_app()
+os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"  # 必填
+os.environ["PROXY"] = "YOUR_PROXY_ADDRESS"            # 选填
+app = AppFactory().create_app(tools_list=[], **{})
 reply = app.ask("YOUR_QUESTION_TO_HERE")
 print(reply)
 ```
-  
-> 如果有需求，我会更新接入的文档，欢迎提issue
+
+#### (3). 以插件形式接入tool-hub可参考tool插件实现
+
+[tool.py](https://github.com/goldfishh/chatgpt-on-wechat/blob/master/plugins/tool/tool.py)
+
+> 如果有需求，我会更新更详细接入的文档，欢迎提issue
 
 ---
 
-## 工具指南
+## ☕ 宣传
+
+#### 如果你想支持本项目，欢迎给项目点个star、提issue和pr
+#### 如果你想进一步支持项目作者少掉头发，努力开发，可以给和我一起开发项目的伙伴 或 单独给我来杯 ☕
+
+<table><tr>
+<td><img src="https://github.com/zhayujie/chatgpt-on-wechat/blob/master/docs/images/planet.jpg?raw=true" width="400" height="200" border=0 /></td>
+<td><img src="./assets/buy_me_a_coffee.jpg" width="200" height="200" border=0 /></td>
+</tr></table> 
 
 ---
 
-> 工具名末尾加*表示使用该工具需要额外申请服务key, 超出免费额度需给服务提供商**支付费用** 
+## 工具指南 
 
-#### 1. terminal
+### 🚀 [工具指南 工具快速开发中](./docs/tool_tutorial.md)
 
-在你运行的电脑里执行shell命令，可以配合你想要ChatGPT生成的代码使用，给予你通过自然语言控制电脑手段 
-
-```text
-1. 使用Terminal执行curl cip.cc    
-2. wget下载 https://static.runoob.com/images/demo/demo2.jpg 到 xxx 路径    
-```
-
-#### 2. python
-
-python解释器，使用它来解释执行python指令，可以配合你想要ChatGPT生成的代码输出结果或执行事务
-
-```text
-1. 使用python查询今天日期    
-2. eval this expression: hex(123456)-123    
-```
-
-#### 3. url-get
-
-往往用来获取某个网站具体内容，结果可能会被反爬策略影响
-
-```
-1. 总结信息 https://github.com/goldfishh/chatgpt-tool-hub    
-2. 可以作为信息入口配合其他工具   
-```
-
-#### 4. wikipedia
-
-可以回答你想要知道确切的人事物
-
-```
-1. wikipedia 查找：小红帽   
-```
-
-#### 5. meteo-weather
-
-回答你有关天气的询问, 需要获取时间、地点上下文信息，本工具使用了[meteo open api](https://open-meteo.com/)
-
-```text
-1. 查询2023.4.1 南京未来七天的天气情况   
-2. 现在时间是2023.4.1 北京明天会不会下雨   
-```
-
-#### 6. news *
-
-获取实时新闻，从全球 80,000 多个信息源中获取当前和历史新闻文章
-
-```text
-1. 最近美国有什么热点新闻？   
-```
-
-#### 7. bing-search *
-
-bing搜索引擎，从此你不用再烦恼搜索要用哪些关键词
-```text
-1. 使用bing-search工具获取任何你想搜索的内容
-``` 
-
-#### 8. wolfram-alpha *
-
-知识搜索引擎、科学问答系统，常用于专业学科计算
-
-```text
-1. 使用wolfram gdp china vs. usa   
-2. 使用wolfram solve a x^2 + b x + c = 0 for x   
-```
-
-#### 申请可选工具：[方法](./docs/apply_optional_tool.md)  
+---
 
 ## 原理
 
@@ -322,39 +295,41 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
 ---
 
 
+## 🎯 计划
 
-## 计划
+<span id="plan"></span>
 
 ---
  
 ### feature todolist
   
-[✓] 结果可解释性输出  
-[○] 长文本场景, tool token溢出的问题    
+[✓] 结果可解释性输出 -> LLM-OS的内心独白 
+[✓] 一个前端demo  -> LLM-OS 
+[✓] 长文本场景 -> summary工具 
+[✓] 长工具顺序控制 -> 实现了toolintool机制   
+[✓] 粒度配置 -> 每个tool封装的LLM可独立配置  
+[○] tokens计算，精确管理    
 [○] gpt_index长文本(pdf、html)检索  
 [○] 接口并发支持  
-[○] support zero-shot tool && no tool    
-[○] 长工具顺序控制  
-[○] 工具中断、定时  
-[○] 粒度配置  
-[○] 语音输入  
-[✗] 一个前端demo   
+[○] 接入国内LLM
+[○] 兼容不使用tool的场景 
+[○] 互斥tool控制
+[○] subtree 动态注册&反注册
+[○] 工具中断
+[○] 定时调度
+
+[○] 语音输入、输出  
   
 ### tool todolist  
    
 [○] stable-diffusion 中文prompt翻译    
 [✓] ImageCaptioning   
 [○] 小米智能家居控制   
-[○] 支持ChatGPT官方插件  
+[○] 支持ChatGPT官方插件
+[○] 让LLM来实现tool
 [○] 支持图片处理工具   
 [○] 支持视频处理工具  
-[✗] Wechat  
-
-## Q&A
-
----
-
-我将在之后更新这部分内容  
+[✗] Wechat
 
 ## 工具开发指南
 
@@ -364,14 +339,22 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
  
 我等待有需求之后更新这部分内容    
 
-## 更新日志
-
----
-
-
+[工具开发教程](./docs/tool_development_guide.md)
 
 ## 背景
 
+我将很快更新这部分内容   
+
 ---
 
-我将很快更新这部分内容   
+## 感谢
+
+感谢以下项目对本项目提供的有力支持：
+
+#### 1. [langchain](https://github.com/hwchase17/langchain)
+
+#### 2. [Auto-GPT](https://github.com/Significant-Gravitas/Auto-GPT)
+
+#### 3. [chatgpt-in-terminal](https://github.com/xiaoxx970/chatgpt-in-terminal)
+
+---

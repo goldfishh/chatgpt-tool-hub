@@ -18,21 +18,21 @@ class AppFactory:
     def init_env(self, **kwargs):
         """ 环境初始化 """
         # set log level
-        nolog_flag = get_from_dict_or_env(kwargs, "nolog", "NOLOG", False)
-        debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", False)
-        if nolog_flag:
+        nolog_flag = get_from_dict_or_env(kwargs, "nolog", "NOLOG", "false")
+        debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", "false")
+        if str(nolog_flag).lower() in ['true', 'enable', 'yes']:
             consoleHandler.setLevel(logging.CRITICAL)
-        elif debug_flag:
+        elif str(debug_flag).lower() in ['true', 'enable', 'yes']:
             consoleHandler.setLevel(logging.DEBUG)
         else:
             consoleHandler.setLevel(logging.INFO)
 
         # default tools
         no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
-        if no_default_flag:
+        if str(no_default_flag).lower() in ['true', 'enable', 'yes']:
             self.default_tools_list = ["answer-user"]
         else:
-            self.default_tools_list = ["answer-user", "python", "terminal", "url-get", "meteo-weather", "news"]
+            self.default_tools_list = ["answer-user", "python", "terminal", "url-get", "meteo-weather"]
 
         # dynamic loading tool
         dynamic_tool_loader()
@@ -54,6 +54,7 @@ class AppFactory:
             for default_tool in self.default_tools_list:
                 if default_tool not in tools_list:
                     tools_list.append(default_tool)
+
             # todo refactor
             if "browser" in tools_list:
                 tools_list = list(filter(lambda tool: tool != "url-get", tools_list))
