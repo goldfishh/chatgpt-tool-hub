@@ -1,3 +1,4 @@
+""" tool-hub核心prompt，改动会影响所有tool效果 """
 PREFIX = """You are a helpful AI operating system called LLM-OS. 
 A user named {human_prefix} is currently interacting with you.
 

@@ -182,7 +182,8 @@ class ChatBot(Bot):
         if action.lower() not in self.allowed_tools:
             return "answer-user", action_input
 
-        self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...\n")
+        if action.lower() != "answer-user":
+            self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...\n")
         # todo
         LOG.info(f"执行Tool: {action}中...")
         return action.strip(), action_input.strip(" ").strip('"')
