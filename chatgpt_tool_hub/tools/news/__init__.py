@@ -1,11 +1,17 @@
 import importlib
-from chatgpt_tool_hub.common.log import LOG
+import os
 
+from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.tools import get_packages
 from chatgpt_tool_hub.tools.tool_register import ToolRegister
 
 news_tool_register = ToolRegister()
-
-all_tool_package_list = ["finance_news", "morning_news", "news_api"]
+try:
+    all_tool_package_list = get_packages(f"{os.path.dirname(os.path.abspath(__file__))}")
+except Exception as e:
+    LOG.debug(f"get_packages error: {repr(e)}")
+    all_tool_package_list = ["finance_news", "morning_news", "news_api"]
+    LOG.debug(f"Detected main tool package: {repr(all_tool_package_list)}")
 
 for package_name in all_tool_package_list:
     try:

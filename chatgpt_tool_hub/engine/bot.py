@@ -256,7 +256,7 @@ class Bot(BaseModel):
                 # If we cannot extract, we just return the full output
                 return BotFinish({"output": full_output}, full_output)
 
-            if action in ['bye', 'goodbye', 'end', 'exit', 'quit']:
+            if action.lower() in ['bye', 'goodbye', 'end', 'exit', 'quit']:
                 # If we can extract, we send the correct stuff
                 return BotFinish({"output": action_input}, full_output)
             else:

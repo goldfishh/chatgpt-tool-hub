@@ -1,11 +1,12 @@
+""" A frontend of LLM-OS, it's just a prototype for now."""
+
 import argparse
 import json
 import logging
 import os
-import sys
 from datetime import datetime
 
-import requests
+import pyperclip
 from dotenv import load_dotenv
 from prompt_toolkit import PromptSession, prompt
 from prompt_toolkit.completion import Completer, Completion
@@ -34,7 +35,14 @@ style = Style.from_dict({
     "prompt": "ansigreen",  # 将提示符设置为绿色
 })
 
+input_dialog_style = Style.from_dict({
+    'dialog': 'bg:#000000',
+    'dialog.body': 'bg:#ffffff',
+})
+
 who = "user"
+
+init_chat_history = []
 
 tools_with_api_key = {
     "bing-search": ["bing_subscription_key"],
@@ -46,10 +54,29 @@ tools_with_api_key = {
 }
 
 # todo consider higher tree
+# Dynamic addition and deletion of subtools are currently not supported.
 subtool_parent = {
     "morning-news": "news",
     "news-api": "news"
 }
+
+
+def read_json() -> dict:
+    curdir = os.path.dirname(__file__)
+    config_path = os.path.join(curdir, "config.json.template")
+    tool_config = {"tools": [], "kwargs": {"nolog": True}}
+    if not os.path.exists(config_path):
+        return tool_config
+    else:
+        with open(config_path, "r") as f:
+            tool_config = json.load(f)
+
+    if not tool_config.get("nolog"):
+        LOG.warning("nolog should be true to ban logging in tool-hub")  
+    return tool_config
+
+
+config = read_json()
 
 
 class ChatMode:
@@ -61,59 +88,45 @@ class ChatMode:
     def toggle_debug_mode(cls):
         cls.debug_mode = not cls.debug_mode
         console.print(
-            f"[dim]Debug mode {'enabled' if cls.debug_mode else 'disabled'}")
+            f"[dim]Debug 模式 {'已开启' if cls.debug_mode else '已关闭'}")
 
     @classmethod
     def toggle_raw_mode(cls):
         cls.raw_mode = not cls.raw_mode
         console.print(
-            f"[dim]Raw mode {'enabled' if cls.raw_mode else 'disabled'}, use `/last` to display the last answer.")
+            f"[dim]Raw 模式 {'已开启' if cls.raw_mode else '已关闭'}, "
+            "使用 `/last` 来显示 LLM-OS 上次回复 .")
 
     @classmethod
     def toggle_multi_line_mode(cls):
         cls.multi_line_mode = not cls.multi_line_mode
         if cls.multi_line_mode:
             console.print(
-                f"[dim]Multi-line mode enabled, press [[bright_magenta]Esc[/]] + [[bright_magenta]ENTER[/]] to submit.")
+                f"[dim]Multi-line 模式 已开启, 使用 [[bright_magenta]Esc[/]] + [[bright_magenta]ENTER[/]] 提交跨行文本.")
         else:
-            console.print(f"[dim]Multi-line mode disabled.")
+            console.print(f"[dim]Multi-line 模式 已关闭.")
 
-
-def read_json() -> dict:
-    curdir = os.path.dirname(__file__)
-    config_path = os.path.join(curdir, "config.json")
-    tool_config = {"tools": [], "kwargs": {}}
-    if not os.path.exists(config_path):
-        return tool_config
-    else:
-        with open(config_path, "r") as f:
-            tool_config = json.load(f)
-    # llmos should not log
-    tool_config["kwargs"]["nolog"] = True
-    return tool_config
-
-
-init_messages = [{"role": "system", "content": "You are a helpful assistant."}]
-
-config = read_json()
 
 class LLMOS:
-    def __init__(self, api_key: str, timeout: int):
-        self.messages = [{"role": "system", "content": "You are a helpful assistant."}]
+    def __init__(self, timeout: int):
+        self.messages = init_chat_history
 
-        self.app = AppFactory().create_app(tools_list=config["tools"], **config["kwargs"])
+        self.app = self.create_app()
 
+        # todo remove it, store in config.json
         self.model = 'gpt-3.5-turbo'
+        self.timeout = timeout
+
+        # todo 需要llm-os model支持
         self.tokens_limit = 4096
         self.total_tokens_spent = 0
         self.current_tokens = count_message_tokens(self.messages)
 
-        self.api_key = api_key
-        self.timeout = timeout
+    def create_app(self):
+        return AppFactory().create_app(tools_list=config["tools"], **config["kwargs"])
 
     @property
     def get_app(self) -> App:
-        """Will be whatever keys the prompt expects."""
         return self.app
 
     def handle(self, message: str):
@@ -127,19 +140,19 @@ class LLMOS:
                 return
 
             if response is not None:
-                LOG.info(f"LLM-OS: {response}")
+                LOG.info(f"LLM-OS response: {response}")
                 _message = {"role": "assistant", "content": f"{response}"}
                 print_message(_message)
                 self.messages.append(_message)
+                # todo
                 self.current_tokens = count_message_tokens(self.messages)
                 self.total_tokens_spent += self.current_tokens
 
         except Exception as e:
-            console.print(
-                f"[red]Error: {str(e)}. Check LOG for more information")
+            console.print(f"[red]系统错误: {str(e)}. 请检查日志获取更多信息")
             LOG.exception(e)
-            self.save_chat_history(
-                f'{sys.path[0]}/chat_history_backup_{datetime.now().strftime("%Y-%m-%d_%H,%M,%S")}.json')
+            # todo
+            self.save_chat_history(f'chat_history_backup_{datetime.now().strftime("%Y-%m-%d_%H,%M,%S")}.json')
             raise EOFError
 
         return response
@@ -151,92 +164,79 @@ class LLMOS:
 
             return response
         except KeyboardInterrupt:
-            console.print("[bold cyan]主动中断.")
+            console.print("[bold cyan]主动中断. 分析已停止.")
             raise
         except Exception as e:
-            console.print(f"[red]错误: {str(e)}")
+            console.print(f"[red]错误: {str(e)}. ")
             LOG.exception(e)
             return None
 
     def save_chat_history(self, filename):
-        with open(f"{filename}", 'w', encoding='utf-8') as f:
-            json.dump(self.messages, f, ensure_ascii=False, indent=4)
-        console.print(
-            f"[dim]Chat history saved to: [bright_magenta]{filename}", highlight=False)
+        # 默认存放路径在本文件下的log目录
+        file_dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "log")
+        if not file_dir_path:
+            os.mkdir(file_dir_path)
+        try:
+            with open(f"{os.path.join(file_dir_path, filename)}", 'w', encoding='utf-8') as f:
+                json.dump(self.messages, f, ensure_ascii=False, indent=4)
+            console.print(f"[dim]聊天记录保存成功: [bright_magenta]{filename}", highlight=False)
+        except Exception as e:
+            console.print(f"[red]聊天记录保存失败: {str(e)}. ")
+            LOG.exception(e)
 
     def get_credit_usage(self):
+        # todo
+        # tool-hub暂时不支持统计tokens cost
+        return {
+            'total_granted': "tool-hub暂时不支持统计tokens cost",
+            'total_used': '',
+            'total_available': ''
+        }
         url = 'https://api.openai.com/dashboard/billing/credit_grants'
-        try:
-            response = requests.get(url, headers=self.headers)
-        except requests.exceptions.RequestException as e:
-            console.print(f"[red]Error: {str(e)}")
-            LOG.exception(e)
-            return None
-        except Exception as e:
-            console.print(
-                f"[red]Error: {str(e)}. Check LOG for more information")
-            LOG.exception(e)
-            self.save_chat_history(
-                f'{sys.path[0]}/chat_history_backup_{datetime.now().strftime("%Y-%m-%d_%H,%M,%S")}.json')
-            raise EOFError
-        return response.json()
 
     def modify_system_prompt(self, new_content):
-        if self.messages[0]['role'] == 'system':
-            old_content = self.messages[0]['content']
-            self.messages[0]['content'] = new_content
-            console.print(
-                f"[dim]System prompt has been modified from '{old_content}' to '{new_content}'.")
-            self.current_tokens = count_message_tokens(self.messages)
-            # recount current tokens
-            if len(self.messages) > 1:
-                console.print(
-                    "[dim]Note this is not a new chat, modifications to the system prompt have limited impact on answers.")
-        else:
-            console.print(
-                f"[dim]No system prompt found in messages.")
+        # todo
+        # tool-hub暂时不支持修改系统prompt
+        return new_content
 
     def set_model(self, new_model: str):
         old_model = self.model
         if not new_model:
-            console.print(
-                f"[dim]Empty input, the model remains '{old_model}'.")
+            console.print(f"[dim]我没有收到新模型名，模型未变更: [bold cyan]{old_model}[/].")
             return
-        self.model = str(new_model)
-        if "gpt-4-32k" in self.model:
-            self.tokens_limit = 32768
-        elif "gpt-4" in self.model:
-            self.tokens_limit = 8192
-        elif "gpt-3.5-turbo" in self.model:
-            self.tokens_limit = 4096
+        # todo test gpt-4
+        if self.model.startswith("gpt-4-32k"):
+            tokens_limit = 32768
+        elif self.model.startswith("gpt-4"):
+            tokens_limit = 8192
+        elif self.model.startswith("gpt-3.5-turbo"):
+            tokens_limit = 4096
         else:
-            self.tokens_limit = -1
-        console.print(
-            f"[dim]Model has been set from '{old_model}' to '{new_model}'.")
+            console.print(f"[red]没有该模型 {new_model} tokens信息，模型未变更: [bold cyan]{old_model}[/].")
+            return
+
+        config["model_name"] = str(new_model)
+        self.model = str(new_model)
+        self.tokens_limit = tokens_limit
+        console.print(f"[dim]模型将发生变更 [bold cyan]{old_model}[/] -> [bold red]{new_model}[/].")
+        self.app = self.create_app()
 
     def set_timeout(self, timeout):
+        old_timeout = self.timeout
         try:
             self.timeout = float(timeout)
         except ValueError:
-            console.print("[red]Input must be a number")
+            console.print("[red]我没有收到数字")
             return
-        console.print(f"[dim]API timeout set to [green]{timeout}s[/].")
+        config["request_timeout"] = self.timeout
+        console.print(f"[dim] LLM-OS超时时间将发生变更 [bold cyan]{old_timeout}[/] -> [bold red]{self.timeout}[/].")
+        self.app = self.create_app()
 
 
 class CustomCompleter(Completer):
     commands = [
-        '/raw', '/multi', '/stream', '/tokens', '/last', '/copy',
-        '/model', '/save', '/system', '/timeout', '/undo', '/delete', '/help', '/exit'
-    ]
-
-    copy_actions = [
-        "code",
-        "all"
-    ]
-
-    delete_actions = [
-        "first",
-        "all"
+        '/debug', '/raw', '/multi', '/tool', '/add', '/del', '/depth', '/reset', '/model'
+        '/last', '/save', '/clear', '/timeout', '/undo', '/exit', '/copy', '/help'
     ]
 
     available_models = [
@@ -257,20 +257,12 @@ class CustomCompleter(Completer):
                 for model in self.available_models:
                     if model.startswith(model_prefix):
                         yield Completion(model, start_position=-len(model_prefix))
-            # Check if it's a /copy command
-            elif text.startswith('/copy '):
-                copy_prefix = text[6:]
-                for copy in self.copy_actions:
-                    if copy.startswith(copy_prefix):
-                        yield Completion(copy, start_position=-len(copy_prefix))
-
-            # Check if it's a /delete command
-            elif text.startswith('/delete '):
-                delete_prefix = text[8:]
-                for delete in self.delete_actions:
-                    if delete.startswith(delete_prefix):
-                        yield Completion(delete, start_position=-len(delete_prefix))
-
+            if text.startswith('/add '):
+                tool_prefix = text[5:]
+                available_tools = main_tool_register.get_registered_tool_names()
+                for tool in available_tools:
+                    if tool.startswith(tool_prefix):
+                        yield Completion(tool, start_position=-len(tool_prefix))
             else:
                 for command in self.commands:
                     if command.startswith(text):
@@ -291,6 +283,7 @@ def print_message(message):
     if role == "user":
         print(f"> {who}: {content}")
     elif role == "assistant":
+        # todo 有时会吞数据
         console.print("LLM-OS: ", end='', style="bold cyan")
         if ChatMode.raw_mode:
             print(content)
@@ -304,56 +297,47 @@ def handle_command(command: str, llm_os: LLMOS):
         ChatMode.toggle_raw_mode()
     elif command == '/multi':
         ChatMode.toggle_multi_line_mode()
-
-    elif command == '/tokens':
-        # here: tokens count may be wrong because of the support of changing AI models, because gpt-4 API allows max 8192 tokens (gpt-4-32k up to 32768)
-        # one possible solution is: there are only 6 models under '/v1/chat/completions' now, and with if-elif-else all cases can be enumerated
-        # but that means, when the model list is updated, here needs to be updated too
-
-        # tokens limit judge moved to LLM-OS.set_model function
-
-        console.print(Panel(f"[bold bright_magenta]Total Tokens Spent:[/]\t{llm_os.total_tokens_spent}\n"
-                            f"[bold green]Current Tokens:[/]\t\t{llm_os.current_tokens}/[bold]{llm_os.tokens_limit}",
-                            title='token_summary', title_align='left', width=40, style='dim'))
+    elif command == '/debug':
+        ChatMode.toggle_debug_mode()
 
     elif command == '/tool':
-
         tools_list = llm_os.get_app.get_tool_list()
-        # todo format below list
-        console.print(Panel(repr(tools_list), title='工具列表', width=80, style='dim'))
+        # todo beautify below Panel
+        console.print(Panel(repr(tools_list), title='工具列表', style='dim'))
 
     elif command.startswith('/add'):
         args = command.split()
-        tools_kwargs = {}
         if len(args) > 1:
             add_tool = args[1]
         else:
             add_tool = prompt("请输入想要添加的工具名: ", default="", style=style)
 
+        if not add_tool:
+            console.print("tool未改变.")
+            return
+
+        tools_kwargs = {}
         if tools_with_api_key.get(add_tool):
+            console.print(f"添加 [bold cyan]{add_tool}[/] 工具必须额外申请服务key")
             for tool_args in tools_with_api_key.get(add_tool):
-                console.print(f"添加{add_tool}工具必须额外申请服务key")
                 add_tool_args = ""
                 while not add_tool_args:
-                    add_tool_args = prompt(
-                        f"{tool_args}: ", default="", style=style)
+                    # ControlC or ControlD to break this loop
+                    add_tool_args = prompt(f"{tool_args}: ", default="", style=style)
                 tools_kwargs[tool_args] = add_tool_args
 
-        # todo
-        parent_tool = subtool_parent.get(add_tool, None)
-        if parent_tool:
-            add_tool = parent_tool
+        # todo 目前tool-hub不支持subtool粒度增删tool
 
         if add_tool not in main_tool_register.get_registered_tool_names():
-            console.print(f"发现未知工具：{add_tool}")
+            console.print(f"发现未知工具: {add_tool}")
             return
 
         app = llm_os.get_app
         app.add_tool(add_tool, **tools_kwargs)
 
         tools_list = app.get_tool_list()
-        # todo format below list
-        console.print(Panel(repr(tools_list), title='工具列表', width=80, style='dim'))
+        # todo beautify below Panel
+        console.print(Panel(repr(tools_list), title='工具列表', style='dim'))
 
     elif command.startswith('/del'):
         args = command.split()
@@ -362,19 +346,33 @@ def handle_command(command: str, llm_os: LLMOS):
         else:
             del_tool = prompt("请输入想要删除的工具名: ", default="", style=style)
 
+        if not del_tool:
+            console.print("tool未改变.")
+            return
+
         app = llm_os.get_app
         app.del_tool(del_tool)
 
         tools_list = app.get_tool_list()
-        # todo format below list
-        console.print(Panel(repr(tools_list), title='工具列表', width=80, style='dim'))
+        # todo beautify below Panel
+        console.print(Panel(repr(tools_list), title='工具列表', style='dim'))
 
     elif command.startswith('/depth'):
         args = command.split()
         if len(args) > 1:
             new_think_depth = args[1]
         else:
-            new_think_depth = prompt("请输入LLM-OS设定的思考深度: ", default="", style=style)
+            new_think_depth = prompt("请输入LLM-OS设定的思考深度: ", default="2", style=style)
+
+        if not new_think_depth:
+            console.print("depth未改变.")
+            return
+
+        try:
+            new_think_depth = int(new_think_depth)
+        except Exception as e:
+            LOG.error(f"parsing new_think_depth error: {repr(e)}")
+            console.print("思考深度类型必须为整数，depth未改变.")
 
         app = llm_os.get_app
         app.think_depth = new_think_depth
@@ -383,31 +381,21 @@ def handle_command(command: str, llm_os: LLMOS):
     elif command == '/reset':
         global config
         config = read_json()
-        llm_os.messages = init_messages
-
-    elif command == '/usage':
-        with console.status("Getting credit usage...") as status:
-            credit_usage = llm_os.get_credit_usage()
-        if not credit_usage:
-            return
-        console.print(Panel(f"[bold blue]Total Granted:[/]\t${credit_usage.get('total_granted')}\n"
-                            f"[bold bright_yellow]Used:[/]\t\t${credit_usage.get('total_used')}\n"
-                            f"[bold green]Available:[/]\t${credit_usage.get('total_available')}",
-                            title=credit_usage.get('object'), title_align='left', width=35, style='dim'))
-        console.print(
-            "[red]`[bright_magenta]/usage[/]` command is currently unavailable, it's not sure if this command will be available again or not.")
+        llm_os.app = llm_os.create_app()
+        # todo
+        llm_os.messages = init_chat_history
 
     elif command.startswith('/model'):
         args = command.split()
         if len(args) > 1:
             new_model = args[1]
         else:
-            new_model = prompt(
-                "OpenAI API model: ", default=llm_os.model, style=style)
+            new_model = prompt("请输入要更改的LLM名称: ", default=llm_os.model, style=style)
+
         if new_model != llm_os.model:
             llm_os.set_model(new_model)
         else:
-            console.print("[dim]No change.")
+            console.print("[dim]model未改变.")
 
     elif command == '/last':
         reply = llm_os.messages[-1]
@@ -418,21 +406,9 @@ def handle_command(command: str, llm_os: LLMOS):
         if len(args) > 1:
             filename = args[1]
         else:
-            date_filename = f'./chat_history_{datetime.now().strftime("%Y-%m-%d_%H,%M,%S")}.json'
+            date_filename = f'chat_history_{datetime.now().strftime("%Y-%m-%d_%H,%M,%S")}.json'
             filename = prompt("Save to: ", default=date_filename, style=style)
         llm_os.save_chat_history(filename)
-
-    elif command.startswith('/system'):
-        args = command.split()
-        if len(args) > 1:
-            new_content = ' '.join(args[1:])
-        else:
-            new_content = prompt(
-                "System prompt: ", default=llm_os.messages[0]['content'], style=style)
-        if new_content != llm_os.messages[0]['content']:
-            llm_os.modify_system_prompt(new_content)
-        else:
-            console.print("[dim]No change.")
 
     elif command == '/clear':
         clear()
@@ -442,47 +418,56 @@ def handle_command(command: str, llm_os: LLMOS):
         if len(args) > 1:
             new_timeout = args[1]
         else:
-            new_timeout = prompt(
-                "OpenAI API timeout: ", default=str(llm_os.timeout), style=style)
+            new_timeout = prompt("请输入更改后的超时时间 [bold red]整数[/]: ", default=str(llm_os.timeout), style=style)
         if new_timeout != str(llm_os.timeout):
             llm_os.set_timeout(new_timeout)
         else:
-            console.print("[dim]No change.")
+            console.print("[dim]timeout未改变. ")
 
     elif command == '/undo':
         if len(llm_os.messages) > 2:
             question = llm_os.messages.pop()
             if question['role'] == "assistant":
                 question = llm_os.messages.pop()
+            # print undo question
             truncated_question = question['content'].split('\n')[0]
             if len(question['content']) > len(truncated_question):
                 truncated_question += "..."
-            console.print(
-                f"[dim]Last question: '{truncated_question}' and it's answer has been removed.")
+            console.print(f"[dim]上个问题: [bold dim]'{truncated_question}'[/] 和对应回复已清除")
         else:
-            console.print("[dim]Nothing to undo.")
+            console.print("[dim]没有要做的事情.")
+
+    elif command.startswith('/copy'):
+        if len(llm_os.messages) > 1:
+            reply = llm_os.messages[-1]
+            pyperclip.copy(reply["content"])
+            console.print("[dim]LLM-OS上次回复已复制到粘贴板")
+        else:
+            console.print("[dim]没有要做的事情.")
 
     elif command == '/exit':
         raise EOFError
 
     else:
+        # todo 为 /help 专门做一个页面
         console.print("""[bold]Available commands:[/]
-    /raw                     - Toggle raw mode (showing raw text of LLM-OS's reply)
-    /multi                   - Toggle multi-line mode (allow multi-line input)
-    /stream                  - Toggle stream output mode (flow print the answer)
-    /tokens                  - Show the total tokens spent and the tokens for the current conversation
-    /last                    - Display last LLM-OS's reply
-    /copy (all)              - Copy the full LLM-OS's last reply (raw) to Clipboard
-    /copy code \[index]       - Copy the code in LLM-OS's last reply to Clipboard
-    /save \[filename_or_path] - Save the chat history to a file
-    /model \[model_name]      - Change AI model
-    /system \[new_prompt]     - Modify the system prompt
-    /timeout \[new_timeout]   - Modify the api timeout
-    /undo                    - Undo the last question and remove its answer
-    /delete (first)          - Delete the first conversation in current chat
-    /delete all              - Clear all messages and conversations current chat
-    /help                    - Show this help message
-    /exit                    - Exit the application""")
+    /debug                   - 切换debug模式开关
+    /raw                     - 切换raw模式开关 (不适用富文本渲染LLM-OS的回复)
+    /multi                   - 切换multi-line模式开关 (允许多行输入)
+    /tool                    - 查看当前加载工具列表
+    /add   [tool_name]       - 增加工具
+    /del   [tool_name]       - 删除工具
+    /depth                   - 设置LLM-OS思考深度 (设置过大可能无法停止)
+    /reset                   - LLM-OS重置 (重新加载配置并重置聊天记录)
+    /model [model_name]      - 切换模型 (目前仅支持gpt-3.5)
+    /last                    - 显示上一次LLM-OS的回复内容
+    /save [filename]         - 保存聊天记录
+    /clear                   - 清屏
+    /timeout [new_timeout]   - 修改访问llm的请求超时时间
+    /undo                    - 清除上一次与llm的对话记录 (包含问题和回复)
+    /exit                    - 离开
+    /copy                    - 复制上一次LLM-OS的回复内容到粘贴板
+    /help                    - 显示帮助信息""")
 
 
 def create_key_bindings():
@@ -502,53 +487,22 @@ def create_key_bindings():
 
 
 def main(args):
-    # 从 .env 文件中读取 OPENAI_API_KEY
+    # 从 .env 文件加载环境变量
     load_dotenv()
-    clear()
 
     if args.key:
-        api_key = os.environ.get(args.key)
+        api_key = str(args.key)
     else:
         api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
-        api_key = prompt("OpenAI API Key not found, please input: ")
+        api_key = prompt("我没有找到OpenAI API Key, 请输入: ", style=style)
+    config["openai_api_key"] = api_key
 
-    api_timeout = int(os.environ.get("OPENAI_API_TIMEOUT", "30"))
-
-    if args.debug:
-        ChatMode.debug_mode = True
-
-    global who
-    example_style = Style.from_dict({
-        'dialog': 'bg:#000000',
-        # 'dialog frame.label': 'bg:#ffffff #000000',
-        'dialog.body': 'bg:#ffffff',
-        # 'dialog shadow': 'bg:#00aa00',
-    })
-
-    if not ChatMode.debug_mode:
-        who = input_dialog(
-            title='个性化设置',
-            text='让我知道你的名字：',
-            ok_text='确认',
-            cancel_text='跳过',
-            style=example_style).run()
-        if not who:
-            who = 'user'
-
-    config["human_prefix"] = who
-
-    llm_os = LLMOS(api_key, api_timeout)
-
-    console.print(
-        f"[dim]{who} 你好:wave: , 欢迎进入 LLM-OS! \n"
-        "输入 `[bright_magenta]/help[/]` 可以获得帮助信息 \n"
-        "目前LLM-OS开发者只有我，能预见有大量:wrench:不能兼顾，请见谅 :persevere: \n"
-        "欢迎提issue和pr，希望这个项目变得更好 :chart_with_upwards_trend:"
-    )
-
-    if args.model:
-        llm_os.set_model(args.model)
+    if args.timeout:
+        request_timeout = os.environ.get(args.timeout)
+    else:
+        request_timeout = int(os.environ.get("REQUEST_TIMEOUT", "90"))
+    config["request_timeout"] = request_timeout
 
     if args.debug:
         ChatMode.toggle_debug_mode()
@@ -558,6 +512,33 @@ def main(args):
 
     if args.raw:
         ChatMode.toggle_raw_mode()
+
+    global who
+    if not ChatMode.debug_mode:
+        who = input_dialog(
+            title='个性化设置',
+            text='让我知道你的名字: ',
+            ok_text='确认',
+            cancel_text='跳过',
+            style=input_dialog_style).run()
+        if not who:
+            who = 'user'
+
+    config["human_prefix"] = who
+
+    llm_os = LLMOS(request_timeout)
+
+    if args.model:
+        llm_os.set_model(args.model)
+
+    clear()
+
+    console.print(
+        f"[dim]{who} 你好:wave: , 欢迎进入 LLM-OS! \n"
+        "输入 `[bright_magenta]/help[/]` 可以获得帮助信息 \n"
+        "目前LLM-OS开发者只有我，能预见有大量:wrench:不能兼顾，请见谅 :persevere: \n"
+        "欢迎提issue和pr，希望这个项目变得更好 :chart_with_upwards_trend:"
+    )
 
     session = PromptSession()
 
@@ -580,11 +561,11 @@ def main(args):
                 if not message:
                     continue
 
+                if message.lower() in ['bye', 'goodbye', 'end', 'exit', 'quit']:
+                    break
+
                 LOG.info(f"> {who}: {message}")
                 llm_os.handle(message)
-
-                if message.lower() in ['再见', 'bye', 'goodbye', '结束', 'end', '退出', 'exit', 'quit']:
-                    break
 
         except KeyboardInterrupt:
             # raises KeyboardInterrupt when ControlC has been pressed
@@ -596,7 +577,7 @@ def main(args):
 
     LOG.info(f"这次互动用了 {llm_os.total_tokens_spent} tokens")
     console.print(
-        f"[bright_magenta]这次互动用了： [bold]{llm_os.total_tokens_spent} tokens")
+        f"[bright_magenta]这次互动用了:  [bold]{llm_os.total_tokens_spent} tokens")
 
 
 if __name__ == "__main__":

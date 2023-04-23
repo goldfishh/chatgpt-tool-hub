@@ -35,6 +35,8 @@ google-api-python-client
 
 # for terminal_io
 rich
+dotenv
+pyperclip
 prompt_toolkit
 
 # todo decouple it

@@ -11,8 +11,10 @@ dist/
 *.pyc
 **.log
 
+.env.template
+config.json.template
+
 # dev
 Dockerfile
-.env
 build.sh
 *.self

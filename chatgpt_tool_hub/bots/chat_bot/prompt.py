@@ -20,7 +20,7 @@ Response Format:
         "speak": "thoughts summary to say to {human_prefix}",
     }}}},
     "tool": {{{{
-        "name": "the tool to use, should be one of [{tool_names}]", 
+        "name": "the tool to use, You must use one of the tools from the list: [{tool_names}]", 
         "input": "the input to the tool" 
     }}}}
 }}}}
@@ -38,7 +38,5 @@ User input: {input}
 
 {bot_scratchpad}
 
-You should provide feedback on whether the task has been completed, 
-explain what you have done, what you have seen and what the outcome was to the Human. 
-Don't make up you response.
+If nothing todo, you should use exit tool.
 """

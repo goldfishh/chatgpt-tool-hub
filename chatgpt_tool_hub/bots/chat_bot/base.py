@@ -176,7 +176,7 @@ class ChatBot(Bot):
         except Exception as e:
             LOG.error("Error:", str(e))
 
-        if action in ['bye', 'goodbye', 'end', 'exit', 'quit']:
+        if action.lower() in ['bye', 'goodbye', 'end', 'exit', 'quit']:
             return "exit", action_input
 
         self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...\n")
