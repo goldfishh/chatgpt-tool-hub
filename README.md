@@ -24,6 +24,12 @@
 
 ## 🌱 4.23 新增LLM-OS demo - [快速上手](#llm-os_jump)
 
+
+
+https://user-images.githubusercontent.com/24581028/233855116-ecbc5ea8-246b-46c6-8a1a-67ea6d970077.mp4
+
+
+
 #### [更新日志](./docs/update_log.md) | [Q&A](./docs/q_and_a.md)
 
 ## 简介
