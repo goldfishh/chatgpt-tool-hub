@@ -69,12 +69,12 @@ class APIChain(Chain, BaseModel):
         api_url = self.api_request_chain.predict(
             question=question, api_docs=self.api_docs
         )
-        LOG.debug("[API] generate url: " + str(api_url))
+        LOG.debug(f"[API] generate url: {str(api_url)}")
         self.callback_manager.on_text(
             api_url, color="green", end="\n", verbose=self.verbose
         )
         api_response = self.requests_wrapper.get(api_url)
-        LOG.debug("[API] response: " + str(api_response))
+        LOG.debug(f"[API] response: {str(api_response)}")
         self.callback_manager.on_text(
             api_response, color="yellow", end="\n", verbose=self.verbose
         )

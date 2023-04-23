@@ -35,10 +35,10 @@ class BingSearchAPIWrapper(BaseModel):
         search_results = json.loads(response)
         try:
             result = search_results["webPages"]["value"]
-            LOG.debug("[bing_search] output: " + str(result))
+            LOG.debug(f"[bing_search] output: {str(result)}")
         except Exception as e:
             result = []
-            LOG.error("[bing_search] " + repr(e))
+            LOG.error(f"[bing_search] {repr(e)}")
         return result
 
     @root_validator(pre=True)

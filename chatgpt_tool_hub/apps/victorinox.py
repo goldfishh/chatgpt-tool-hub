@@ -41,7 +41,6 @@ class Victorinox(App):
             LOG.warning("refresh the config of tools")
 
         self.update_tool_args(tools_list, **tools_kwargs)
-
         self.load_tools_into_bot(**tools_kwargs)
 
     def add_tool(self, tool: str, **tools_kwargs):
@@ -50,7 +49,6 @@ class Victorinox(App):
             return
 
         self.update_tool_args([tool], **tools_kwargs)
-
         self.load_tools_into_bot()
 
     def del_tool(self, tool: str, **tools_kwargs):
@@ -59,7 +57,6 @@ class Victorinox(App):
             return
 
         self.update_tool_args([tool], is_del=True, **tools_kwargs)
-
         self.load_tools_into_bot()
 
     def update_tool_args(self, tools_list: list, is_del: bool = False, **tools_kwargs):
@@ -81,11 +78,12 @@ class Victorinox(App):
         try:
             tools = load_tools(list(self.tools), main_tool_register, console=self.console, **self.tools_kwargs)
         except ValueError as e:
-            LOG.error(str(e))
+            LOG.error(repr(e))
             raise RuntimeError("loading tool failed")
 
-        # loading tools from config.
-        LOG.info(f"use_tools={[tool.name for tool in tools]}, params: {str(self.tools_kwargs)}")
+        # tool可能注册失败
+        self.tools = set([tool.name for tool in tools])
+        LOG.info(f"use_tools={list(self.tools)}, params: {str(self.tools_kwargs)}")
 
         self.init_tool_engine(tools, **tools_kwargs)
 
@@ -136,7 +134,7 @@ class Victorinox(App):
                 outputs["output"] = item.get('content')
                 self.memory.save_context(inputs, outputs)
 
-        LOG.debug("Now memory: {}".format(self.memory.chat_memory.messages))
+        LOG.debug(f"Now memory: {repr(self.memory.chat_memory.messages)}")
 
 
 if __name__ == "__main__":

@@ -45,7 +45,7 @@ class WolframAlphaAPIWrapper(BaseModel):
         try:
             assumption = next(res.pods).text
             answer = next(res.results).text
-            LOG.debug("[wolfram alpha]: " + str(assumption) + ", " + str(answer))
+            LOG.debug(f"[wolfram alpha]: {str(assumption)}, {str(answer)}")
         except StopIteration:
             return "Wolfram Alpha wasn't able to answer it"
 

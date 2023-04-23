@@ -23,6 +23,7 @@ class GoogleSearch(BaseTool):
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console)
+        self.api_wrapper = GoogleSearchAPIWrapper(**tool_kwargs)
 
     def _run(self, query: str) -> str:
         """Use the tool."""
@@ -42,10 +43,11 @@ class GoogleSearchJson(BaseTool):
         "Useful for when you need to answer questions about current events. "
         "Input should be a search query. Output is a JSON array of the query results"
     )
-    api_wrapper: GoogleSearchAPIWrapper
+    api_wrapper: GoogleSearchAPIWrapper = None
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console)
+        self.api_wrapper = GoogleSearchAPIWrapper(**tool_kwargs)
 
     def _run(self, query: str) -> str:
         """Use the tool."""
@@ -57,5 +59,5 @@ class GoogleSearchJson(BaseTool):
 
 
 main_tool_register.register_tool(default_tool_name,
-                                 lambda console, kwargs: GoogleSearchJson(console, api_wrapper=GoogleSearchAPIWrapper(**kwargs)),
+                                 lambda console, kwargs: GoogleSearchJson(console, **kwargs),
                                  tool_input_keys=["google_api_key", "google_cse_id"])

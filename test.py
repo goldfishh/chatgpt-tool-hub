@@ -9,7 +9,7 @@ if __name__ == "__main__":
         print("没有收到你的问题")
     else:
         try:
-            with open("config.json.template", "r") as f:
+            with open("config.json", "r") as f:
                 config = json.load(f)
         except Exception as e:
             LOG.error(repr(e))

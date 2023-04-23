@@ -23,9 +23,10 @@ class WolframAlphaTool(BaseTool):
     )
     api_wrapper: WolframAlphaAPIWrapper
 
-    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+    def __init__(self, console: Console = Console(), **tool_kwargs):
         # 这个工具直接返回内容
         super().__init__(console=console, return_direct=False)
+        self.api_wrapper = WolframAlphaAPIWrapper(**tool_kwargs)
 
     def _run(self, query: str) -> str:
         """Use the WolframAlpha tool."""
@@ -36,5 +37,5 @@ class WolframAlphaTool(BaseTool):
         raise NotImplementedError("WolframAlphaTool does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: WolframAlphaTool(console, api_wrapper=WolframAlphaAPIWrapper(**kwargs)),
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: WolframAlphaTool(console, **kwargs),
               tool_input_keys=["wolfram_alpha_appid"])

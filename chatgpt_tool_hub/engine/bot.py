@@ -72,8 +72,8 @@ class Bot(BaseModel):
         """Construct the scratchpad that lets the bot continue its thought process."""
         thoughts = ""
         for action, observation in intermediate_steps:
-            thoughts += action.log
-            thoughts += f"\n{self.observation_prefix}{observation}\n{self.llm_prefix}"
+            thoughts += f"The JSON you responded me: \n{action.log}\n\n"
+            thoughts += f"The content returned after invoking the tool: \n{observation}\n\n"
         return thoughts
 
     def _crop_full_input(self, inputs: str) -> str:
@@ -256,7 +256,7 @@ class Bot(BaseModel):
                 # If we cannot extract, we just return the full output
                 return BotFinish({"output": full_output}, full_output)
 
-            if action.lower() in ['bye', 'goodbye', 'end', 'exit', 'quit']:
+            if action.lower() in ['answer-user']:
                 # If we can extract, we send the correct stuff
                 return BotFinish({"output": action_input}, full_output)
             else:

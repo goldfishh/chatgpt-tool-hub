@@ -31,9 +31,9 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         try:
             html = self.requests_wrapper.get(url)
             _content = filter_text(html)
-            LOG.debug("[url-get] output: " + str(_content))
+            LOG.debug(f"[url-get] output: {str(_content)}")
         except Exception as e:
-            LOG.error("[url-get] " + str(e))
+            LOG.error(f"[url-get] {str(e)}")
             _content = repr(e)
         return _content
 
@@ -42,9 +42,9 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         try:
             html = await self.requests_wrapper.aget(url)
             _content = filter_text(html)
-            LOG.debug("[url-get] output: " + str(_content))
+            LOG.debug(f"[url-get] output: {str(_content)}")
         except Exception as e:
-            LOG.error("[url-get] " + str(e))
+            LOG.error(f"[url-get] {str(e)}")
             _content = repr(e)
         return _content
 

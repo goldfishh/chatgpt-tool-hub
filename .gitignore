@@ -6,13 +6,14 @@
 build/
 *.egg-info/
 dist/
+log/
 **/.DS_Store
 .idea/
 *.pyc
 **.log
 
-.env.template
-config.json.template
+.env
+config.json
 
 # dev
 Dockerfile

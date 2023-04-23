@@ -68,7 +68,7 @@ class GoogleSearchAPIWrapper(BaseModel):
         for result in results:
             if "snippet" in result:
                 snippets.append(filter_text(result["snippet"]))
-        LOG.debug("[GoogleSearch] output: " + str(snippets))
+        LOG.debug(f"[GoogleSearch] output: {str(snippets)}")
         return " ".join(snippets)
 
     def results(self, query: str) -> List[Dict]:
@@ -97,5 +97,5 @@ class GoogleSearchAPIWrapper(BaseModel):
             if "snippet" in result:
                 metadata_result["snippet"] = filter_text(result["snippet"])
             metadata_results.append(metadata_result)
-        LOG.debug("[GoogleSearch] output: " + str(metadata_results))
+        LOG.debug(f"[GoogleSearch] output: {str(metadata_results)}")
         return metadata_results

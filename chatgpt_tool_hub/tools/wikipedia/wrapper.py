@@ -62,5 +62,5 @@ class WikipediaAPIWrapper(BaseModel):
             self.wiki_client.exceptions.PageError,
             self.wiki_client.exceptions.DisambiguationError,
         ) as e:
-            LOG.error("[wikipedia]: " + repr(e))
+            LOG.error(f"[wikipedia]: {repr(e)}")
             return None

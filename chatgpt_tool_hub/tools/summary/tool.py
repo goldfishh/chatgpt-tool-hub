@@ -134,7 +134,7 @@ class SummaryTool(BaseTool):
         try:
             self.message_num = int(message_num)
         except Exception as e:
-            LOG.error(e)
+            LOG.error(repr(e))
 
         _clipper = TextClipper(self.max_segment_length)
         with open(file_path, "r") as f:

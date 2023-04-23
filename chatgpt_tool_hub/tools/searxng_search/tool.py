@@ -46,8 +46,9 @@ class SearxSearchJsonTool(BaseTool):
     api_wrapper: SearxSearchWrapper
     num_results: int = 4
 
-    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+    def __init__(self, console: Console = Console(), **tool_kwargs):
         super().__init__(console=console, return_direct=True)
+        self.api_wrapper = SearxSearchWrapper(**tool_kwargs)
 
     class Config:
         """Pydantic config."""
@@ -64,5 +65,5 @@ class SearxSearchJsonTool(BaseTool):
 
 
 main_tool_register.register_tool(default_tool_name,
-                                 lambda console, kwargs: SearxSearchTool(console, api_wrapper=SearxSearchWrapper(**kwargs)),
+                                 lambda console, kwargs: SearxSearchTool(console, **kwargs),
                                  tool_input_keys=["searx_search_host"])

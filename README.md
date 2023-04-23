@@ -2,20 +2,29 @@
 <p align='center'>给ChatGPT装上手和脚，拿起工具提高你的生产力</p>
 
 <p align="center">
-  <a style="text-decoration:none" href="https://aianything.netlify.app" target="_blank">
+  <a style="text-decoration:none" href="https://github.com/goldfishh" target="_blank">
     <img src="https://img.shields.io/badge/language-python-blue" alt="Language" />
   </a>
-  <a style="text-decoration:none" href="https://github.com/KeJunMao" target="_blank">
+  <a style="text-decoration:none" href="https://github.com/goldfishh" target="_blank">
     <img src="https://img.shields.io/github/license/goldfishh/chatgpt-tool-hub" alt="license " />
   </a>
-  <a style="text-decoration:none" href="https://github.com/KeJunMao" target="_blank">
-    <img src="https://img.shields.io/github/last-commit/goldfishh/chatgpt-tool-hub" alt="last commit " />
+  <a style="text-decoration:none" href="https://github.com/goldfishh" target="_blank">
+    <img src="https://img.shields.io/github/commit-activity/w/goldfishh/chatgpt-tool-hub" alt="commit-activity-week " />
+  </a>
+  <a style="text-decoration:none" href="https://pypi.org/project/chatgpt-tool-hub/" target="_blank">
+    <img src="https://img.shields.io/pypi/dw/chatgpt-tool-hub" alt="pypi-download-dw" />
   </a>
 </p>
 
 
 ---
 简体中文 | [English](./docs/README_en.md)
+
+> 大语言模型涌现能力让人惊艳，ChatGPT出现给NLP技术带来革命，除此之外还让我意识到一种新的人机交互的可能性
+
+## 🌱 4.23 新增LLM-OS demo - [快速上手]()
+
+#### [更新日志](./docs/update_log.md) | [Q&A](./docs/q_and_a.md)
 
 ## 简介
 

@@ -33,11 +33,11 @@ class PythonREPL(BaseModel):
             exec(command, self.globals, self.locals)
             sys.stdout = old_stdout
             output = mystdout.getvalue()
-            LOG.debug("[python] output: " + str(output))
+            LOG.debug(f"[python] output: {str(output)}")
         except Exception as e:
             output = repr(e)
             sys.stdout = old_stdout
-            LOG.error("[python] " + str(output))
+            LOG.error(f"[python] {str(output)}")
         return output
 
 

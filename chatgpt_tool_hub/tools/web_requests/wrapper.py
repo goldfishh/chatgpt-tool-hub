@@ -48,7 +48,7 @@ class RequestsWrapper(BaseModel):
             try:
                 response.raise_for_status()
             except Exception as e:
-                LOG.error("RequestsWrapper.get status_code is not good: " + repr(e))
+                LOG.error(f"RequestsWrapper.get status_code is not good: {repr(e)}")
 
         return response.text
 
