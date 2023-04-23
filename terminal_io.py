@@ -40,7 +40,7 @@ input_dialog_style = Style.from_dict({
     'dialog.body': 'bg:#ffffff',
 })
 
-who = "user"
+who = ""
 
 init_chat_history = []
 
@@ -61,9 +61,9 @@ subtool_parent = {
 }
 
 
-def read_json() -> dict:
+def read_config_json() -> dict:
     curdir = os.path.dirname(__file__)
-    config_path = os.path.join(curdir, "config.json.template")
+    config_path = os.path.join(curdir, "config.json")
     tool_config = {"tools": [], "kwargs": {"nolog": True}}
     if not os.path.exists(config_path):
         return tool_config
@@ -72,11 +72,19 @@ def read_json() -> dict:
             tool_config = json.load(f)
 
     if not tool_config.get("nolog"):
-        LOG.warning("nolog should be true to ban logging in tool-hub")  
+        LOG.warning("nolog should be true to ban logging in tool-hub")
     return tool_config
 
 
-config = read_json()
+def save_config_json():
+    global config
+    curdir = os.path.dirname(__file__)
+    config_path = os.path.join(curdir, "config.json")
+    with open(config_path, "w") as f:
+        json.dump(config, f)
+
+
+config = read_config_json()
 
 
 class ChatMode:
@@ -174,7 +182,7 @@ class LLMOS:
     def save_chat_history(self, filename):
         # 默认存放路径在本文件下的log目录
         file_dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "log")
-        if not file_dir_path:
+        if not os.path.exists(file_dir_path):
             os.mkdir(file_dir_path)
         try:
             with open(f"{os.path.join(file_dir_path, filename)}", 'w', encoding='utf-8') as f:
@@ -215,7 +223,7 @@ class LLMOS:
             console.print(f"[red]没有该模型 {new_model} tokens信息，模型未变更: [bold cyan]{old_model}[/].")
             return
 
-        config["model_name"] = str(new_model)
+        config["kwargs"]["model_name"] = str(new_model)
         self.model = str(new_model)
         self.tokens_limit = tokens_limit
         console.print(f"[dim]模型将发生变更 [bold cyan]{old_model}[/] -> [bold red]{new_model}[/].")
@@ -228,7 +236,7 @@ class LLMOS:
         except ValueError:
             console.print("[red]我没有收到数字")
             return
-        config["request_timeout"] = self.timeout
+        config["kwargs"]["request_timeout"] = self.timeout
         console.print(f"[dim] LLM-OS超时时间将发生变更 [bold cyan]{old_timeout}[/] -> [bold red]{self.timeout}[/].")
         self.app = self.create_app()
 
@@ -236,7 +244,8 @@ class LLMOS:
 class CustomCompleter(Completer):
     commands = [
         '/debug', '/raw', '/multi', '/tool', '/add', '/del', '/depth', '/reset', '/model'
-        '/last', '/save', '/clear', '/timeout', '/undo', '/exit', '/copy', '/help'
+                                                                                 '/last', '/save', '/clear', '/timeout',
+        '/undo', '/exit', '/copy', '/help'
     ]
 
     available_models = [
@@ -293,13 +302,16 @@ def print_message(message):
 
 def handle_command(command: str, llm_os: LLMOS):
     """处理斜杠(/)命令"""
+    global config
+
     if command == '/raw':
         ChatMode.toggle_raw_mode()
     elif command == '/multi':
         ChatMode.toggle_multi_line_mode()
     elif command == '/debug':
         ChatMode.toggle_debug_mode()
-
+        config["kwargs"]['nolog'] = not ChatMode.debug_mode
+        llm_os.app = llm_os.create_app()
     elif command == '/tool':
         tools_list = llm_os.get_app.get_tool_list()
         # todo beautify below Panel
@@ -379,8 +391,7 @@ def handle_command(command: str, llm_os: LLMOS):
         app.load_tools_into_bot()
 
     elif command == '/reset':
-        global config
-        config = read_json()
+        config = read_config_json()
         llm_os.app = llm_os.create_app()
         # todo
         llm_os.messages = init_chat_history
@@ -398,8 +409,11 @@ def handle_command(command: str, llm_os: LLMOS):
             console.print("[dim]model未改变.")
 
     elif command == '/last':
-        reply = llm_os.messages[-1]
-        print_message(reply)
+        if len(llm_os.messages) > 1:
+            reply = llm_os.messages[-1]
+            print_message(reply)
+        else:
+            console.print("[dim]没有要做的事情.")
 
     elif command.startswith('/save'):
         args = command.split()
@@ -452,21 +466,21 @@ def handle_command(command: str, llm_os: LLMOS):
         # todo 为 /help 专门做一个页面
         console.print("""[bold]Available commands:[/]
     /debug                   - 切换debug模式开关
-    /raw                     - 切换raw模式开关 (不适用富文本渲染LLM-OS的回复)
+    /raw                     - 切换raw模式开关 (禁用富文本)
     /multi                   - 切换multi-line模式开关 (允许多行输入)
     /tool                    - 查看当前加载工具列表
-    /add   [tool_name]       - 增加工具
-    /del   [tool_name]       - 删除工具
+    /add     \[tool_name]     - 增加工具
+    /del     \[tool_name]     - 删除工具
     /depth                   - 设置LLM-OS思考深度 (设置过大可能无法停止)
     /reset                   - LLM-OS重置 (重新加载配置并重置聊天记录)
-    /model [model_name]      - 切换模型 (目前仅支持gpt-3.5)
+    /timeout \[new_timeout]   - 修改访问llm的请求超时时间
+    /model   \[model_name]    - 切换模型 (目前仅支持gpt-3.5)
     /last                    - 显示上一次LLM-OS的回复内容
-    /save [filename]         - 保存聊天记录
-    /clear                   - 清屏
-    /timeout [new_timeout]   - 修改访问llm的请求超时时间
-    /undo                    - 清除上一次与llm的对话记录 (包含问题和回复)
-    /exit                    - 离开
     /copy                    - 复制上一次LLM-OS的回复内容到粘贴板
+    /undo                    - 清除上一次与llm的对话记录 (包含问题和回复)
+    /save    \[filename]      - 保存聊天记录
+    /clear                   - 清屏
+    /exit                    - 离开
     /help                    - 显示帮助信息""")
 
 
@@ -496,15 +510,15 @@ def main(args):
         api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
         api_key = prompt("我没有找到OpenAI API Key, 请输入: ", style=style)
-    config["openai_api_key"] = api_key
+    config["kwargs"]["openai_api_key"] = api_key
 
     if args.timeout:
         request_timeout = os.environ.get(args.timeout)
     else:
         request_timeout = int(os.environ.get("REQUEST_TIMEOUT", "90"))
-    config["request_timeout"] = request_timeout
+    config["kwargs"]["request_timeout"] = request_timeout
 
-    if args.debug:
+    if args.debug or config.get('kwargs', {}).get('debug', False):
         ChatMode.toggle_debug_mode()
 
     if args.multi:
@@ -521,10 +535,10 @@ def main(args):
             ok_text='确认',
             cancel_text='跳过',
             style=input_dialog_style).run()
-        if not who:
-            who = 'user'
+    if not who:
+        who = 'user'
 
-    config["human_prefix"] = who
+    config["kwargs"]["human_prefix"] = who
 
     llm_os = LLMOS(request_timeout)
 
@@ -550,9 +564,8 @@ def main(args):
 
     while True:
         try:
-            # todo color of `who`
-            message = session.prompt(
-                f'> {who}: ', completer=commands, complete_while_typing=True, key_bindings=key_bindings)
+            message = session.prompt(f'> {who}: ', completer=commands,
+                                     complete_while_typing=True, key_bindings=key_bindings)
 
             if message.startswith('/'):
                 command = message.strip().lower()
@@ -572,12 +585,14 @@ def main(args):
             continue
         except EOFError:
             # EOFError when ControlD has been pressed
-            console.print("拜拜~ 👋🏻")
             break
 
-    LOG.info(f"这次互动用了 {llm_os.total_tokens_spent} tokens")
-    console.print(
-        f"[bright_magenta]这次互动用了:  [bold]{llm_os.total_tokens_spent} tokens")
+    save_config_json()
+    console.print("[dim]拜拜~ 👋🏻")
+    # todo
+    # LOG.info(f"这次互动用了 {llm_os.total_tokens_spent} tokens")
+    # console.print(
+    #     f"[bright_magenta]这次互动用了:  [bold]{llm_os.total_tokens_spent} tokens")
 
 
 if __name__ == "__main__":

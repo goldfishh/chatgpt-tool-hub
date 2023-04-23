@@ -103,7 +103,7 @@ class ChatBot(Bot):
         """Given input, decided what to do."""
         full_inputs = self.get_full_inputs(intermediate_steps, **kwargs)
         action = self._get_next_action(full_inputs)
-        if action.tool == "exit":
+        if action.tool == "answer-user":
             return BotFinish({"output": action.tool_input}, action.log)
         return action
 
@@ -174,10 +174,13 @@ class ChatBot(Bot):
             LOG.error("Error:", "Invalid JSON")
 
         except Exception as e:
-            LOG.error("Error:", str(e))
+            LOG.error(f"Error: {repr(e)}")
 
-        if action.lower() in ['bye', 'goodbye', 'end', 'exit', 'quit']:
-            return "exit", action_input
+        if action.lower() == "answer-user" and action_input in ['', '空', '无']:
+            action_input = llm_reply_json.get('thoughts', {}).get('speak', '')
+
+        if action.lower() not in self.allowed_tools:
+            return "answer-user", action_input
 
         self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...\n")
         # todo
@@ -191,7 +194,7 @@ class ChatBot(Bot):
                 # Parse and print Assistant response
                 assistant_reply_json = json_utils.fix_and_parse_json(assistant_reply)
             except json.JSONDecodeError as e:
-                LOG.error("Error: Invalid JSON in assistant thoughts\n", assistant_reply)
+                LOG.error(f"Error: Invalid JSON in assistant thoughts: {assistant_reply}, error: {repr(e)}")
                 assistant_reply_json = json_utils.fix_json_by_finding_outermost_brackets(assistant_reply)
 
                 assistant_reply_json = json_utils.fix_and_parse_json(assistant_reply_json)
@@ -202,7 +205,7 @@ class ChatBot(Bot):
                 try:
                     assistant_reply_json = json.loads(assistant_reply_json)
                 except json.JSONDecodeError as e:
-                    LOG.error("Error: Invalid JSON\n", assistant_reply)
+                    LOG.error(f"Error: Invalid JSON: {assistant_reply}, error: {repr(e)}")
                     assistant_reply_json = (
                         json_utils.fix_json_by_finding_outermost_brackets(assistant_reply_json)
                     )
@@ -232,15 +235,15 @@ class ChatBot(Bot):
             # it's useful for avoid splitting Panel
             self.console.print("\n")
             return assistant_reply_json
-        except json.decoder.JSONDecodeError:
+        except json.decoder.JSONDecodeError as e:
             call_stack = traceback.format_exc()
-            LOG.error("Error: Invalid JSON\n", assistant_reply)
-            LOG.error("Traceback: \n", call_stack)
+            LOG.error(f"Error: Invalid JSON: {assistant_reply}\n")
+            LOG.error(f"Traceback: {repr(call_stack)}, error: {repr(e)}")
 
         # All other errors, return "Error: + error message"
-        except Exception:
+        except Exception as e:
             call_stack = traceback.format_exc()
-            LOG.error("Error: \n", call_stack)
+            LOG.error(f"Traceback: {repr(call_stack)}, error: {repr(e)}")
 
     @classmethod
     def from_llm_and_tools(

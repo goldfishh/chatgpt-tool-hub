@@ -79,15 +79,15 @@ class BashProcess:
                 timeout=self.timeout  # raises TimeoutExpired after running 20s
             ).stdout.decode()
         except subprocess.CalledProcessError as error:
-            LOG.error("[Terminal] " + str(error))
+            LOG.error(f"[Terminal] {str(error)}")
             if self.return_err_output:
                 return error.stdout.decode()
             return "this tool can't run there commands"
         except subprocess.TimeoutExpired as error:
-            LOG.error("[Terminal] " + str(error))
+            LOG.error(f"[Terminal] {str(error)}")
             return f"you input commands exceeds the time limit: `{self.timeout} seconds` " \
                    "supported by the tool for executing commands."
-        LOG.debug("[Terminal] output: " + str(output))
+        LOG.debug(f"[Terminal] output: {str(output)}")
         return output
 
 

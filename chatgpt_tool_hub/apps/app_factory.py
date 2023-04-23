@@ -1,11 +1,12 @@
 import logging
 
+from rich.console import Console
+
 from chatgpt_tool_hub.apps import App
-from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.common.log import consoleHandler
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.tools import dynamic_tool_loader
-from rich.console import Console
 
 
 class AppFactory:
@@ -20,18 +21,18 @@ class AppFactory:
         nolog_flag = get_from_dict_or_env(kwargs, "nolog", "NOLOG", False)
         debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", False)
         if nolog_flag:
-            LOG.setLevel(logging.CRITICAL)
+            consoleHandler.setLevel(logging.CRITICAL)
         elif debug_flag:
-            LOG.setLevel(logging.DEBUG)
+            consoleHandler.setLevel(logging.DEBUG)
         else:
-            LOG.setLevel(logging.INFO)
+            consoleHandler.setLevel(logging.INFO)
 
         # default tools
         no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
         if no_default_flag:
-            self.default_tools_list = ["exit"]
+            self.default_tools_list = ["answer-user"]
         else:
-            self.default_tools_list = ["exit", "python", "terminal", "url-get", "meteo-weather", "news"]
+            self.default_tools_list = ["answer-user", "python", "terminal", "url-get", "meteo-weather", "news"]
 
         # dynamic loading tool
         dynamic_tool_loader()
@@ -58,14 +59,6 @@ class AppFactory:
                 tools_list = list(filter(lambda tool: tool != "url-get", tools_list))
 
             app = Victorinox(**build_model_params(kwargs))
-            app.create(tools_list, **kwargs)
-            return app
-        elif app_type == 'auto':
-            from chatgpt_tool_hub.apps.auto_app import AutoApp
-
-            # todo no default
-
-            app = AutoApp(**build_model_params(kwargs))
             app.create(tools_list, **kwargs)
             return app
         else:

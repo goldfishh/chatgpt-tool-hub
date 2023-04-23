@@ -1,7 +1,5 @@
 """Tool for the Wikipedia API."""
 
-from typing import Any
-
 from rich.console import Console
 
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
@@ -22,9 +20,10 @@ class WikipediaTool(BaseTool):
     )
     api_wrapper: WikipediaAPIWrapper
 
-    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+    def __init__(self, console: Console = Console(), api_wrapper: WikipediaAPIWrapper = WikipediaAPIWrapper()):
         # 这个工具直接返回内容
         super().__init__(console=console, return_direct=False)
+        self.api_wrapper = api_wrapper
 
     def _run(self, query: str) -> str:
         """Use the Wikipedia tool."""

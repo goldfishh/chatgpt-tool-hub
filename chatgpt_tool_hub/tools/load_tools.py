@@ -51,7 +51,7 @@ def load_tools(
                 # sub_kwargs = {k: kwargs[k] for k in extra_keys if k in kwargs}
                 tool = _get_tool_func(console, kwargs)
             except Exception as e:
-                LOG.info(f"[{name}] init failed, error_info: {repr(e)}")
+                console.log(f"[dim][bold red]{name}[/] init failed, error_info: {repr(e)}")
                 tool_register.unregister_tool(name)
                 continue
 
@@ -60,7 +60,7 @@ def load_tools(
 
             tools.append(tool)
         else:
-            LOG.error("Now registered tools are："+str(list(all_tool_dict)))
+            LOG.error(f"Now registered tools are: {str(list(all_tool_dict))}")
             raise ValueError(f"Got unknown tool: {name}")
     filter_tools = crop_tools(tools)
     return filter_tools

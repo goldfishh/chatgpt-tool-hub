@@ -31,7 +31,7 @@ class ArxivTool(BaseTool):
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console, return_direct=True)
 
-        self.api_wrapper = ArxivAPIWrapper()
+        self.api_wrapper = ArxivAPIWrapper(**tool_kwargs)
 
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
         prompt = PromptTemplate(

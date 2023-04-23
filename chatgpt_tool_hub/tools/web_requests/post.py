@@ -23,10 +23,10 @@ class RequestsPostTool(BaseRequestsTool, BaseTool):
         try:
             _data = _parse_input(text)
             _content = self.requests_wrapper.post(_data["url"], _data["data"])
-            LOG.debug(("[requests_post] output: " + str(_content)))
+            LOG.debug(f"[requests_post] output: {str(_content)}")
             return _content
         except Exception as e:
-            LOG.error("[requests_post] " + str(e))
+            LOG.error(f"[requests_post] {str(e)}")
             return repr(e)
 
     async def _arun(self, text: str) -> str:
@@ -34,10 +34,10 @@ class RequestsPostTool(BaseRequestsTool, BaseTool):
         try:
             _data = _parse_input(text)
             _content = await self.requests_wrapper.apost(_data["url"], _data["data"])
-            LOG.debug(("[requests_post] output: " + str(_content)))
+            LOG.debug(f"[requests_post] output: {str(_content)}")
             return _content
         except Exception as e:
-            LOG.error("[requests_post] " + str(e))
+            LOG.error(f"[requests_post] {str(e)}")
             return repr(e)
 
 

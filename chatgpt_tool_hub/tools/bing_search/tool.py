@@ -23,10 +23,11 @@ class BingSearch(BaseTool):
         "Useful for when you need to answer questions about current events. "
         "Input should be a search query."
     )
-    api_wrapper: BingSearchAPIWrapper
+    api_wrapper: BingSearchAPIWrapper = None
 
-    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
+    def __init__(self, console: Console = Console(), **tool_kwargs):
         super().__init__(console=console)
+        self.api_wrapper = BingSearchAPIWrapper(**tool_kwargs)
 
     def _run(self, query: str) -> str:
         """Use the tool."""
@@ -37,6 +38,5 @@ class BingSearch(BaseTool):
         raise NotImplementedError("BingSearch does not support async")
 
 
-main_tool_register.register_tool(default_tool_name,
-                                 lambda console, kwargs: BingSearch(console, api_wrapper=BingSearchAPIWrapper(**kwargs)),
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: BingSearch(console, **kwargs),
                                  tool_input_keys=["bing_subscription_key"])
