@@ -168,7 +168,7 @@ print(reply)
 #### 如果你想进一步支持项目作者少掉头发，努力开发，可以给和我一起开发项目的伙伴 或 单独给我来杯 ☕
 
 <table><tr>
-<td><img src="https://github.com/zhayujie/chatgpt-on-wechat/blob/master/docs/images/planet.jpg?raw=true" width="400" height="200" border=0 /></td>
+<td><a href="https://public.zsxq.com/groups/88885848842852.html"><img src="https://github.com/zhayujie/chatgpt-on-wechat/blob/master/docs/images/planet.jpg?raw=true" width="400" height="200" border=0></a></td>
 <td><img src="./assets/buy_me_a_coffee.jpg" width="200" height="200" border=0 /></td>
 </tr></table> 
 
@@ -309,33 +309,32 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
  
 ### feature todolist
   
-[✓] 结果可解释性输出 -> LLM-OS的内心独白 
-[✓] 一个前端demo  -> LLM-OS 
-[✓] 长文本场景 -> summary工具 
-[✓] 长工具顺序控制 -> 实现了toolintool机制   
+[✓] 结果可解释性输出 -> LLM-OS的内心独白  
+[✓] 一个前端demo  -> LLM-OS  
+[✓] 长文本场景 -> summary工具  
+[✓] 长工具顺序控制 -> 实现了toolintool机制    
 [✓] 粒度配置 -> 每个tool封装的LLM可独立配置  
 [○] tokens计算，精确管理    
-[○] gpt_index长文本(pdf、html)检索  
+[○] gpt_index长文本(pdf、html)检索   
 [○] 接口并发支持  
-[○] 接入国内LLM
-[○] 兼容不使用tool的场景 
-[○] 互斥tool控制
-[○] subtree 动态注册&反注册
-[○] 工具中断
-[○] 定时调度
-
+[○] 接入国内LLM  
+[○] 兼容不使用tool的场景  
+[○] 互斥tool控制  
+[○] subtree 动态注册&反注册  
+[○] 工具中断  
+[○] 定时调度  
 [○] 语音输入、输出  
   
 ### tool todolist  
    
 [○] stable-diffusion 中文prompt翻译    
-[✓] ImageCaptioning   
-[○] 小米智能家居控制   
-[○] 支持ChatGPT官方插件
-[○] 让LLM来实现tool
-[○] 支持图片处理工具   
-[○] 支持视频处理工具  
-[✗] Wechat
+[✓] ImageCaptioning    
+[○] 小米智能家居控制    
+[○] 支持ChatGPT官方插件  
+[○] 让LLM来实现tool  
+[○] 支持图片处理工具    
+[○] 支持视频处理工具   
+[✗] Wechat  
 
 ## 工具开发指南
 

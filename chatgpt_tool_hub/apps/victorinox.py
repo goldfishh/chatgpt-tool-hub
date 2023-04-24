@@ -81,7 +81,7 @@ class Victorinox(App):
             LOG.error(repr(e))
             raise RuntimeError("loading tool failed")
 
-        # tool可能注册失败
+        # tool可能注册失败 && 过多tool会被拦截
         self.tools = set([tool.name for tool in tools])
         LOG.info(f"use_tools={list(self.tools)}, params: {str(self.tools_kwargs)}")
 
