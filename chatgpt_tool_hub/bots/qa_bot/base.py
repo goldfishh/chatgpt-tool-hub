@@ -36,16 +36,9 @@ class QABot(Bot):
         return "Thought:"
 
     def _fix_text(self, text: str) -> str:
-        if not self.allowed_tools:
-            tool_names = ""
-        else:
-            tool_names = ", ".join([tool for tool in self.allowed_tools])
+        tool_names = ", ".join(list(self.allowed_tools)) if self.allowed_tools else ""
         instruction_text = FORMAT_INSTRUCTIONS.format(tool_names=tool_names)
-        _text = ("\n\n"
-                 f"You just told me: {text}, but it doesn't meet the format I mentioned to you. \n\n"
-                 f"format: {instruction_text}. \n\n"
-                 "You should understand why you did not input the correct format, correct it and try again. \n\n")
-        return _text
+        return f"\n\nYou just told me: {text}, but it doesn't meet the format I mentioned to you. \n\nformat: {instruction_text}. \n\nYou should understand why you did not input the correct format, correct it and try again. \n\n"
 
     @classmethod
     def create_prompt(
@@ -130,8 +123,8 @@ class QABot(Bot):
         if not match:
             return None
 
-        action = match.group(1).strip()
-        action_input = match.group(2)
+        action = match[1].strip()
+        action_input = match[2]
         LOG.info(f"执行Tool: {action}中...")
 
         return action, action_input.strip(" ").strip('"')

@@ -64,14 +64,11 @@ class BingSearchAPIWrapper(BaseModel):
 
     def run(self, query: str) -> str:
         """Run query through BingSearch and parse result."""
-        snippets = []
         results = self._bing_search_results(query, count=self.top_k_results)
         if len(results) == 0:
             return "No good Bing Search Result was found"
 
-        for result in results:
-            snippets.append(filter_text(result["snippet"]))
-
+        snippets = [filter_text(result["snippet"]) for result in results]
         return " ".join(snippets)
 
     def results(self, query: str, num_results: int) -> List[Dict]:

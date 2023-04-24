@@ -60,15 +60,16 @@ class GoogleSearchAPIWrapper(BaseModel):
 
     def run(self, query: str) -> str:
         """(for normal result): Run query through GoogleSearch and parse result."""
-        snippets = []
         results = self._google_search_results(query, num=self.top_k_results)
         if len(results) == 0:
             return "No good Google Search Result was found"
 
-        for result in results:
-            if "snippet" in result:
-                snippets.append(filter_text(result["snippet"]))
-        LOG.debug(f"[GoogleSearch] output: {str(snippets)}")
+        snippets = [
+            filter_text(result["snippet"])
+            for result in results
+            if "snippet" in result
+        ]
+        LOG.debug(f"[GoogleSearch] output: {snippets}")
         return " ".join(snippets)
 
     def results(self, query: str) -> List[Dict]:
@@ -97,5 +98,5 @@ class GoogleSearchAPIWrapper(BaseModel):
             if "snippet" in result:
                 metadata_result["snippet"] = filter_text(result["snippet"])
             metadata_results.append(metadata_result)
-        LOG.debug(f"[GoogleSearch] output: {str(metadata_results)}")
+        LOG.debug(f"[GoogleSearch] output: {metadata_results}")
         return metadata_results

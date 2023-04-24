@@ -60,7 +60,7 @@ class Victorinox(App):
         self.load_tools_into_bot()
 
     def update_tool_args(self, tools_list: list, is_del: bool = False, **tools_kwargs):
-        if len(tools_list) == 0:
+        if not tools_list:
             return
 
         if is_del:
@@ -81,8 +81,8 @@ class Victorinox(App):
             LOG.error(repr(e))
             raise RuntimeError("loading tool failed")
 
-        # tool可能注册失败 && 过多tool会被拦截
-        self.tools = set([tool.name for tool in tools])
+        # tool可能注册失败
+        self.tools = {tool.name for tool in tools}
         LOG.info(f"use_tools={list(self.tools)}, params: {str(self.tools_kwargs)}")
 
         self.init_tool_engine(tools, **tools_kwargs)
@@ -114,9 +114,8 @@ class Victorinox(App):
             LOG.error(f"[APP] catch a Exception: {str(e)}")
             if retry_num < 1:
                 return self.ask(query, chat_history, retry_num + 1)
-            else:
-                LOG.error("exceed retry_num")
-                raise TimeoutError("超过重试次数")
+            LOG.error("exceed retry_num")
+            raise TimeoutError("超过重试次数")
 
     def _refresh_memory(self, chat_history: list):
         self.memory.chat_memory.clear()

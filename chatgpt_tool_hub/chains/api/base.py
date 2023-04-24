@@ -102,7 +102,7 @@ class APIChain(Chain, BaseModel):
     ) -> APIChain:
         """Load chain from just an LLM and the api docs."""
         if headers is None:
-            headers = dict()
+            headers = {}
         get_request_chain = LLMChain(llm=llm, prompt=api_url_prompt)
         requests_wrapper = RequestsWrapper(headers=headers)
         get_answer_chain = LLMChain(llm=llm, prompt=api_response_prompt)

@@ -37,7 +37,7 @@ class PythonREPL(BaseModel):
         except Exception as e:
             output = repr(e)
             sys.stdout = old_stdout
-            LOG.error(f"[python] {str(output)}")
+            LOG.error(f"[python] {output}")
         return output
 
 

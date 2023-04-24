@@ -36,10 +36,11 @@ class NewsApiTool(BaseTool):
         """Use the tool."""
         if not query:
             return "the input of tool is empty"
-        if not self.api_chain:
-            return "the tool was not initialized"
-
-        return self.api_chain.run(query)
+        return (
+            self.api_chain.run(query)
+            if self.api_chain
+            else "the tool was not initialized"
+        )
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""

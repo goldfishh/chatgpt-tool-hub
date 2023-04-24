@@ -17,8 +17,7 @@ def get_color_mapping(
     colors = list(_TEXT_COLOR_MAPPING.keys())
     if excluded_colors is not None:
         colors = [c for c in colors if c not in excluded_colors]
-    color_mapping = {item: colors[i % len(colors)] for i, item in enumerate(items)}
-    return color_mapping
+    return {item: colors[i % len(colors)] for i, item in enumerate(items)}
 
 
 def get_colored_text(text: str, color: str) -> str:
@@ -29,8 +28,5 @@ def get_colored_text(text: str, color: str) -> str:
 
 def print_text(text: str, color: Optional[str] = None, end: str = "") -> None:
     """Print text with highlighting and no end characters."""
-    if color is None:
-        text_to_print = text
-    else:
-        text_to_print = get_colored_text(text, color)
+    text_to_print = text if color is None else get_colored_text(text, color)
     print(text_to_print, end=end)

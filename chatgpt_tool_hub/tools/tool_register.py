@@ -5,7 +5,7 @@ from chatgpt_tool_hub.common.log import LOG
 
 class ToolRegister:
     def __init__(self):
-        self.REGISTER_TOOLS = dict()
+        self.REGISTER_TOOLS = {}
 
     def register_tool(self, name: str, function: callable, tool_input_keys: list):
         self.REGISTER_TOOLS[name] = (function, tool_input_keys)

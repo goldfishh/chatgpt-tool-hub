@@ -34,8 +34,7 @@ def load_tools(
 
             # consistency validation between input and required params
             try:
-                missing_keys = set(extra_keys).difference(kwargs)
-                if missing_keys:
+                if missing_keys := set(extra_keys).difference(kwargs):
                     raise ValueError(
                         f"Tool {name} requires some parameters that were not "
                         f"provided: {missing_keys}"
@@ -60,10 +59,9 @@ def load_tools(
 
             tools.append(tool)
         else:
-            LOG.error(f"Now registered tools are: {str(list(all_tool_dict))}")
+            LOG.error(f"Now registered tools are: {list(all_tool_dict)}")
             raise ValueError(f"Got unknown tool: {name}")
-    filter_tools = crop_tools(tools)
-    return filter_tools
+    return crop_tools(tools)
 
 
 def crop_tools(tools: List[BaseTool]) -> List[BaseTool]:

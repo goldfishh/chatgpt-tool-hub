@@ -31,21 +31,19 @@ def fix_and_parse_json(
         last_brace_index = json_str.rindex("}")
         json_str = json_str[: last_brace_index + 1]
         return json.loads(json_str)
-    # Can throw a ValueError if there is no "{" or "}" in the json_str
     except (json.JSONDecodeError, ValueError) as e:  # noqa: F841
-        if try_to_fix_with_gpt:
-            LOG.warn(
-                "Warning: Failed to parse AI output, attempting to fix."
-                "\n If you see this warning frequently, it's likely that"
-                " your prompt is confusing the AI. Try changing it up"
-                " slightly."
-            )
-            # This allows the AI to react to the error message,
-            #   which usually results in it correcting its ways.
-            LOG.error("Failed to fix AI output, telling the AI.")
-            return json_str
-        else:
+        if not try_to_fix_with_gpt:
             raise e
+        LOG.warn(
+            "Warning: Failed to parse AI output, attempting to fix."
+            "\n If you see this warning frequently, it's likely that"
+            " your prompt is confusing the AI. Try changing it up"
+            " slightly."
+        )
+        # This allows the AI to react to the error message,
+        #   which usually results in it correcting its ways.
+        LOG.error("Failed to fix AI output, telling the AI.")
+        return json_str
 
 
 def fix_json_by_finding_outermost_brackets(json_string):
@@ -56,9 +54,7 @@ def fix_json_by_finding_outermost_brackets(json_string):
         import regex
 
         json_pattern = regex.compile(r"\{(?:[^{}]|(?R))*\}")
-        json_match = json_pattern.search(json_string)
-
-        if json_match:
+        if json_match := json_pattern.search(json_string):
             # Extract the valid JSON object from the string
             json_string = json_match.group(0)
             LOG.info("Apparently json was fixed.")
@@ -166,7 +162,7 @@ def correct_json(json_str: str) -> str:
     """
 
     try:
-        LOG.info("json: " + repr(json_str))
+        LOG.info(f"json: {repr(json_str)}")
         json.loads(json_str)
         return json_str
     except json.JSONDecodeError as e:

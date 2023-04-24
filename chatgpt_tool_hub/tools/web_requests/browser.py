@@ -75,38 +75,35 @@ class ChromeBrowser(BaseModel):
         options.add_argument(f"--proxy-server={proxy}")
         # 设置代理
         from webdriver_manager.chrome import ChromeDriverManager
-        browser = webdriver.Chrome(
+        return webdriver.Chrome(
             executable_path=ChromeDriverManager().install(), options=options
         )
 
-        return browser
-
     def get(self, url: str, **kwargs) -> str:
         """GET the URL and return the text."""
-        if browser:
-            from selenium.webdriver.support.wait import WebDriverWait
-            from selenium.webdriver.support import expected_conditions as EC
-            from selenium.webdriver.common.by import By
-
-            # Network.setExtraHTTPHeaders command to the browser's DevTools.
-            # This method allows setting multiple headers at once.
-            # browser.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": self.headers})
-
-            browser.get(url)
-
-            # inspired by auto-gpt
-            WebDriverWait(browser, 10).until(
-                EC.presence_of_element_located((By.TAG_NAME, "body"))
-            )
-            # Get the HTML content directly from the browser's DOM
-            _content = browser.execute_script("return document.body.outerHTML;")
-
-            if len(browser.window_handles) > 2:
-                browser.close()  # 退出多余页面, 节省内存
-
-            return _content
-        else:
+        if not browser:
             return "chrome browser was not initialized"
+        from selenium.webdriver.support.wait import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
+        from selenium.webdriver.common.by import By
+
+        # Network.setExtraHTTPHeaders command to the browser's DevTools.
+        # This method allows setting multiple headers at once.
+        # browser.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": self.headers})
+
+        browser.get(url)
+
+        # inspired by auto-gpt
+        WebDriverWait(browser, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, "body"))
+        )
+        # Get the HTML content directly from the browser's DOM
+        _content = browser.execute_script("return document.body.outerHTML;")
+
+        if len(browser.window_handles) > 2:
+            browser.close()  # 退出多余页面, 节省内存
+
+        return _content
 
 
 class BrowserTool(BaseTool):
