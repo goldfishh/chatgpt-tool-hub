@@ -105,7 +105,7 @@ class ChatBot(Bot):
         thoughts = self._construct_scratchpad(intermediate_steps)
         # todo remove stop
         new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
-        return kwargs | new_inputs
+        return {**kwargs, **new_inputs}
 
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
         llm_answer_str = self.llm_chain.predict(**full_inputs)
@@ -172,10 +172,10 @@ class ChatBot(Bot):
             return "answer-user", action_input
 
         if action.lower() != "answer-user":
-            self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...\n")
+            self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...")
         # todo
         LOG.info(f"执行Tool: {action}中...")
-        return action.strip(), action_input.strip(" ").strip('"')
+        return action.strip(), action_input.strip()
 
     def parse_reply_json(self, assistant_reply) -> dict:
         """Prints the assistant's thoughts to the console"""

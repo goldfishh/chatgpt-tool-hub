@@ -164,7 +164,7 @@ class Chain(BaseModel, ABC):
         self._validate_outputs(outputs)
         if self.memory is not None:
             self.memory.save_context(inputs, outputs)
-        return outputs if return_only_outputs else inputs | outputs
+        return outputs if return_only_outputs else {**inputs, **outputs}
 
     def prep_inputs(self, inputs: Union[Dict[str, Any], Any]) -> Dict[str, str]:
         """Validate and prep inputs."""

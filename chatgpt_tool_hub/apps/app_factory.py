@@ -29,9 +29,9 @@ class AppFactory:
         # default tools
         no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
         if str(no_default_flag).lower() in {'true', 'enable', 'yes'}:
-            self.default_tools_list = ["answer-user"]
+            self.default_tools_list = []
         else:
-            self.default_tools_list = ["answer-user", "python", "terminal", "url-get", "meteo-weather"]
+            self.default_tools_list = ["python", "terminal", "url-get", "meteo-weather"]
 
         # dynamic loading tool
         dynamic_tool_loader()
