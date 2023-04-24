@@ -50,12 +50,13 @@ class ToolEngine(Chain, BaseModel):
         """Validate that tools are compatible with bot."""
         bot = values["bot"]
         tools = values["tools"]
-        if bot.allowed_tools is not None:
-            if set(bot.allowed_tools) != set([tool.name for tool in tools]):
-                raise ValueError(
-                    f"Allowed tools ({bot.allowed_tools}) different than "
-                    f"provided tools ({[tool.name for tool in tools]})"
-                )
+        if bot.allowed_tools is not None and set(bot.allowed_tools) != {
+            tool.name for tool in tools
+        }:
+            raise ValueError(
+                f"Allowed tools ({bot.allowed_tools}) different than "
+                f"provided tools ({[tool.name for tool in tools]})"
+            )
         return values
 
     def save(self, file_path: Union[Path, str]) -> None:
@@ -185,7 +186,7 @@ class ToolEngine(Chain, BaseModel):
             # todo test below
             try:
                 action, observation = next_step_output
-                LOG.info(f"我从[{action.tool}]中获得了一些信息：\n" + repr(observation.strip()))
+                LOG.info(f"我从[{action.tool}]中获得了一些信息：\n{repr(observation.strip())}")
             except Exception as e:
                 LOG.debug(f"parsing next_step_output error: {repr(e)}")
 
@@ -208,12 +209,14 @@ class ToolEngine(Chain, BaseModel):
         bot_action, observation = next_step_output
         name_to_tool_map = {tool.name: tool for tool in self.tools}
         # Invalid tools won't be in the map, so we return False.
-        if bot_action.tool in name_to_tool_map:
-            if name_to_tool_map[bot_action.tool].return_direct:
-                return BotFinish(
-                    {self.bot.return_values[0]: observation},
-                    "",
-                )
+        if (
+            bot_action.tool in name_to_tool_map
+            and name_to_tool_map[bot_action.tool].return_direct
+        ):
+            return BotFinish(
+                {self.bot.return_values[0]: observation},
+                "",
+            )
         return None
 
     async def _acall(self, inputs: Dict[str, str]) -> Dict[str, str]:

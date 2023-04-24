@@ -37,11 +37,11 @@ class NewsTool(BaseTool):
         """Use the tool."""
         if not query:
             return "the input of tool is empty"
-        if not self.engine:
-            return "the tool was not initialized"
-
-        # todo should connect to parent bot
-        return self.engine.run(query)
+        return (
+            self.engine.run(query)
+            if self.engine
+            else "the tool was not initialized"
+        )
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""

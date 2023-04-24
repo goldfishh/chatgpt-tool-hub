@@ -51,7 +51,7 @@ class WikipediaAPIWrapper(BaseModel):
             if summary is not None:
                 summaries.append(summary)
         _content = "\n\n".join(summaries)
-        LOG.debug("[wikipedia]: " + str(_content))
+        LOG.debug(f"[wikipedia]: {_content}")
         return _content
 
     def fetch_formatted_page_summary(self, page: str) -> Optional[str]:

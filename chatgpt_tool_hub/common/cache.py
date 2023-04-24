@@ -75,8 +75,9 @@ class SQLAlchemyCache(BaseCache):
             .order_by(self.cache_schema.idx)
         )
         with Session(self.engine) as session:
-            generations = [Generation(text=row[0]) for row in session.execute(stmt)]
-            if len(generations) > 0:
+            if generations := [
+                Generation(text=row[0]) for row in session.execute(stmt)
+            ]:
                 return generations
         return None
 
@@ -117,7 +118,7 @@ class RedisCache(BaseCache):
 
     def _key(self, prompt: str, llm_string: str, idx: int) -> str:
         """Compute key from prompt, llm_string, and idx."""
-        return str(hash(prompt + llm_string)) + "_" + str(idx)
+        return f"{hash(prompt + llm_string)}_{idx}"
 
     def lookup(self, prompt: str, llm_string: str) -> Optional[RETURN_VAL_TYPE]:
         """Look up based on prompt and llm_string."""

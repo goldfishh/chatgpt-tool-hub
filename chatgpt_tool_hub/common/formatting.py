@@ -13,8 +13,7 @@ class StrictFormatter(Formatter):
         kwargs: Mapping[str, Any],
     ) -> None:
         """Check to see if extra parameters are passed."""
-        extra = set(kwargs).difference(used_args)
-        if extra:
+        if extra := set(kwargs).difference(used_args):
             raise KeyError(extra)
 
     def vformat(

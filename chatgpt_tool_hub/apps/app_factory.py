@@ -13,23 +13,22 @@ class AppFactory:
     def __init__(self, console=Console()):
         self.default_tools_list = []
         self.console = console
-        pass
 
     def init_env(self, **kwargs):
         """ 环境初始化 """
         # set log level
         nolog_flag = get_from_dict_or_env(kwargs, "nolog", "NOLOG", "false")
         debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", "false")
-        if str(nolog_flag).lower() in ['true', 'enable', 'yes']:
+        if str(nolog_flag).lower() in {'true', 'enable', 'yes'}:
             consoleHandler.setLevel(logging.CRITICAL)
-        elif str(debug_flag).lower() in ['true', 'enable', 'yes']:
+        elif str(debug_flag).lower() in {'true', 'enable', 'yes'}:
             consoleHandler.setLevel(logging.DEBUG)
         else:
             consoleHandler.setLevel(logging.INFO)
 
         # default tools
         no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
-        if str(no_default_flag).lower() in ['true', 'enable', 'yes']:
+        if str(no_default_flag).lower() in {'true', 'enable', 'yes'}:
             self.default_tools_list = ["answer-user"]
         else:
             self.default_tools_list = ["answer-user", "python", "terminal", "url-get", "meteo-weather"]
@@ -38,7 +37,7 @@ class AppFactory:
         dynamic_tool_loader()
 
     def create_app(self, app_type: str = 'victorinox', tools_list: list = None, **kwargs) -> App:
-        tools_list = [] if not tools_list else tools_list
+        tools_list = tools_list if tools_list else []
 
         self.init_env(**kwargs)
 

@@ -36,22 +36,22 @@ class BashProcess:
 
         command_ban_set = {"halt", "poweroff", "shutdown", "reboot", "rm", "kill",
                            "exit", "sudo", "su", "userdel", "groupdel", "logout", "alias"}
-        _both_have = command_ban_set.intersection(set(_commands.split()))
-        if len(_both_have) > 0:
-            LOG.info("[terminal] nsfc_filter: unsupported command: " + repr(_both_have))
-            return False, "this command: " + repr(_both_have) + " is dangerous for you, you are not allowed to use it"
-        else:
+        if not (
+            _both_have := command_ban_set.intersection(set(_commands.split()))
+        ):
             return True, "success"
+        LOG.info(f"[terminal] nsfc_filter: unsupported command: {repr(_both_have)}")
+        return (
+            False,
+            f"this command: {repr(_both_have)} is dangerous for you, you are not allowed to use it",
+        )
 
     def reprocess(self, commands: str) -> str:
         # ```xxx
         # real commands is here
         # ```
         commands = "\n".join(filter(lambda s: "```" not in s, commands.split("\n")))
-        # `real commands is here`
-        commands = commands.strip('`')
-
-        return commands
+        return commands.strip('`')
 
     def run(self, commands: Union[str, List[str]]) -> str:
         """Run commands and return final output."""

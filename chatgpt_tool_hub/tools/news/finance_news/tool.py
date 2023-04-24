@@ -27,9 +27,7 @@ class FinanceNewsTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """ finance-news 仅仅是一个 browser tool 的封装吗？ """
-        _response = BrowserTool().run(self.jin10_url)
-
-        return _response
+        return BrowserTool().run(self.jin10_url)
 
     async def _arun(self, tool_input: str) -> str:
         pass

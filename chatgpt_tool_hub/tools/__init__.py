@@ -24,9 +24,9 @@ def dynamic_tool_loader():
     for package_name in all_tool_package_list:
         try:
             import importlib
-            importlib.import_module("chatgpt_tool_hub.tools." + package_name)
+            importlib.import_module(f"chatgpt_tool_hub.tools.{package_name}")
         except Exception as e:
-            LOG.info(f"[{package_name}] init failed, error_info: " + repr(e))
+            LOG.info(f"[{package_name}] init failed, error_info: {repr(e)}")
 
 
 from chatgpt_tool_hub.tools.python import PythonREPLTool

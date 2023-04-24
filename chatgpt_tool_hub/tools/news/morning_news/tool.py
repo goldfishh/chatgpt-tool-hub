@@ -45,11 +45,11 @@ class MorningNewsTool(BaseTool):
         if not query:
             return "the input of tool is empty"
 
-        morning_news_url = "https://v2.alapi.cn/api/zaobao?token={}&format={}".format(self.morning_news_api_key, "json")
+        morning_news_url = f"https://v2.alapi.cn/api/zaobao?token={self.morning_news_api_key}&format=json"
         _response = RequestsWrapper().get(morning_news_url)
         _response_json = json.loads(_response)
         if self.morning_news_use_llm:
-            _return = self.bot.run(_response)
+            return self.bot.run(_response)
         elif _response_json.get("code") == 200 or _response_json.get("msg") == "success":
             # 不使用llm，表明人类具有先天的优越性
             _return_data = _response_json.get('data', {})
@@ -57,10 +57,9 @@ class MorningNewsTool(BaseTool):
             _news_content = "\n".join(_return_data.get("news"))
             _weiyu = _return_data.get('weiyu')
             _image_url = _return_data.get('image')
-            _return = f"\n今日日期：{_date}\n今日早报：{_news_content}\n今日微语：{_weiyu}\nURL: {_image_url}"
+            return f"\n今日日期：{_date}\n今日早报：{_news_content}\n今日微语：{_weiyu}\nURL: {_image_url}"
         else:
-            _return = f"[{default_tool_name}] api error, error_info: {_response_json.get('msg')}"
-        return _return
+            return f"[{default_tool_name}] api error, error_info: {_response_json.get('msg')}"
 
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""

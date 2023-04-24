@@ -15,7 +15,7 @@ except Exception as e:
 
 for package_name in all_tool_package_list:
     try:
-        importlib.import_module("chatgpt_tool_hub.tools.news." + package_name)
+        importlib.import_module(f"chatgpt_tool_hub.tools.news.{package_name}")
     except Exception as e:
         LOG.info(f"[news.{package_name}] init failed, error_info: {repr(e)}")
 

@@ -54,27 +54,47 @@ class RequestsWrapper(BaseModel):
 
     def post(self, url: str, data: Dict[str, Any]) -> str:
         """POST to the URL and return the text."""
-        self.headers = dict().update(DEFAULT_HEADER) if not self.headers else self.headers.update(DEFAULT_HEADER)
+        self.headers = (
+            self.headers.update(DEFAULT_HEADER)
+            if self.headers
+            else {}.update(DEFAULT_HEADER)
+        )
         return requests.post(url, data=data, headers=self.headers).text
 
     def patch(self, url: str, data: Dict[str, Any]) -> str:
         """PATCH the URL and return the text."""
-        self.headers = dict().update(DEFAULT_HEADER) if not self.headers else self.headers.update(DEFAULT_HEADER)
+        self.headers = (
+            self.headers.update(DEFAULT_HEADER)
+            if self.headers
+            else {}.update(DEFAULT_HEADER)
+        )
         return requests.patch(url, json=data, headers=self.headers).text
 
     def put(self, url: str, data: Dict[str, Any]) -> str:
         """PUT the URL and return the text."""
-        self.headers = dict().update(DEFAULT_HEADER) if not self.headers else self.headers.update(DEFAULT_HEADER)
+        self.headers = (
+            self.headers.update(DEFAULT_HEADER)
+            if self.headers
+            else {}.update(DEFAULT_HEADER)
+        )
         return requests.put(url, json=data, headers=self.headers).text
 
     def delete(self, url: str) -> str:
         """DELETE the URL and return the text."""
-        self.headers = dict().update(DEFAULT_HEADER) if not self.headers else self.headers.update(DEFAULT_HEADER)
+        self.headers = (
+            self.headers.update(DEFAULT_HEADER)
+            if self.headers
+            else {}.update(DEFAULT_HEADER)
+        )
         return requests.delete(url, headers=self.headers).text
 
     async def _arequest(self, method: str, url: str, **kwargs: Any) -> str:
         """Make an async request."""
-        self.headers = dict().update(DEFAULT_HEADER) if not self.headers else self.headers.update(DEFAULT_HEADER)
+        self.headers = (
+            self.headers.update(DEFAULT_HEADER)
+            if self.headers
+            else {}.update(DEFAULT_HEADER)
+        )
         if not self.aiosession:
             async with aiohttp.ClientSession() as session:
                 async with session.request(
