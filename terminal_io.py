@@ -67,9 +67,8 @@ def read_config_json() -> dict:
     tool_config = {"tools": [], "kwargs": {"nolog": True}}
     if not os.path.exists(config_path):
         return tool_config
-    else:
-        with open(config_path, "r") as f:
-            tool_config = json.load(f)
+    with open(config_path, "r") as f:
+        tool_config = json.load(f)
     # todo test it
     tool_config.get("kwargs", {})["nolog"] = True
 
@@ -110,9 +109,10 @@ class ChatMode:
         cls.multi_line_mode = not cls.multi_line_mode
         if cls.multi_line_mode:
             console.print(
-                f"[dim]Multi-line 模式 已开启, 使用 [[bright_magenta]Esc[/]] + [[bright_magenta]ENTER[/]] 提交跨行文本.")
+                "[dim]Multi-line 模式 已开启, 使用 [[bright_magenta]Esc[/]] + [[bright_magenta]ENTER[/]] 提交跨行文本."
+            )
         else:
-            console.print(f"[dim]Multi-line 模式 已关闭.")
+            console.print("[dim]Multi-line 模式 已关闭.")
 
 
 class LLMOS:
@@ -146,14 +146,13 @@ class LLMOS:
                 self.messages.pop()
                 return
 
-            if response is not None:
-                LOG.info(f"LLM-OS response: {response}")
-                _message = {"role": "assistant", "content": f"{response}"}
-                print_message(_message)
-                self.messages.append(_message)
-                # todo
-                self.current_tokens = count_message_tokens(self.messages)
-                self.total_tokens_spent += self.current_tokens
+            LOG.info(f"LLM-OS response: {response}")
+            _message = {"role": "assistant", "content": f"{response}"}
+            print_message(_message)
+            self.messages.append(_message)
+            # todo
+            self.current_tokens = count_message_tokens(self.messages)
+            self.total_tokens_spent += self.current_tokens
 
         except Exception as e:
             console.print(f"[red]系统错误: {str(e)}. 请检查日志获取更多信息")
@@ -199,7 +198,6 @@ class LLMOS:
             'total_used': '',
             'total_available': ''
         }
-        url = 'https://api.openai.com/dashboard/billing/credit_grants'
 
     def modify_system_prompt(self, new_content):
         # todo
@@ -222,8 +220,8 @@ class LLMOS:
             console.print(f"[red]没有该模型 {new_model} tokens信息，模型未变更: [bold cyan]{old_model}[/].")
             return
 
-        config["kwargs"]["model_name"] = str(new_model)
-        self.model = str(new_model)
+        config["kwargs"]["model_name"] = new_model
+        self.model = new_model
         self.tokens_limit = tokens_limit
         console.print(f"[dim]模型将发生变更 [bold cyan]{old_model}[/] -> [bold red]{new_model}[/].")
         self.app = self.create_app()
@@ -520,13 +518,14 @@ def main(args):
     else:
         request_timeout = os.environ.get("REQUEST_TIMEOUT")
 
-    if not request_timeout:
-        request_timeout = 90  # 默认90s
-    else:
-        request_timeout = int(request_timeout)
+    request_timeout = int(request_timeout) if request_timeout else 90
     os.environ["REQUEST_TIMEOUT"] = str(request_timeout)
 
-    if args.debug or str(os.environ.get("DEBUG")).lower() in ['true', 'enable', 'yes']:
+    if args.debug or str(os.environ.get("DEBUG")).lower() in {
+        'true',
+        'enable',
+        'yes',
+    }:
         ChatMode.toggle_debug_mode()
 
     if args.multi:

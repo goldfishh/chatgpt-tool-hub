@@ -61,7 +61,7 @@ class ConversationTokenBufferMemory(BaseChatMemory, BaseModel):
         if not self.filter_key_list:
             return _inputs
 
-        for key in inputs.keys():
+        for key in inputs:
             if key in self.filter_key_list:
                 LOG.debug(f"[MEMORY]: key: {key} will pop up")
                 _inputs.pop(key)

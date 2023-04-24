@@ -137,27 +137,24 @@ class CallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when LLM starts running."""
         for handler in self.handlers:
-            if not handler.ignore_llm:
-                if verbose or handler.always_verbose:
-                    handler.on_llm_start(serialized, prompts, **kwargs)
+            if not handler.ignore_llm and (verbose or handler.always_verbose):
+                handler.on_llm_start(serialized, prompts, **kwargs)
 
     def on_llm_new_token(
         self, token: str, verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run when LLM generates a new token."""
         for handler in self.handlers:
-            if not handler.ignore_llm:
-                if verbose or handler.always_verbose:
-                    handler.on_llm_new_token(token, **kwargs)
+            if not handler.ignore_llm and (verbose or handler.always_verbose):
+                handler.on_llm_new_token(token, **kwargs)
 
     def on_llm_end(
         self, response: LLMResult, verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run when LLM ends running."""
         for handler in self.handlers:
-            if not handler.ignore_llm:
-                if verbose or handler.always_verbose:
-                    handler.on_llm_end(response)
+            if not handler.ignore_llm and (verbose or handler.always_verbose):
+                handler.on_llm_end(response)
 
     def on_llm_error(
         self,
@@ -167,9 +164,8 @@ class CallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when LLM errors."""
         for handler in self.handlers:
-            if not handler.ignore_llm:
-                if verbose or handler.always_verbose:
-                    handler.on_llm_error(error)
+            if not handler.ignore_llm and (verbose or handler.always_verbose):
+                handler.on_llm_error(error)
 
     def on_chain_start(
         self,
@@ -180,18 +176,16 @@ class CallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when chain starts running."""
         for handler in self.handlers:
-            if not handler.ignore_chain:
-                if verbose or handler.always_verbose:
-                    handler.on_chain_start(serialized, inputs, **kwargs)
+            if not handler.ignore_chain and (verbose or handler.always_verbose):
+                handler.on_chain_start(serialized, inputs, **kwargs)
 
     def on_chain_end(
         self, outputs: Dict[str, Any], verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run when chain ends running."""
         for handler in self.handlers:
-            if not handler.ignore_chain:
-                if verbose or handler.always_verbose:
-                    handler.on_chain_end(outputs)
+            if not handler.ignore_chain and (verbose or handler.always_verbose):
+                handler.on_chain_end(outputs)
 
     def on_chain_error(
         self,
@@ -201,9 +195,8 @@ class CallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when chain errors."""
         for handler in self.handlers:
-            if not handler.ignore_chain:
-                if verbose or handler.always_verbose:
-                    handler.on_chain_error(error)
+            if not handler.ignore_chain and (verbose or handler.always_verbose):
+                handler.on_chain_error(error)
 
     def on_tool_start(
         self,
@@ -214,25 +207,22 @@ class CallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when tool starts running."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    handler.on_tool_start(serialized, input_str, **kwargs)
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                handler.on_tool_start(serialized, input_str, **kwargs)
 
     def on_bot_action(
         self, action: BotAction, verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run when tool starts running."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    handler.on_bot_action(action, **kwargs)
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                handler.on_bot_action(action, **kwargs)
 
     def on_tool_end(self, output: str, verbose: bool = False, **kwargs: Any) -> None:
         """Run when tool ends running."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    handler.on_tool_end(output, **kwargs)
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                handler.on_tool_end(output, **kwargs)
 
     def on_tool_error(
         self,
@@ -242,9 +232,8 @@ class CallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when tool errors."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    handler.on_tool_error(error)
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                handler.on_tool_error(error)
 
     def on_text(self, text: str, verbose: bool = False, **kwargs: Any) -> None:
         """Run on additional input from  chains and bots."""
@@ -257,9 +246,8 @@ class CallbackManager(BaseCallbackManager):
     ) -> None:
         """Run on bot end."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    handler.on_bot_finish(finish, **kwargs)
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                handler.on_bot_finish(finish, **kwargs)
 
     def add_handler(self, handler: BaseCallbackHandler) -> None:
         """Add a handler to the callback manager."""
@@ -350,49 +338,46 @@ class AsyncCallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when LLM starts running."""
         for handler in self.handlers:
-            if not handler.ignore_llm:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_llm_start):
-                        await handler.on_llm_start(serialized, prompts, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(
-                                handler.on_llm_start, serialized, prompts, **kwargs
-                            ),
-                        )
+            if not handler.ignore_llm and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_llm_start):
+                    await handler.on_llm_start(serialized, prompts, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(
+                            handler.on_llm_start, serialized, prompts, **kwargs
+                        ),
+                    )
 
     async def on_llm_new_token(
         self, token: str, verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run on new LLM token. Only available when streaming is enabled."""
         for handler in self.handlers:
-            if not handler.ignore_llm:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_llm_new_token):
-                        await handler.on_llm_new_token(token, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(
-                                handler.on_llm_new_token, token, **kwargs
-                            ),
-                        )
+            if not handler.ignore_llm and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_llm_new_token):
+                    await handler.on_llm_new_token(token, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(
+                            handler.on_llm_new_token, token, **kwargs
+                        ),
+                    )
 
     async def on_llm_end(
         self, response: LLMResult, verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run when LLM ends running."""
         for handler in self.handlers:
-            if not handler.ignore_llm:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_llm_end):
-                        await handler.on_llm_end(response, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(handler.on_llm_end, response, **kwargs),
-                        )
+            if not handler.ignore_llm and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_llm_end):
+                    await handler.on_llm_end(response, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(handler.on_llm_end, response, **kwargs),
+                    )
 
     async def on_llm_error(
         self,
@@ -402,15 +387,14 @@ class AsyncCallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when LLM errors."""
         for handler in self.handlers:
-            if not handler.ignore_llm:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_llm_error):
-                        await handler.on_llm_error(error, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(handler.on_llm_error, error, **kwargs),
-                        )
+            if not handler.ignore_llm and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_llm_error):
+                    await handler.on_llm_error(error, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(handler.on_llm_error, error, **kwargs),
+                    )
 
     async def on_chain_start(
         self,
@@ -421,32 +405,30 @@ class AsyncCallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when chain starts running."""
         for handler in self.handlers:
-            if not handler.ignore_chain:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_chain_start):
-                        await handler.on_chain_start(serialized, inputs, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(
-                                handler.on_chain_start, serialized, inputs, **kwargs
-                            ),
-                        )
+            if not handler.ignore_chain and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_chain_start):
+                    await handler.on_chain_start(serialized, inputs, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(
+                            handler.on_chain_start, serialized, inputs, **kwargs
+                        ),
+                    )
 
     async def on_chain_end(
         self, outputs: Dict[str, Any], verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run when chain ends running."""
         for handler in self.handlers:
-            if not handler.ignore_chain:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_chain_end):
-                        await handler.on_chain_end(outputs, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(handler.on_chain_end, outputs, **kwargs),
-                        )
+            if not handler.ignore_chain and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_chain_end):
+                    await handler.on_chain_end(outputs, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(handler.on_chain_end, outputs, **kwargs),
+                    )
 
     async def on_chain_error(
         self,
@@ -456,15 +438,14 @@ class AsyncCallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when chain errors."""
         for handler in self.handlers:
-            if not handler.ignore_chain:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_chain_error):
-                        await handler.on_chain_error(error, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(handler.on_chain_error, error, **kwargs),
-                        )
+            if not handler.ignore_chain and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_chain_error):
+                    await handler.on_chain_error(error, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(handler.on_chain_error, error, **kwargs),
+                    )
 
     async def on_tool_start(
         self,
@@ -475,32 +456,30 @@ class AsyncCallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when tool starts running."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_tool_start):
-                        await handler.on_tool_start(serialized, input_str, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(
-                                handler.on_tool_start, serialized, input_str, **kwargs
-                            ),
-                        )
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_tool_start):
+                    await handler.on_tool_start(serialized, input_str, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(
+                            handler.on_tool_start, serialized, input_str, **kwargs
+                        ),
+                    )
 
     async def on_tool_end(
         self, output: str, verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run when tool ends running."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_tool_end):
-                        await handler.on_tool_end(output, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(handler.on_tool_end, output, **kwargs),
-                        )
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_tool_end):
+                    await handler.on_tool_end(output, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(handler.on_tool_end, output, **kwargs),
+                    )
 
     async def on_tool_error(
         self,
@@ -510,15 +489,14 @@ class AsyncCallbackManager(BaseCallbackManager):
     ) -> None:
         """Run when tool errors."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_tool_error):
-                        await handler.on_tool_error(error, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(handler.on_tool_error, error, **kwargs),
-                        )
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_tool_error):
+                    await handler.on_tool_error(error, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(handler.on_tool_error, error, **kwargs),
+                    )
 
     async def on_text(self, text: str, verbose: bool = False, **kwargs: Any) -> None:
         """Run when text is printed."""
@@ -536,34 +514,32 @@ class AsyncCallbackManager(BaseCallbackManager):
     ) -> None:
         """Run on bot action."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_bot_action):
-                        await handler.on_bot_action(action, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(
-                                handler.on_bot_action, action, **kwargs
-                            ),
-                        )
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_bot_action):
+                    await handler.on_bot_action(action, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(
+                            handler.on_bot_action, action, **kwargs
+                        ),
+                    )
 
     async def on_bot_finish(
         self, finish: BotFinish, verbose: bool = False, **kwargs: Any
     ) -> None:
         """Run when bot finishes."""
         for handler in self.handlers:
-            if not handler.ignore_bot:
-                if verbose or handler.always_verbose:
-                    if asyncio.iscoroutinefunction(handler.on_bot_finish):
-                        await handler.on_bot_finish(finish, **kwargs)
-                    else:
-                        await asyncio.get_event_loop().run_in_executor(
-                            None,
-                            functools.partial(
-                                handler.on_bot_finish, finish, **kwargs
-                            ),
-                        )
+            if not handler.ignore_bot and (verbose or handler.always_verbose):
+                if asyncio.iscoroutinefunction(handler.on_bot_finish):
+                    await handler.on_bot_finish(finish, **kwargs)
+                else:
+                    await asyncio.get_event_loop().run_in_executor(
+                        None,
+                        functools.partial(
+                            handler.on_bot_finish, finish, **kwargs
+                        ),
+                    )
 
     def add_handler(self, handler: BaseCallbackHandler) -> None:
         """Add a handler to the callback manager."""

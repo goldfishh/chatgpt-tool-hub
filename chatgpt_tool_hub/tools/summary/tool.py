@@ -45,8 +45,7 @@ class TextClipper:
     def clip(self, text: str, capacity: int = 0) -> List[str]:
         if get_token_num(text) <= self.max_segment_length:
             return [text]
-        if capacity < 0:
-            capacity = 0
+        capacity = max(capacity, 0)
         segments = text.split(self.seperator)
         segments = list(filter(lambda x: x.strip() != "", segments))
         _segment_num = len(segments)
@@ -101,7 +100,7 @@ class SummaryTool(BaseTool):
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console)
-        tool_kwargs = dict() if tool_kwargs is None else tool_kwargs
+        tool_kwargs = {} if tool_kwargs is None else tool_kwargs
         self.message_num = get_from_dict_or_env(tool_kwargs, "message_num", "MESSAGE_NUM", 100)
         self.max_segment_length = get_from_dict_or_env(tool_kwargs, "max_segment_length", "MAX_SEGMENT_LENGTH", 2500)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
@@ -114,8 +113,7 @@ class SummaryTool(BaseTool):
         for text in clip_text_list:
             task = asyncio.create_task(bot.arun(text=text))
             tasks.append(task)
-        results = await asyncio.gather(*tasks)
-        return results
+        return await asyncio.gather(*tasks)
 
     def _run(self, tool_input: str) -> str:
         """run the tool"""

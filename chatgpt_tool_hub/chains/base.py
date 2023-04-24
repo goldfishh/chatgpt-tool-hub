@@ -53,10 +53,7 @@ class Chain(BaseModel, ABC):
 
         This allows users to pass in None as verbose to access the global setting.
         """
-        if verbose is None:
-            return _get_verbosity()
-        else:
-            return verbose
+        return _get_verbosity() if verbose is None else verbose
 
     @property
     @abstractmethod
@@ -70,8 +67,7 @@ class Chain(BaseModel, ABC):
 
     def _validate_inputs(self, inputs: Dict[str, str]) -> None:
         """Check that all inputs are present."""
-        missing_keys = set(self.input_keys).difference(inputs)
-        if missing_keys:
+        if missing_keys := set(self.input_keys).difference(inputs):
             raise ValueError(f"Missing some input keys: {missing_keys}")
 
     def _validate_outputs(self, outputs: Dict[str, str]) -> None:
@@ -168,10 +164,7 @@ class Chain(BaseModel, ABC):
         self._validate_outputs(outputs)
         if self.memory is not None:
             self.memory.save_context(inputs, outputs)
-        if return_only_outputs:
-            return outputs
-        else:
-            return {**inputs, **outputs}
+        return outputs if return_only_outputs else inputs | outputs
 
     def prep_inputs(self, inputs: Union[Dict[str, Any], Any]) -> Dict[str, str]:
         """Validate and prep inputs."""
@@ -261,11 +254,7 @@ class Chain(BaseModel, ABC):
             chain.save(file_path="path/chain.yaml")
         """
         # Convert file to Path object.
-        if isinstance(file_path, str):
-            save_path = Path(file_path)
-        else:
-            save_path = file_path
-
+        save_path = Path(file_path) if isinstance(file_path, str) else file_path
         directory_path = save_path.parent
         directory_path.mkdir(parents=True, exist_ok=True)
 

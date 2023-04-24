@@ -46,10 +46,7 @@ class ArxivTool(BaseTool):
         _llm_response = self.bot.run(query)
         LOG.info(f"[arxiv]: search_query: {_llm_response}")
 
-        _response = self.api_wrapper.run(_llm_response)
-
-        # 不使用llm，表明人类具有先天的优越性
-        return _response
+        return self.api_wrapper.run(_llm_response)
 
     async def _arun(self, query: str) -> str:
         """Use the Arxiv tool asynchronously."""

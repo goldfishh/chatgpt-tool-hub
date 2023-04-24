@@ -45,9 +45,8 @@ class LiteApp(App):
             LOG.error(f"[APP] catch a ValueError: {str(e)}")
             if retry_num < 1:
                 return self.ask(query, chat_history, retry_num + 1)
-            else:
-                LOG.error("exceed retry_num")
-                raise TimeoutError("超过重试次数")
+            LOG.error("exceed retry_num")
+            raise TimeoutError("超过重试次数")
 
 
 if __name__ == "__main__":

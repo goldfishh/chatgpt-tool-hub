@@ -33,7 +33,7 @@ def filter_text(html: str) -> str:
 
     with open(file_path, "w") as f:
         f.write(text + "\n")
-    _summary = SummaryTool().run(str(file_path) + ", 0")
+    _summary = SummaryTool().run(f"{str(file_path)}, 0")
     try:
         os.remove(file_path)
     except Exception as e:

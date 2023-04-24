@@ -191,12 +191,10 @@ class SearxSearchWrapper(BaseModel):
 
         values["params"] = {**_get_default_params(), **values["params"]}
 
-        engines = values.get("engines")
-        if engines:
+        if engines := values.get("engines"):
             values["params"]["engines"] = ",".join(engines)
 
-        categories = values.get("categories")
-        if categories:
+        if categories := values.get("categories"):
             values["params"]["categories"] = ",".join(categories)
 
         searx_search_host = get_from_dict_or_env(values, "searx_search_host", "SEARX_SEARCH_HOST")
@@ -205,7 +203,7 @@ class SearxSearchWrapper(BaseModel):
                 f"Warning: missing the url scheme on host \
                 ! assuming secure https://{searx_search_host} "
             )
-            searx_search_host = "https://" + searx_search_host
+            searx_search_host = f"https://{searx_search_host}"
         elif searx_search_host.startswith("http://"):
             values["unsecure"] = True
             cls.disable_ssl_warnings(True)
@@ -304,10 +302,10 @@ class SearxSearchWrapper(BaseModel):
         params = {**self.params, **_params, **kwargs}
 
         if self.query_suffix and len(self.query_suffix) > 0:
-            params["q"] += " " + self.query_suffix
+            params["q"] += f" {self.query_suffix}"
 
         if isinstance(query_suffix, str) and len(query_suffix) > 0:
-            params["q"] += " " + query_suffix
+            params["q"] += f" {query_suffix}"
 
         if isinstance(engines, list) and len(engines) > 0:
             params["engines"] = ",".join(engines)
@@ -318,15 +316,14 @@ class SearxSearchWrapper(BaseModel):
         res = self._searx_api_query(params)
 
         if len(res.answers) > 0:
-            toret = res.answers[0]
+            return res.answers[0]
 
-        # only return the content of the results list
         elif len(res.results) > 0:
-            toret = "\n\n".join([r.get("content", "") for r in res.results[: self.top_k_results]])
+            return "\n\n".join(
+                [r.get("content", "") for r in res.results[: self.top_k_results]]
+            )
         else:
-            toret = "No good search result found"
-
-        return toret
+            return "No good search result found"
 
     async def arun(
         self,
@@ -342,10 +339,10 @@ class SearxSearchWrapper(BaseModel):
         params = {**self.params, **_params, **kwargs}
 
         if self.query_suffix and len(self.query_suffix) > 0:
-            params["q"] += " " + self.query_suffix
+            params["q"] += f" {self.query_suffix}"
 
         if isinstance(query_suffix, str) and len(query_suffix) > 0:
-            params["q"] += " " + query_suffix
+            params["q"] += f" {query_suffix}"
 
         if isinstance(engines, list) and len(engines) > 0:
             params["engines"] = ",".join(engines)
@@ -353,15 +350,14 @@ class SearxSearchWrapper(BaseModel):
         res = await self._asearx_api_query(params)
 
         if len(res.answers) > 0:
-            toret = res.answers[0]
+            return res.answers[0]
 
-        # only return the content of the results list
         elif len(res.results) > 0:
-            toret = "\n\n".join([r.get("content", "") for r in res.results[: self.top_k_results]])
+            return "\n\n".join(
+                [r.get("content", "") for r in res.results[: self.top_k_results]]
+            )
         else:
-            toret = "No good search result found"
-
-        return toret
+            return "No good search result found"
 
     def results(
         self,
@@ -409,9 +405,9 @@ class SearxSearchWrapper(BaseModel):
         }
         params = {**self.params, **_params, **kwargs}
         if self.query_suffix and len(self.query_suffix) > 0:
-            params["q"] += " " + self.query_suffix
+            params["q"] += f" {self.query_suffix}"
         if isinstance(query_suffix, str) and len(query_suffix) > 0:
-            params["q"] += " " + query_suffix
+            params["q"] += f" {query_suffix}"
         if isinstance(engines, list) and len(engines) > 0:
             params["engines"] = ",".join(engines)
         if isinstance(categories, list) and len(categories) > 0:
@@ -449,9 +445,9 @@ class SearxSearchWrapper(BaseModel):
         params = {**self.params, **_params, **kwargs}
 
         if self.query_suffix and len(self.query_suffix) > 0:
-            params["q"] += " " + self.query_suffix
+            params["q"] += f" {self.query_suffix}"
         if isinstance(query_suffix, str) and len(query_suffix) > 0:
-            params["q"] += " " + query_suffix
+            params["q"] += f" {query_suffix}"
         if isinstance(engines, list) and len(engines) > 0:
             params["engines"] = ",".join(engines)
         results = (await self._asearx_api_query(params)).results[:num_results]

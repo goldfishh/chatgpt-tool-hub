@@ -39,18 +39,11 @@ class ChatBot(Bot):
         return "Observation: "
 
     def _fix_text(self, text: str) -> str:
-        if not self.allowed_tools:
-            tool_names = ""
-        else:
-            tool_names = ", ".join([tool for tool in self.allowed_tools])
+        tool_names = ", ".join(list(self.allowed_tools)) if self.allowed_tools else ""
         instruction_text = FORMAT_INSTRUCTIONS.format(
             tool_names=tool_names, human_prefix=self.human_prefix
         )
-        _text = ("\n\n"
-                 f"You just told me: {text}, but it doesn't meet the format I mentioned to you. \n\n"
-                 f"format: {instruction_text}. \n\n"
-                 "You should understand why you did not input the correct format, correct it and try again. \n\n")
-        return _text
+        return f"\n\nYou just told me: {text}, but it doesn't meet the format I mentioned to you. \n\nformat: {instruction_text}. \n\nYou should understand why you did not input the correct format, correct it and try again. \n\n"
 
     @property
     def llm_prefix(self) -> str:
@@ -93,9 +86,7 @@ class ChatBot(Bot):
         template = "\n\n".join([prefix, tool_strings, instruction_text, suffix])
         if input_variables is None:
             input_variables = ["input", "chat_history", "bot_scratchpad"]
-        prompt = PromptTemplate(template=template, input_variables=input_variables)
-
-        return prompt
+        return PromptTemplate(template=template, input_variables=input_variables)
 
     def plan(
         self, intermediate_steps: List[Tuple[BotAction, str]], **kwargs: Any
@@ -114,9 +105,7 @@ class ChatBot(Bot):
         thoughts = self._construct_scratchpad(intermediate_steps)
         # todo remove stop
         new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
-        full_inputs = {**kwargs, **new_inputs}
-
-        return full_inputs
+        return kwargs | new_inputs
 
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
         llm_answer_str = self.llm_chain.predict(**full_inputs)
