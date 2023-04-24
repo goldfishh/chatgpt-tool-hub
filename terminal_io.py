@@ -436,7 +436,7 @@ def handle_command(command: str, llm_os: LLMOS):
             console.print("[dim]timeout未改变. ")
 
     elif command == '/undo':
-        if len(llm_os.messages) > 2:
+        if len(llm_os.messages) >= 2:
             question = llm_os.messages.pop()
             if question['role'] == "assistant":
                 question = llm_os.messages.pop()
@@ -555,10 +555,10 @@ def main(args):
     clear()
 
     console.print(
-        f"[dim]{who} 你好:wave: , 欢迎进入 LLM-OS! \n"
+        f"[dim]{who} 你好 :wave:  欢迎进入 LLM-OS! \n"
         "输入 `[bright_magenta]/help[/]` 可以获得帮助信息 \n"
-        "目前LLM-OS开发者只有我，能预见有大量:wrench:不能兼顾，请见谅 :persevere: \n"
-        "欢迎提issue和pr，希望这个项目变得更好 :chart_with_upwards_trend:"
+        "目前LLM-OS开发者只有我 能预见有大量:wrench:不能兼顾 请见谅 :persevere: \n"
+        "欢迎提issue和pr 希望这个项目变得更好 :chart_with_upwards_trend:"
     )
 
     session = PromptSession()

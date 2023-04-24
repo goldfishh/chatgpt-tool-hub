@@ -3,6 +3,7 @@ import os
 from typing import Any, List
 
 from rich.console import Console
+from rich.panel import Panel
 
 from chatgpt_tool_hub.chains.llm import LLMChain
 from chatgpt_tool_hub.common.calculate_token import count_string_tokens as get_token_num
@@ -149,6 +150,12 @@ class SummaryTool(BaseTool):
             # async call llm to get summary of each clip_text
             map_text_list = asyncio.run(self._acall(self.map_bot, _clip_text_list))
             map_text = _clipper.seperator.join(map_text_list)
+
+            self.console.print(Panel(f"{map_text}",
+                                     title=f"=[bright_magenta]Summary tool[/] 总结",
+                                     highlight=True))
+            self.console.print("\n")
+
             LOG.debug(f"[summary] round:{ctn}, map_list: {map_text}")
             # reduce
             _clip_summary_list = _clipper.clip(map_text, self.message_num)

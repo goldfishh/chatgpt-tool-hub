@@ -33,6 +33,7 @@ setup(
         'pydantic~=1.10.7',
         'pyopenssl',
         'pyyaml~=6.0',
+        'lxml',
         'beautifulsoup4~=4.12.0',
         "tenacity~=8.2.2",
         "openai~=0.27.2",

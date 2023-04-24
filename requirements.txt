@@ -16,6 +16,7 @@ selenium
 webdriver_manager
 
 # for crop html
+lxml
 beautifulsoup4~=4.12.0
 
 # for openai

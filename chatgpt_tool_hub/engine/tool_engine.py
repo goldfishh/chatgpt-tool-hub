@@ -127,7 +127,10 @@ class ToolEngine(Chain, BaseModel):
         )
         # Otherwise we lookup the tool
         if output.tool in name_to_tool_map:
-            self.console.print(f"√ 我将给工具发送 [bold cyan]{output.tool_input}[/] 信息...\n")
+            self.console.print(Panel(f"{output.tool_input}",
+                                     title=f"我将给工具 [bright_magenta]{output.tool}[/] 发送如下信息",
+                                     highlight=True))
+            self.console.print("\n")
 
             tool = name_to_tool_map[output.tool]
             return_direct = tool.return_direct
@@ -142,7 +145,8 @@ class ToolEngine(Chain, BaseModel):
                 observation_prefix=self.bot.observation_prefix,
             )
         else:
-            self.console.print(f"× 该工具 [bright_magenta]{output.tool}[/] 无效 \n")
+            self.console.print(f"× 该工具 [bright_magenta]{output.tool}[/] 无效")
+            self.console.print("\n")
 
             observation = InvalidTool().run(
                 output.tool,
