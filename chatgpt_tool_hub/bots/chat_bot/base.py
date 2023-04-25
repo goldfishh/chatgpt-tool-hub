@@ -105,7 +105,7 @@ class ChatBot(Bot):
         thoughts = self._construct_scratchpad(intermediate_steps)
         # todo remove stop
         new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
-        return {**kwargs, **new_inputs}
+        return kwargs | new_inputs
 
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
         llm_answer_str = self.llm_chain.predict(**full_inputs)
