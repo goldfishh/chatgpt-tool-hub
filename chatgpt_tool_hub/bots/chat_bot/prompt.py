@@ -27,7 +27,7 @@ Response Format:
         "speak": "thoughts summary to say to {human_prefix}",
     }}}},
     "tool": {{{{
-        "name": "the tool to use, You must use one of the tools from the list: [{tool_names}]", 
+        "name": "the tool to use, You must use one of the tools from the list: [{tool_names}, answer-user]", 
         "input": "the input to the tool" 
     }}}}
 }}}}

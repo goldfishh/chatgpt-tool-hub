@@ -37,7 +37,7 @@ def filter_text(html: str) -> str:
     try:
         os.remove(file_path)
     except Exception as e:
-        LOG.info(f"remove {file_path} failed... error_info: {repr(e)}")
+        LOG.debug(f"remove {file_path} failed... error_info: {repr(e)}")
 
     return _summary.encode('utf-8').decode()
 

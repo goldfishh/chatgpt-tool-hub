@@ -130,8 +130,8 @@ class ToolEngine(Chain, BaseModel):
             self.console.print(Panel(f"{output.tool_input}",
                                      title=f"我将给工具 [bright_magenta]{output.tool}[/] 发送如下信息",
                                      highlight=True))
-            self.console.print("\n")
-
+            
+            LOG.info(f"我将给工具发送如下信息: \n{output.tool_input}")
             tool = name_to_tool_map[output.tool]
             return_direct = tool.return_direct
             # color = color_mapping[output.tool]
@@ -146,8 +146,8 @@ class ToolEngine(Chain, BaseModel):
             )
         else:
             self.console.print(f"× 该工具 [bright_magenta]{output.tool}[/] 无效")
-            self.console.print("\n")
-
+            
+            LOG.info(f"该工具 {output.tool} 无效")
             observation = InvalidTool().run(
                 output.tool,
                 verbose=self.verbose,
@@ -159,8 +159,8 @@ class ToolEngine(Chain, BaseModel):
         self.console.print(Panel(observation + "\n",
                                  title=f"工具 [bright_magenta]{output.tool}[/] 返回内容",
                                  highlight=True, style='dim'))
-        self.console.print("\n")
-
+        
+        LOG.info(f"工具 {output.tool} 返回内容: {observation}")
         return output, observation
 
     def _call(self, inputs: Dict[str, str]) -> Dict[str, Any]:
@@ -321,3 +321,9 @@ class ToolEngine(Chain, BaseModel):
         if self.return_intermediate_steps:
             final_output["intermediate_steps"] = intermediate_steps
         return final_output
+
+    def get_tool_list(self) -> List[str]:
+        _tool_list = []
+        for tool in self.tools:
+            _tool_list.extend(tool.get_tool_list())
+        return _tool_list

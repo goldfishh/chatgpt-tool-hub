@@ -1,4 +1,5 @@
 """Util that calls Wikipedia."""
+import time
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Extra, root_validator
@@ -47,9 +48,16 @@ class WikipediaAPIWrapper(BaseModel):
         search_results = self.wiki_client.search(query)
         summaries = []
         for i in range(min(self.top_k_results, len(search_results))):
-            summary = self.fetch_formatted_page_summary(search_results[i])
-            if summary is not None:
-                summaries.append(summary)
+            retry_num = 0
+            while retry_num <= 1:
+                summary = self.fetch_formatted_page_summary(search_results[i])
+                if summary is not None:
+                    summaries.append(summary)
+                    break
+                else:
+                    # wikipedia api 限制
+                    time.sleep(2)
+                    retry_num += 1
         _content = "\n\n".join(summaries)
         LOG.debug(f"[wikipedia]: {_content}")
         return _content
@@ -58,9 +66,6 @@ class WikipediaAPIWrapper(BaseModel):
         try:
             wiki_page = self.wiki_client.page(title=page, auto_suggest=False)
             return f"Page: {page}\nSummary: {wiki_page.summary}"
-        except (
-            self.wiki_client.exceptions.PageError,
-            self.wiki_client.exceptions.DisambiguationError,
-        ) as e:
-            LOG.error(f"[wikipedia]: {repr(e)}")
+        except Exception as e:
+            LOG.info(f"[wikipedia]: {repr(e)}")
             return None

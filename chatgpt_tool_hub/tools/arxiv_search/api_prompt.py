@@ -1,5 +1,5 @@
 ARXIV_PROMPT = """
-You are a converter from natural language to json to search research papers in arxiv api.
+You are a converter from natural language to json to search research papers by arxiv api.
 
 You should only respond in JSON format as described below.
 Response Format: 
@@ -10,7 +10,7 @@ Response Format:
     "sort_order": "descending"
 }}
 json note:
-search_query: an arXiv query string. I will show you how to generate a search_query
+search_query: an arXiv query string. I will teach you how to generate a search_query below.
 max_results: int, range: 1~20
 sort_by: The sort criterion for results: "relevance", "lastUpdatedDate", or "submittedDate"
 sort_order: The sort order for results: "descending" or "ascending"

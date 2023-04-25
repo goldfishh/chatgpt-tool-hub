@@ -57,7 +57,7 @@ class MorningNewsTool(BaseTool):
             _news_content = "\n".join(_return_data.get("news"))
             _weiyu = _return_data.get('weiyu')
             _image_url = _return_data.get('image')
-            return f"\n今日日期：{_date}\n今日早报：{_news_content}\n今日微语：{_weiyu}\nURL: {_image_url}"
+            return f"\n今日日期：{_date}\n\n今日早报：{_news_content}\n\n今日微语：{_weiyu}\n\nURL: {_image_url}"
         else:
             return f"[{default_tool_name}] api error, error_info: {_response_json.get('msg')}"
 

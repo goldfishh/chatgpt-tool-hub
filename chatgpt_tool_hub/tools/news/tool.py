@@ -17,9 +17,9 @@ default_tool_name = "news"
 class NewsTool(BaseTool):
     name: str = default_tool_name
     description: str = (
-        "Useful when you want to get information about current news stories, "
-        "such as financial news, daily morning reports and any other news. "
-        "The input should be a description of your needs in natural language."
+        "当你想要获取实时新闻资讯时可以使用该工具，你能获取任何与新闻有关的信息。"
+        "该工具包含了金融、早报和news-api三个子工具，访问这些工具前你需要先访问本工具。"
+        "工具输入：你目前了解到的所有信息的总结 和 用户想获取的新闻内容。"
     )
     engine: ToolEngine = Any
 
@@ -30,6 +30,7 @@ class NewsTool(BaseTool):
         tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register, console, **tool_kwargs)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
 
+        # subtool 思考深度暂时固定为2
         self.engine = init_tool_engine(tools, llm, bot="qa-bot", verbose=True, console=self.console,
                                        max_iterations=2, early_stopping_method="force")
 
@@ -46,6 +47,9 @@ class NewsTool(BaseTool):
     async def _arun(self, query: str) -> str:
         """Use the tool asynchronously."""
         raise NotImplementedError("NewsTool does not support async")
+
+    def get_tool_list(self):
+        return news_tool_register.get_registered_tool_names()
 
 
 main_tool_register.register_tool(default_tool_name, lambda console, kwargs: NewsTool(console, **kwargs), [])

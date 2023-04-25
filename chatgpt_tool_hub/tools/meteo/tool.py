@@ -24,7 +24,7 @@ class MeteoWeatherTool(BaseTool):
     def __init__(self, console: Console = Console(), **tool_kwargs):
         super().__init__(console=console, return_direct=False)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
-        self.api_chain = APIChain.from_llm_and_api_docs(llm, OPEN_METEO_DOCS)
+        self.api_chain = APIChain.from_llm_and_api_docs(llm, OPEN_METEO_DOCS, console=console)
 
     def _run(self, query: str) -> str:
         """Use the tool."""

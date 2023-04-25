@@ -1,4 +1,5 @@
 """Tool for the Wikipedia API."""
+from typing import Any
 
 from rich.console import Console
 
@@ -18,12 +19,12 @@ class WikipediaTool(BaseTool):
         "people, places, companies, historical events, or other subjects. "
         "Input should be a search query."
     )
-    api_wrapper: WikipediaAPIWrapper
+    api_wrapper: WikipediaAPIWrapper = None
 
-    def __init__(self, console: Console = Console(), api_wrapper: WikipediaAPIWrapper = WikipediaAPIWrapper()):
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容
         super().__init__(console=console, return_direct=False)
-        self.api_wrapper = api_wrapper
+        self.api_wrapper = WikipediaAPIWrapper(**tool_kwargs)
 
     def _run(self, query: str) -> str:
         """Use the Wikipedia tool."""
@@ -34,4 +35,4 @@ class WikipediaTool(BaseTool):
         raise NotImplementedError("WikipediaQueryRun does not support async")
 
 
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: WikipediaTool(console, api_wrapper=WikipediaAPIWrapper(**kwargs)), [])
+main_tool_register.register_tool(default_tool_name, lambda console, kwargs: WikipediaTool(console, **kwargs), [])

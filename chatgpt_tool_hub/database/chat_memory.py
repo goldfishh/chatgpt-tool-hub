@@ -38,8 +38,8 @@ class BaseChatMemory(BaseMemory, ABC):
             output_key = list(outputs.keys())[0]
         else:
             output_key = self.output_key
-        self.chat_memory.add_user_message(inputs[prompt_input_key])
-        self.chat_memory.add_ai_message(outputs[output_key])
+        self.chat_memory.add_user_message(repr(inputs[prompt_input_key]))
+        self.chat_memory.add_ai_message(repr(outputs[output_key]))
 
     def clear(self) -> None:
         """Clear memory contents."""

@@ -151,11 +151,6 @@ class SummaryTool(BaseTool):
             map_text_list = asyncio.run(self._acall(self.map_bot, _clip_text_list))
             map_text = _clipper.seperator.join(map_text_list)
 
-            self.console.print(Panel(f"{map_text}",
-                                     title=f"=[bright_magenta]Summary tool[/] 总结",
-                                     highlight=True))
-            self.console.print("\n")
-
             LOG.debug(f"[summary] round:{ctn}, map_list: {map_text}")
             # reduce
             _clip_summary_list = _clipper.clip(map_text, self.message_num)
@@ -164,6 +159,16 @@ class SummaryTool(BaseTool):
             reduce_text = _clipper.seperator.join(reduce_text_list)
             LOG.debug(f"[summary] round:{ctn}, reduce_list: {reduce_text}")
             _text = reduce_text
+
+            self.console.print(Panel(f"{_text}",
+                                     title=f"[bright_magenta]Summary tool[/] 第{ctn}轮总结",
+                                     highlight=True))
+            
+        if ctn > 2:
+            self.console.print(Panel(f"{_text}",
+                                     title=f"[bright_magenta]Summary tool[/] 最终总结",
+                                     highlight=True))
+            
         return _text
 
     async def _arun(self, file_path: str) -> str:
