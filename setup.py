@@ -47,6 +47,7 @@ setup(
         "SQLAlchemy~=2.0.7",
         "selenium",
         "webdriver_manager",
+        "rich"
     ],
     classifiers=[
         'Intended Audience :: Developers',
