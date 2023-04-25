@@ -2,7 +2,7 @@ from abc import abstractmethod
 
 from typing import List
 
-from chatgpt_tool_hub.chains.base import Chain
+from chatgpt_tool_hub.engine.tool_engine import ToolEngine
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 
@@ -11,7 +11,7 @@ class App:
     _instance = None  # 存储单例实例
     init_flag = False  # 记录是否执行过初始化动作
 
-    engine: Chain = None
+    engine: ToolEngine = None
 
     # 当前已加载工具
     tools: set = set()
@@ -76,4 +76,4 @@ class App:
         return True
 
     def get_tool_list(self) -> List[str]:
-        return list(self.tools)
+        return list(self.engine.get_tool_list())

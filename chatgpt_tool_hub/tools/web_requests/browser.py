@@ -113,7 +113,7 @@ class BrowserTool(BaseTool):
     description = (
         "A Google Chrome browser. Use this when you need to get specific content from a website. "
         "Input should be a url (i.e. https://github.com/goldfishh/chatgpt-tool-hub). "
-        "The output will be the text response of browser. This tool has a higher priority than url-get tool."
+        "The output will be the text response of browser. "
     )
 
     browser: ChromeBrowser = None

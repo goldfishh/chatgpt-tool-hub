@@ -1,4 +1,5 @@
 import logging
+import os
 
 from rich.console import Console
 
@@ -33,10 +34,16 @@ class AppFactory:
         else:
             self.default_tools_list = ["python", "terminal", "url-get", "meteo-weather"]
 
+        # set proxy
+        # _proxy = get_from_dict_or_env(kwargs, "proxy", "PROXY", "")
+        # if not _proxy:
+        #     os.environ["http_proxy"] = str(_proxy)
+        #     os.environ["https_proxy"] = str(_proxy)
+
         # dynamic loading tool
         dynamic_tool_loader()
 
-    def create_app(self, app_type: str = 'victorinox', tools_list: list = None, **kwargs) -> App:
+    def create_app(self, app_type: str = 'victorinox', tools_list: list = None, console=Console(quiet=True), **kwargs) -> App:
         tools_list = tools_list if tools_list else []
 
         self.init_env(**kwargs)
@@ -58,7 +65,7 @@ class AppFactory:
             if "browser" in tools_list:
                 tools_list = list(filter(lambda tool: tool != "url-get", tools_list))
 
-            app = Victorinox(**build_model_params(kwargs))
+            app = Victorinox(console, **build_model_params(kwargs))
             app.create(tools_list, **kwargs)
             return app
         else:

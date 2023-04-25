@@ -23,6 +23,7 @@ from chatgpt_tool_hub.apps import AppFactory, App
 from chatgpt_tool_hub.common.calculate_token import count_message_tokens
 from chatgpt_tool_hub.common.constants import LOGGING_FMT, LOGGING_DATEFMT
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+from chatgpt_tool_hub.tools.news import news_tool_register
 
 logging.basicConfig(filename=f'{os.getcwd()}/llmos.log', format=LOGGING_FMT,
                     datefmt=LOGGING_DATEFMT, level=logging.INFO)
@@ -130,7 +131,7 @@ class LLMOS:
         self.current_tokens = count_message_tokens(self.messages)
 
     def create_app(self):
-        return AppFactory().create_app(tools_list=config["tools"], **config["kwargs"])
+        return AppFactory().create_app(tools_list=config["tools"], console=console, **config["kwargs"])
 
     @property
     def get_app(self) -> App:
@@ -264,7 +265,8 @@ class CustomCompleter(Completer):
                         yield Completion(model, start_position=-len(model_prefix))
             if text.startswith('/add '):
                 tool_prefix = text[5:]
-                available_tools = main_tool_register.get_registered_tool_names()
+                available_tools = main_tool_register.get_registered_tool_names() \
+                                  + news_tool_register.get_registered_tool_names()
                 for tool in available_tools:
                     if tool.startswith(tool_prefix):
                         yield Completion(tool, start_position=-len(tool_prefix))
@@ -336,10 +338,12 @@ def handle_command(command: str, llm_os: LLMOS):
                 tools_kwargs[tool_args] = add_tool_args
 
         # todo 目前tool-hub不支持subtool粒度增删tool
-
         if add_tool not in main_tool_register.get_registered_tool_names():
-            console.print(f"发现未知工具: {add_tool}")
-            return
+            if add_tool not in subtool_parent.keys():
+                console.print(f"发现未知工具: {add_tool}")
+                return
+            elif subtool_parent[add_tool] not in llm_os.get_app.get_tool_list():
+                add_tool = subtool_parent[add_tool]
 
         app = llm_os.get_app
         app.add_tool(add_tool, **tools_kwargs)

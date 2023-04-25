@@ -122,3 +122,6 @@ class BaseTool(BaseModel):
                 observation, verbose=verbose, color=color, **kwargs
             )
         return observation
+
+    def get_tool_list(self):
+        return [self.name]

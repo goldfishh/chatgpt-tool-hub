@@ -21,9 +21,9 @@ class WolframAlphaTool(BaseTool):
         "Science, Technology, Culture, Society and Everyday Life. "
         "Input should be a search query."
     )
-    api_wrapper: WolframAlphaAPIWrapper
+    api_wrapper: WolframAlphaAPIWrapper = None
 
-    def __init__(self, console: Console = Console(), **tool_kwargs):
+    def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容
         super().__init__(console=console, return_direct=False)
         self.api_wrapper = WolframAlphaAPIWrapper(**tool_kwargs)
@@ -38,4 +38,4 @@ class WolframAlphaTool(BaseTool):
 
 
 main_tool_register.register_tool(default_tool_name, lambda console, kwargs: WolframAlphaTool(console, **kwargs),
-              tool_input_keys=["wolfram_alpha_appid"])
+                                 tool_input_keys=["wolfram_alpha_appid"])

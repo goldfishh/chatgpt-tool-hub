@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, root_validator
 from rich.console import Console
+from rich.panel import Panel
 
 from chatgpt_tool_hub.chains.api.prompt import API_RESPONSE_PROMPT, API_URL_PROMPT
 from chatgpt_tool_hub.chains.base import Chain
@@ -69,12 +70,21 @@ class APIChain(Chain, BaseModel):
         api_url = self.api_request_chain.predict(
             question=question, api_docs=self.api_docs
         )
-        LOG.debug(f"[API] generate url: {str(api_url)}")
+        self.console.print(Panel(f"{str(api_url)}",
+                                 title=f"[bright_magenta]URL 构造[/]",
+                                 highlight=True))
+        
+        LOG.info(f"URL 构造: {str(api_url)}")
         self.callback_manager.on_text(
             api_url, color="green", end="\n", verbose=self.verbose
         )
         api_response = self.requests_wrapper.get(api_url)
-        LOG.debug(f"[API] response: {str(api_response)}")
+
+        self.console.print(Panel(f"{repr(api_response)}",
+                                 title=f"[bright_magenta]API 响应[/]",
+                                 highlight=True))
+        
+        LOG.info(f"API 响应: {repr(api_response)}")
         self.callback_manager.on_text(
             api_response, color="yellow", end="\n", verbose=self.verbose
         )

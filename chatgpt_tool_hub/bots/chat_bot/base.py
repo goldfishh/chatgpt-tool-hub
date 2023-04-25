@@ -173,7 +173,7 @@ class ChatBot(Bot):
 
         if action.lower() != "answer-user":
             self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...")
-        # todo
+
         LOG.info(f"执行Tool: {action}中...")
         return action.strip(), action_input.strip()
 
@@ -223,7 +223,8 @@ class ChatBot(Bot):
                                      title=f"{self.ai_prefix.upper()}的内心独白",
                                      highlight=True, style='dim'))
             # it's useful for avoid splitting Panel
-            self.console.print("\n")
+            LOG.info(f"{self.ai_prefix.upper()}的内心独白: {thoughts_text}")
+            
             return assistant_reply_json
         except json.decoder.JSONDecodeError as e:
             call_stack = traceback.format_exc()

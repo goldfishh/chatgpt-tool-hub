@@ -8,7 +8,7 @@ from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.models.model_factory import ModelFactory
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.news import news_tool_register
-from chatgpt_tool_hub.tools.news.news_api.docs_prompts import NEWS_DOCS
+from chatgpt_tool_hub.tools.news.news_api.docs_prompt import NEWS_DOCS
 
 default_tool_name = "news-api"
 
@@ -29,7 +29,7 @@ class NewsApiTool(BaseTool):
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
 
         self.api_chain = APIChain.from_llm_and_api_docs(
-            llm, NEWS_DOCS, headers={"X-Api-Key": news_api_key}
+            llm, NEWS_DOCS, console=console, headers={"X-Api-Key": news_api_key}
         )
 
     def _run(self, query: str) -> str:
