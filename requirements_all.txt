@@ -39,8 +39,6 @@ pyperclip
 prompt_toolkit
 
 setuptools~=65.6.3
-pyperclip~=1.8.2
-rich~=13.3.3
 pillow~=9.5.0
 transformers~=4.27.4
 torch~=2.0.0

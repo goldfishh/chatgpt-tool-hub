@@ -61,7 +61,7 @@ class ArxivTool(BaseTool):
         with open(file_path, "w") as f:
             f.write(_api_response + "\n")
 
-        _input = SummaryTool(max_segment_length=2400).run(f"{str(file_path)}, 0")
+        _input = SummaryTool(self.console, max_segment_length=2400).run(f"{str(file_path)}, 0")
         try:
             os.remove(file_path)
         except Exception as e:

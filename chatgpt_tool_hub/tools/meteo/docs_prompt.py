@@ -61,12 +61,13 @@ Code	Description
 80, 81, 82	Rain showers: Slight, moderate, and violent
 85, 86	Snow showers slight and heavy
 
-Pay attention: 
+Think step by step: 
 1. You should only use the parameters described in this document to construct the API URL, 
 and should not make up parameters. If there is no parameter for daily granularity, 
 you can use the parameter for hourly granularity instead.
-2. If daily weather variables are specified, parameter timezone is required.
+2. Access weather information for no more than 3 days using the parameters start_date, or end_date.
 3. Parameter past_days is mutually exclusive with start_date and end_date.
-4. Your output can only be a URL, no need for explanation.
+4. If daily weather variables are specified, parameter timezone is required.
+5. Your output can only be a URL, no need for explanation.
 
 URL: """

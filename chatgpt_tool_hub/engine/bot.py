@@ -72,8 +72,11 @@ class Bot(BaseModel):
         """Construct the scratchpad that lets the bot continue its thought process."""
         thoughts = ""
         for action, observation in intermediate_steps:
-            thoughts += f"The JSON you responded me: \n{action.log}\n\n"
-            thoughts += f"The content returned after invoking the tool: \n{observation}\n\n"
+            thoughts += f"We just had an interaction: \n"
+            thoughts += f"You responded to me with: {action.log}\n"
+            thoughts += f"Based on that, I called {action.tool} tool and it returned: {observation}\n"
+            thoughts += f"Analyze tool results to determine if the user's input " \
+                        f"has been resolved, and select the next tool accordingly.\n\n"
         return thoughts
 
     def _crop_full_input(self, inputs: str) -> str:
@@ -91,7 +94,7 @@ class Bot(BaseModel):
             with open(file_path, "w") as f:
                 f.write(_input + "\n")
             # 总结
-            _input = SummaryTool(max_segment_length=2000).run(f"{str(file_path)}, 0")
+            _input = SummaryTool(self.console, max_segment_length=2000).run(f"{str(file_path)}, 0")
             try:
                 os.remove(file_path)
             except Exception as e:
@@ -231,20 +234,15 @@ class Bot(BaseModel):
             # `force` just returns a constant string
             return BotFinish({"output": "Bot stopped due to max iterations."}, "")
         elif early_stopping_method == "generate":
-            # Generate does one final forward pass
-            thoughts = ""
-            for action, observation in intermediate_steps:
-                thoughts += action.log
-                thoughts += (
-                    f"\n{self.observation_prefix}{observation}\n{self.llm_prefix}"
-                )
             # Adding to the previous steps, we now tell the LLM to make a final pred
+            thoughts = self._construct_scratchpad(intermediate_steps)
             thoughts += (
                 f"你超过了tool使用次数限制: 最多{max_iterations}次。"
-                "你现在需要总结当前你了解到的所有信息，来反馈给人类。"
+                "你现在需要总结当前你了解到的所有信息，来反馈给人类，本次你必须使用answer-user工具!"
                 "你需要生成一个final answer:"
             )
-            new_inputs = {"bot_scratchpad": thoughts, "stop": self._stop}
+
+            new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
             full_inputs = {**kwargs, **new_inputs}
             full_output = self.llm_chain.predict(**full_inputs)
             # We try to extract a final answer
@@ -254,7 +252,7 @@ class Bot(BaseModel):
                 return (
                     BotFinish({"output": action_input}, full_output)
                     if action.lower() in ['answer-user']
-                    else BotFinish({"output": full_output}, full_output)
+                    else BotFinish({"output": "受think_depth限制，系统强制终止了LLM-OS"}, full_output)
                 )
             else:
                 # If we cannot extract, we just return the full output

@@ -33,6 +33,7 @@ def filter_text(html: str) -> str:
 
     with open(file_path, "w") as f:
         f.write(text + "\n")
+    # todo should input console
     _summary = SummaryTool().run(f"{str(file_path)}, 0")
     try:
         os.remove(file_path)

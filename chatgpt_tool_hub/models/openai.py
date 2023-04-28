@@ -131,7 +131,7 @@ class BaseOpenAI(BaseLLM, BaseModel):
     client: Any  #: :meta private:
     model_name: str = "text-davinci-003"
     """Model name to use."""
-    temperature: float = 0.7
+    temperature: float = 0
     """What sampling temperature to use."""
     max_tokens: int = 256
     """The maximum number of tokens to generate in the completion.

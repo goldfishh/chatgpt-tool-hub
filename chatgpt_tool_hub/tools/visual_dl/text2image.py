@@ -19,7 +19,7 @@ class ImageCaptionTool(BaseTool):
     name = default_tool_name
     description = (
         "useful when you want to know what is inside the photo. receives image_path as input."
-        "The input to this tool should be a string, representing the image_path."
+        "The input to this tool should be a string, representing the image_path, you MUST use absolute path."
     )
     device: str = "cpu"
     torch_dtype: torch.dtype = torch.float32

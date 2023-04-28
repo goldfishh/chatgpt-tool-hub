@@ -392,9 +392,9 @@ def handle_command(command: str, llm_os: LLMOS):
         app.load_tools_into_bot()
 
     elif command == '/reset':
+        # todo bug 这里没有清空历史记录
         config = read_config_json()
         llm_os.app = llm_os.create_app()
-        # todo
         llm_os.messages = init_chat_history
 
     elif command.startswith('/model'):
