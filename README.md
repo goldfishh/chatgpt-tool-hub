@@ -22,12 +22,16 @@
 
 > 大语言模型涌现能力让人惊艳，ChatGPT出现给NLP技术带来革命，除此之外还让我意识到一种新的人机交互的可能性
 
-## 🌱 4.23 新增LLM-OS demo - [快速上手](#llm-os_jump)
+<div>
+    <h2 style="display:inline; margin:0; padding:0;">🌱 5.4 LLM-OS demo在线演示 - </h2>
+    <a style="display:inline-block; align:center" src="https://colab.research.google.com/assets/colab-badge.svg" href="https://colab.research.google.com/drive/11nYPGFCYiaZ73H8nTHSN8ifbo0u3W_8p">
+        <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="demo in Colab"/>
+    </a>
+</div>
 
+[私有化部署](#llm-os_jump)
 
-
-https://user-images.githubusercontent.com/24581028/233855116-ecbc5ea8-246b-46c6-8a1a-67ea6d970077.mp4
-
+<iframe src="//player.bilibili.com/player.html?aid=443026516&bvid=BV1eL411h7Nk&cid=1111299601&page=1&high_quality=1&danmaku=0" width="100%" height="500" scrolling="no" frameborder="no" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"> </iframe>
 
 
 #### [更新日志](./docs/update_log.md) | [Q&A](./docs/q_and_a.md)
@@ -88,7 +92,7 @@ pip3 install -r requirements.txt
 
 `.env` 用于配置全局参数 文件配置示例
 ```text
-OPENAI_API_KEY=sk-xx          // 必填，你的OPENAI API Key, 如何申请请见Q&A
+LLM_API_KEY=sk-xx          // 必填，你的OPENAI API Key, 如何申请请见Q&A
 MODEL_NAME=gpt-3.5-turbo      // 选填，OPENAI LLM模型
 THINK_DEPTH=3                 // 选填，默认为3，控制LLM-OS的最大调用工具次数，过大不一定能提高回复质量
 REQUEST_TIMEOUT=90            // 选填，默认120，等待openai api回复的最大时间
@@ -118,7 +122,7 @@ python3 terminal_io.py
 
 #### (5). 进入LLM-OS后你可以自行探索 或者进一步浏览详细教程：[LLM_OS demo使用说明](https://github.com/goldfishh/llm-os/blob/main/README.md)
 
---- 
+---
 
 ### 2. 我给[chatgpt-on-wechat](https://github.com/zhayujie/chatgpt-on-wechat)开发了tool插件
 
@@ -147,7 +151,7 @@ pip install -i https://pypi.python.org/simple chatgpt-tool-hub
 ```python
 import os
 from chatgpt_tool_hub.apps import AppFactory
-os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"  # 必填
+os.environ["LLM_API_KEY"] = "YOUR_LLM_API_KEY"  # 必填
 os.environ["PROXY"] = "YOUR_PROXY_ADDRESS"            # 选填
 app = AppFactory().create_app(tools_list=[], **{})
 reply = app.ask("YOUR_QUESTION_TO_HERE")
@@ -162,18 +166,6 @@ print(reply)
 
 ---
 
-## ☕ 宣传
-
-#### 如果你想支持本项目，欢迎给项目点个star、提issue和pr
-#### 如果你想进一步支持项目作者少掉头发，努力开发，可以给和我一起开发项目的伙伴 或 单独给我来杯 ☕
-
-<table><tr>
-<td><a href="https://public.zsxq.com/groups/88885848842852.html"><img src="https://github.com/zhayujie/chatgpt-on-wechat/blob/master/docs/images/planet.jpg?raw=true" width="400" height="200" border=0></a></td>
-<td><img src="./assets/buy_me_a_coffee.jpg" width="200" height="200" border=0 /></td>
-</tr></table> 
-
----
-
 ## 工具指南 
 
 ### 🚀 [工具指南 工具快速开发中](./docs/tool_tutorial.md)
@@ -185,14 +177,14 @@ print(reply)
 ---
 
 工具引擎的实现原理本质是**Chain-of-Thought**：[Chain-of-Thought Prompting Elicits Reasoning in Large Language Models](https://arxiv.org/abs/2201.11903)
-  
+
 我将通过用6个自问自答的问题解释chatgpt-tool-hub的工作原理  
 
 #### 1. 事务型工具（如terminal、python）是在哪运行，以及如何执行的
 
 事务型工具是在你本地运行的，事务型工具本质是一个python编写的函数，terminal、python、url-get工具分别用到了封装调用subprocess库、python解释器和requests库的函数
 
---- 
+---
 
 #### 2. ChatGPT是如何触发调用这些函数
 
@@ -239,8 +231,8 @@ Observation: 当事务函数执行完成返回时的内容
 
 带Observation前缀的内容往往是使用事务型工具的用户想知道的答案
 
---- 
-  
+---
+
 #### 3. ChatGPT怎么知道该用的工具和输入，是否每次都严格按照prompt生成格式化内容
 
 ChatGPT微调时进行大量Q&A、CoT预料的学习和RLHF调优，目前ChatGPT对于工具和内容生成的质量是有保证的  
@@ -249,7 +241,7 @@ ChatGPT微调时进行大量Q&A、CoT预料的学习和RLHF调优，目前ChatGP
 我创建一个issue，可以方便大家来获取和分享使用tool过程解决的有趣问题和思路、每个tool使用时prompt技巧、遇到问题的处理办法：
 [更好的使用tool的技巧交流](https://github.com/goldfishh/chatgpt-tool-hub/issues/3)
 
---- 
+---
 
 #### 4. 如果需要多个工具交替配合解决某个问题，引擎是怎么做的？
 
@@ -272,7 +264,7 @@ Thought:
 ```
 
 每轮工具CoT过程均会作为下次推理判断工具的依据，由此迭代地进行工具判断、执行，最后当识别到特定前缀时，CoT结果将返回给用户    
-  
+
 CoT结束prompt：
 ```text
 When you have a response to say to the Human, or if you do not need to use a tool, you MUST use the format:
@@ -285,14 +277,14 @@ AI: the response to the original input question in chinese
 
 ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时，会根据历史过程，返回给用户最后结果    
 
---- 
+---
 
 #### 5. 事务性工具交给ChatGPT是否具有不可预料的危险性？
 
 是的，当你用事务性工具时，你就给予了ChatGPT在你本地运行程序的权利，你需要权限限制来规避可能的风险      
 如果无法信任ChatGPT主导你的机器，请不要使用  
 
---- 
+---
 
 #### 6. 非事务型工具的实现原理是什么
 
@@ -306,9 +298,9 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
 <span id="plan"></span>
 
 ---
- 
+
 ### feature todolist
-  
+
 [✓] 结果可解释性输出 -> LLM-OS的内心独白  
 [✓] 一个前端demo  -> LLM-OS  
 [✓] 长文本场景 -> summary工具  
@@ -324,9 +316,9 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
 [○] 工具中断  
 [○] 定时调度  
 [○] 语音输入、输出  
-  
+
 ### tool todolist  
-   
+
 [○] stable-diffusion 中文prompt翻译    
 [✓] ImageCaptioning    
 [○] 小米智能家居控制    
@@ -339,10 +331,8 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
 ## 工具开发指南
 
 ---
- 
+
 目前工具分为两类：事务型工具、插件型工具   
- 
-我等待有需求之后更新这部分内容    
 
 [工具开发教程](./docs/tool_development_guide.md)
 
@@ -352,14 +342,32 @@ ChatGPT使用工具过程并不顺利：当遇到迭代次数到达预设值时�
 
 ---
 
+## ☕ 宣传
+
+#### 如果你想支持本项目，欢迎给项目点个star、提issue和pr
+#### 如果你想进一步支持项目作者少掉头发，努力开发，可以给和我一起开发项目的伙伴 或 单独给我来杯 ☕
+
+<table><tr>
+<td><a href="https://public.zsxq.com/groups/88885848842852.html"><img src="https://github.com/zhayujie/chatgpt-on-wechat/blob/master/docs/images/planet.jpg?raw=true" width="400" height="200" border=0></a></td>
+<td><img src="./assets/buy_me_a_coffee.jpg" width="200" height="200" border=0 /></td>
+</tr></table> 
+
+---
+
 ## 感谢
 
 感谢以下项目对本项目提供的有力支持：
 
-#### 1. [langchain](https://github.com/hwchase17/langchain)
+#### 1. [langchain](https://github.com/hwchase17/langchain) 
+
+受langchain的启发，本项目重写了langchain v0.0.123 工具有关的实现
 
 #### 2. [Auto-GPT](https://github.com/Significant-Gravitas/Auto-GPT)
 
+启发了browser tool跨平台的实现、tool engine的json通信、部分prompt描述
+
 #### 3. [chatgpt-in-terminal](https://github.com/xiaoxx970/chatgpt-in-terminal)
+
+llm-os demo 改写自该项目
 
 ---

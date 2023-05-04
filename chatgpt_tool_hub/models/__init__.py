@@ -24,20 +24,21 @@ def change_memory_max_tokens(memory_max_tokens_num: int):
 
 
 def build_model_params(kwargs: dict) -> dict:
-    _api_key = get_from_dict_or_env(kwargs, "openai_api_key", "OPENAI_API_KEY")
+    _api_key = get_from_dict_or_env(kwargs, "llm_api_key", "LLM_API_KEY")
     _proxy = get_from_dict_or_env(kwargs, "proxy", "PROXY", "")
     _model = get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo")
     _timeout = get_from_dict_or_env(kwargs, "request_timeout", "REQUEST_TIMEOUT", 120)
-    _openai_api_base = get_from_dict_or_env(kwargs, "open_ai_api_base", "OPEN_AI_API_BASE", openai_default_api_base)
+    _llm_api_base_url = get_from_dict_or_env(kwargs, "llm_api_base_url", "LLM_API_BASE_URL", openai_default_api_base)
     # tool llm need them
-    os.environ["OPENAI_API_KEY"] = str(_api_key)
+    os.environ["LLM_API_KEY"] = str(_api_key)
     os.environ["PROXY"] = str(_proxy)
     os.environ["MODEL_NAME"] = str(_model)
     os.environ["REQUEST_TIMEOUT"] = str(_timeout)
-    os.environ["OPEN_AI_API_BASE"] = str(_openai_api_base)
+    os.environ["LLM_API_BASE_URL"] = str(_llm_api_base_url)
     return {
         "temperature": get_from_dict_or_env(kwargs, "temperature", "TEMPERATURE", 0),
-        "openai_api_key": _api_key,
+        "llm_api_key": _api_key,
+        "llm_api_base_url": _llm_api_base_url,
         "proxy": _proxy,
         "model_name": _model,  # 对话模型的名称
         "top_p": 1,

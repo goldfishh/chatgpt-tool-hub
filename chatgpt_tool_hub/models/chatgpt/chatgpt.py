@@ -105,7 +105,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
     """Wrapper around OpenAI Chat large language models.
 
     To use, you should have the ``openai`` python package installed, and the
-    environment variable ``OPENAI_API_KEY`` set with your API key.
+    environment variable ``LLM_API_KEY`` set with your API key.
 
     Any parameters that are valid to be passed to the openai.create call can be passed
     in, even if not explicitly saved on this class.
@@ -118,23 +118,27 @@ class ChatOpenAI(BaseChatModel, BaseModel):
     """
 
     client: Any  #: :meta private:
-    model_name: str = "gpt-3.5-turbo"
     """Model name to use."""
-    model_kwargs: Dict[str, Any] = Field(default_factory=dict)
+    model_name: str = "gpt-3.5-turbo"
     """Holds any model parameters valid for `create` call not explicitly specified."""
-    openai_api_key: Optional[str] = None
-    request_timeout: int = 60
+    model_kwargs: Dict[str, Any] = Field(default_factory=dict)
+    """llm api base url"""
+    llm_api_base_url: str = openai_default_api_base
+    """a key to call llm api server"""
+    llm_api_key: Optional[str] = None
     """Timeout in seconds for the OpenAPI request."""
-    max_retries: int = 6
+    request_timeout: int = 60
     """Maximum number of retries to make when generating."""
-    streaming: bool = False
+    max_retries: int = 6
     """Whether to stream the results or not."""
-    n: int = 1
+    streaming: bool = False
     """Number of chat completions to generate for each prompt."""
-    max_tokens: Optional[int] = None
+    n: int = 1
     """Maximum number of tokens to generate."""
-    proxy: str = None
+    max_tokens: Optional[int] = None
     """the proxy to use"""
+    proxy: Optional[str] = None
+    """"""
 
     class Config:
         """Configuration for this pydantic object."""
@@ -158,27 +162,36 @@ class ChatOpenAI(BaseChatModel, BaseModel):
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that api key and python package exists in environment."""
-        _openai_api_key = get_from_dict_or_env(
-            values, "openai_api_key", "OPENAI_API_KEY"
+        _llm_api_key = get_from_dict_or_env(
+            values, "llm_api_key", "LLM_API_KEY"
         )
-        _api_base_url = get_from_dict_or_env(
-            values, "open_ai_api_base", "OPEN_AI_API_BASE",
+        _llm_api_base_url = get_from_dict_or_env(
+            values, "llm_api_base_url", "LLM_API_BASE_URL",
             openai_default_api_base)
+        _proxy = get_from_dict_or_env(
+            values, "proxy", "PROXY", ""
+        )
         try:
             import openai
 
-            if not openai.proxy:
-                if values.get('proxy'):
-                    openai.proxy = values['proxy']
-                    LOG.info(f"success use proxy: {values['proxy']}")
+            if openai.proxy != _proxy:
+                if _proxy:
+                    openai.proxy = _proxy
+                    values["proxy"] = _proxy
+                    LOG.info(f"success use proxy: {_proxy}")
                 else:
-                    LOG.warning("proxy no find, directly request to chatgpt instead")
+                    LOG.info("proxy no find, directly request to chatgpt instead")
 
-            openai.api_base = _api_base_url
-            if _api_base_url != openai_default_api_base:
-                LOG.info(f"success use customized api base url: {_api_base_url}")
+            if openai.api_base != _llm_api_base_url:
+                openai.api_base = _llm_api_base_url
+                values["llm_api_base_url"] = _llm_api_base_url
+                LOG.info(f"success use customized api base url: {_llm_api_base_url}")
 
-            openai.api_key = _openai_api_key
+            if openai.api_key != _llm_api_key:
+                openai.api_key = _llm_api_key
+                values["llm_api_key"] = _llm_api_key
+                LOG.debug(f"success use llm api key: {_llm_api_key}")
+
         except ImportError:
             raise ValueError(
                 "Could not import openai python package. "

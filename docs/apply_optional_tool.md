@@ -1,5 +1,24 @@
+<h2 align='center'> chatgpt-tool-hub / ChatGPT工具引擎 </h2>
+<p align='center'>给ChatGPT装上手和脚，拿起工具提高你的生产力</p>
 
-> 所有api-key有两种配置方式：config.json、或设置环境变量（变量名为对应英文大写）
+<p align="center">
+  <a style="text-decoration:none" href="https://github.com/goldfishh" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/chatgpt-tool-hub" alt="Language" />
+  </a>
+  <a style="text-decoration:none" href="https://github.com/goldfishh" target="_blank">
+    <img src="https://img.shields.io/github/license/goldfishh/chatgpt-tool-hub" alt="license " />
+  </a>
+  <a style="text-decoration:none" href="https://github.com/goldfishh" target="_blank">
+    <img src="https://img.shields.io/github/commit-activity/w/goldfishh/chatgpt-tool-hub" alt="commit-activity-week " />
+  </a>
+  <a style="text-decoration:none" href="https://pypi.org/project/chatgpt-tool-hub/" target="_blank">
+    <img src="https://img.shields.io/pypi/dw/chatgpt-tool-hub" alt="pypi-download-dw" />
+  </a>
+</p>
+
+---
+
+> 所有tool api-key有两种配置方式：config.json、或设置环境变量（变量名为对应英文大写）
 
 > json配置示例以本项目demo（见README）为准，用到本项目的其他项目配置可能有差异，请自行阅读相应文档配置
 
@@ -11,7 +30,7 @@
 {
   "tools": ["news"],
   "kwargs": {
-      "openai_api_key": "",
+      "llm_api_key": "",
       "proxy": "",
       "debug": false,
       "no_default": false,
@@ -39,7 +58,7 @@ Articles available with 24 hour delay, Search articles up to a month old
 {
   "tools": ["bing-search"],
   "kwargs": {
-      "openai_api_key": "",
+      "llm_api_key": "",
       "proxy": "",
       "debug": false,
       "no_default": false,
@@ -64,7 +83,7 @@ API限制：
 {
   "tools": ["wolfram-alpha"],
   "kwargs": {
-      "openai_api_key": "",
+      "llm_api_key": "",
       "proxy": "",
       "debug": false,
       "no_default": false,
@@ -103,7 +122,7 @@ cse: https://programmablesearchengine.google.com/cse/setup/basic?cx=ac35de3babcf
 {
   "tools": ["google-search"],
   "kwargs": {
-      "openai_api_key": "",
+      "llm_api_key": "",
       "proxy": "",
       "debug": false,
       "no_default": false,
@@ -129,7 +148,7 @@ API限制：
 {
   "tools": ["morning-news"],
   "kwargs": {
-      "openai_api_key": "",
+      "llm_api_key": "",
       "proxy": "",
       "debug": false,
       "no_default": false,
@@ -155,7 +174,7 @@ API限制
 {
   "tools": ["searxng-search"],
   "kwargs": {
-      "openai_api_key": "",
+      "llm_api_key": "",
       "proxy": "",
       "debug": false,
       "no_default": false,

@@ -31,7 +31,7 @@ You can install directly using **pip** by doing `chatgpt-tool-hub`
 ```python
 import os
 from chatgpt_tool_hub.apps import AppFactory
-os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"
+os.environ["LLM_API_KEY"] = "YOUR_LLM_API_KEY"
 os.environ["PROXY"] = "YOUR_PROXY_ADDRESS"
 app = AppFactory().create_app()
 reply = app.ask("YOUR_QUESTION_TO_HERE")

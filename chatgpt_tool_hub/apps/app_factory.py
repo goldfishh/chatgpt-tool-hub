@@ -46,6 +46,12 @@ class AppFactory:
     def create_app(self, app_type: str = 'victorinox', tools_list: list = None, console=Console(quiet=True), **kwargs) -> App:
         tools_list = tools_list if tools_list else []
 
+        # todo remove it
+        if kwargs.get("openai_api_key"):
+            kwargs["llm_api_key"] = kwargs.get("openai_api_key")
+        if kwargs.get("open_ai_api_base"):
+            kwargs["llm_api_base_url"] = kwargs.get("open_ai_api_base")
+
         self.init_env(**kwargs)
 
         if app_type == 'lite':

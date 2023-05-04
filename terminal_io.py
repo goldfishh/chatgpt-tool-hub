@@ -507,13 +507,13 @@ def main(args):
 
     if args.key:
         api_key = str(args.key)
-    elif config.get("kwargs", {}).get("openai_api_key", ""):
-        api_key = config["kwargs"]["openai_api_key"]
+    elif config.get("kwargs", {}).get("llm_api_key", ""):
+        api_key = config["kwargs"]["llm_api_key"]
     else:
-        api_key = os.environ.get("OPENAI_API_KEY")
+        api_key = os.environ.get("LLM_API_KEY")
     if not api_key:
         api_key = prompt("我没有找到OpenAI API Key, 请输入: ", style=style)
-    os.environ["OPENAI_API_KEY"] = api_key
+    os.environ["LLM_API_KEY"] = api_key
 
     if args.timeout:
         request_timeout = args.timeout
