@@ -23,16 +23,21 @@
 > 大语言模型涌现能力让人惊艳，ChatGPT出现给NLP技术带来革命，除此之外还让我意识到一种新的人机交互的可能性
 
 <div>
-    <h2 style="display:inline; margin:0; padding:0;">🌱 5.4 LLM-OS demo在线演示 - </h2>
+    <h2 style="display:inline; margin:0; padding:0;">🌱 5.4 LLM-OS demo在线演示</h2>
     <a style="display:inline-block; align:center" src="https://colab.research.google.com/assets/colab-badge.svg" href="https://colab.research.google.com/drive/11nYPGFCYiaZ73H8nTHSN8ifbo0u3W_8p">
         <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="demo in Colab"/>
     </a>
 </div>
 
-[私有化部署](#llm-os_jump)
+<br/>
 
-<iframe src="//player.bilibili.com/player.html?aid=443026516&bvid=BV1eL411h7Nk&cid=1111299601&page=1&high_quality=1&danmaku=0" width="100%" height="500" scrolling="no" frameborder="no" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"> </iframe>
+<div align="center">
+    <a style="text-decoration:none" href="https://www.bilibili.com/video/BV1eL411h7Nk/" target="_blank">
+        <img src="https://i.328888.xyz/2023/04/29/iJQNi3.jpeg" width = "659" height = "410" alt="LLM-OS" align=center />
+    </a>
+</div>
 
+<br/>
 
 #### [更新日志](./docs/update_log.md) | [Q&A](./docs/q_and_a.md)
 
@@ -72,8 +77,6 @@
 ---
 
 ### 1.  LLM-OS demo
-
-<span id="llm-os_jump"></span>
 
 #### (1). 克隆仓库
 
