@@ -126,19 +126,3 @@ class BaseChatModel(BaseLanguageModel, BaseModel, ABC):
     def call_as_llm(self, message: str, stop: Optional[List[str]] = None) -> str:
         result = self([HumanMessage(content=message)], stop=stop)
         return result.content
-
-
-class SimpleChatModel(BaseChatModel):
-    def _generate(
-        self, messages: List[BaseMessage], stop: Optional[List[str]] = None
-    ) -> ChatResult:
-        output_str = self._call(messages, stop=stop)
-        message = AIMessage(content=output_str)
-        generation = ChatGeneration(message=message)
-        return ChatResult(generations=[generation])
-
-    @abstractmethod
-    def _call(
-        self, messages: List[BaseMessage], stop: Optional[List[str]] = None
-    ) -> str:
-        """Simpler interface."""

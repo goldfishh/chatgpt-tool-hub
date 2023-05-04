@@ -14,6 +14,7 @@ from tenacity import (
     wait_exponential,
 )
 
+from chatgpt_tool_hub.common.constants import openai_default_api_base
 from chatgpt_tool_hub.common.log import LOG
 from chatgpt_tool_hub.common.schema import (
     AIMessage,
@@ -157,9 +158,12 @@ class ChatOpenAI(BaseChatModel, BaseModel):
     @root_validator()
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that api key and python package exists in environment."""
-        openai_api_key = get_from_dict_or_env(
+        _openai_api_key = get_from_dict_or_env(
             values, "openai_api_key", "OPENAI_API_KEY"
         )
+        _api_base_url = get_from_dict_or_env(
+            values, "open_ai_api_base", "OPEN_AI_API_BASE",
+            openai_default_api_base)
         try:
             import openai
 
@@ -170,12 +174,17 @@ class ChatOpenAI(BaseChatModel, BaseModel):
                 else:
                     LOG.warning("proxy no find, directly request to chatgpt instead")
 
-            openai.api_key = openai_api_key
+            openai.api_base = _api_base_url
+            if _api_base_url != openai_default_api_base:
+                LOG.info(f"success use customized api base url: {_api_base_url}")
+
+            openai.api_key = _openai_api_key
         except ImportError:
             raise ValueError(
                 "Could not import openai python package. "
                 "Please it install it with `pip install openai`."
             )
+
         try:
             values["client"] = openai.ChatCompletion
         except AttributeError:

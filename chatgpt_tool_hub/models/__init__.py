@@ -2,6 +2,7 @@ import os
 from typing import Optional
 
 from chatgpt_tool_hub.common.cache import BaseCache
+from chatgpt_tool_hub.common.constants import openai_default_api_base
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 
 verbose: bool = False
@@ -27,11 +28,13 @@ def build_model_params(kwargs: dict) -> dict:
     _proxy = get_from_dict_or_env(kwargs, "proxy", "PROXY", "")
     _model = get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo")
     _timeout = get_from_dict_or_env(kwargs, "request_timeout", "REQUEST_TIMEOUT", 120)
+    _openai_api_base = get_from_dict_or_env(kwargs, "open_ai_api_base", "OPEN_AI_API_BASE", openai_default_api_base)
     # tool llm need them
     os.environ["OPENAI_API_KEY"] = str(_api_key)
     os.environ["PROXY"] = str(_proxy)
     os.environ["MODEL_NAME"] = str(_model)
     os.environ["REQUEST_TIMEOUT"] = str(_timeout)
+    os.environ["OPEN_AI_API_BASE"] = str(_openai_api_base)
     return {
         "temperature": get_from_dict_or_env(kwargs, "temperature", "TEMPERATURE", 0),
         "openai_api_key": _api_key,
@@ -47,7 +50,6 @@ def build_model_params(kwargs: dict) -> dict:
 
 from chatgpt_tool_hub.models.base import BaseLLM, LLM
 from chatgpt_tool_hub.models.chatgpt.chatgpt import ChatOpenAI
-from chatgpt_tool_hub.models.openai import OpenAI, AzureOpenAI
 
 
 __all__ = [
@@ -57,7 +59,5 @@ __all__ = [
 
     "BaseLLM",
     "LLM",
-    "OpenAI",
-    "AzureOpenAI",
     "ChatOpenAI"
 ]
