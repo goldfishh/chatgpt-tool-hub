@@ -51,7 +51,6 @@ class App:
     def load_tools_into_bot(self, **tools_kwargs):
         raise ValueError("load_tools_into_bot not implemented for this app.")
 
-
     def update_tool_args(self, tools_list: list, is_del: bool = False, **tools_kwargs):
         if is_del:
             for tool in tools_list:

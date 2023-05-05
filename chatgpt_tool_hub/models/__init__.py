@@ -29,8 +29,11 @@ def build_model_params(kwargs: dict) -> dict:
     _model = get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo")
     _timeout = get_from_dict_or_env(kwargs, "request_timeout", "REQUEST_TIMEOUT", 120)
     _llm_api_base_url = get_from_dict_or_env(kwargs, "llm_api_base_url", "LLM_API_BASE_URL", openai_default_api_base)
+
     # tool llm need them
     os.environ["LLM_API_KEY"] = str(_api_key)
+    if not _proxy.startswith("http://") and not _proxy.startswith("https://"):
+        _proxy = "http://" + _proxy
     os.environ["PROXY"] = str(_proxy)
     os.environ["MODEL_NAME"] = str(_model)
     os.environ["REQUEST_TIMEOUT"] = str(_timeout)

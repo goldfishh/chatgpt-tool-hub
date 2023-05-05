@@ -1,4 +1,5 @@
 import logging
+import time
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Extra, root_validator
@@ -9,7 +10,6 @@ from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
 from chatgpt_tool_hub.tools.base_tool import BaseTool
 from chatgpt_tool_hub.tools.web_requests import filter_text
-
 default_tool_name = "browser"
 
 
@@ -68,11 +68,13 @@ class ChromeBrowser(BaseModel):
             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.5615.49 Safari/537.36"
         )
         options.add_argument("--headless")
+        options.add_argument('blink-settings=imagesEnabled=false')
         options.add_argument("--disable-gpu")
         options.add_argument("--disable-extensions")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument("--no-sandbox")
         options.add_argument(f"--proxy-server={proxy}")
+
         # 设置代理
         from webdriver_manager.chrome import ChromeDriverManager
         return webdriver.Chrome(

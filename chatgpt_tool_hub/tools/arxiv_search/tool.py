@@ -31,6 +31,7 @@ class ArxivTool(BaseTool):
     bot: Any = None
 
     api_wrapper: ArxivAPIWrapper = None
+    arxiv_summary: bool = True
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console, return_direct=True)
