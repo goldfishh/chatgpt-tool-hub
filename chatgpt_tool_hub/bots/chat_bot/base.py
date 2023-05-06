@@ -223,7 +223,7 @@ class ChatBot(Bot):
                                      title=f"{self.ai_prefix.upper()}的内心独白",
                                      highlight=True, style='dim'))
             # it's useful for avoid splitting Panel
-            LOG.info(f"{self.ai_prefix.upper()}的内心独白: {thoughts_text}")
+            LOG.info(f"{self.ai_prefix.upper()}的内心独白: \n{thoughts_text}")
             
             return assistant_reply_json
         except json.decoder.JSONDecodeError as e:

@@ -21,7 +21,7 @@ class NewsTool(BaseTool):
         "该工具包含了金融、早报和news-api三个子工具，访问这些工具前你需要先访问本工具。"
         "工具输入：草稿的总结, 用户想获取的新闻内容"
     )
-    engine: ToolEngine = Any
+    engine: ToolEngine = None
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容

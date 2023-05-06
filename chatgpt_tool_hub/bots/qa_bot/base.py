@@ -124,7 +124,7 @@ class QABot(Bot):
             return None
 
         action = match[1].strip()
-        action_input = match[2]
+        action_input = match[2].strip()
         LOG.info(f"执行Tool: {action}中...")
 
-        return action, action_input.strip(" ")
+        return action, action_input

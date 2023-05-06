@@ -72,11 +72,8 @@ class Bot(BaseModel):
         """Construct the scratchpad that lets the bot continue its thought process."""
         thoughts = ""
         for action, observation in intermediate_steps:
-            thoughts += f"We just had an interaction: \n"
-            thoughts += f"You responded to me with: {action.log}\n"
-            thoughts += f"Based on that, I called {action.tool} tool and it returned: {observation}\n"
-            thoughts += f"Analyze tool results to determine if the user's input " \
-                        f"has been resolved, and select the next tool accordingly.\n\n"
+            thoughts += f"previous constructed JSON: {action.log}\n"
+            thoughts += f"{action.tool} tool was called and it returned: {observation}\n\n"
         return thoughts
 
     def _crop_full_input(self, inputs: str) -> str:
