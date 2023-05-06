@@ -104,7 +104,7 @@ class ChatBot(Bot):
         """Create the full inputs for the LLMChain from intermediate steps."""
         thoughts = self._construct_scratchpad(intermediate_steps)
         # todo remove stop
-        new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
+        new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts)}
         return {**kwargs, **new_inputs}
 
     def _get_next_action(self, full_inputs: Dict[str, str]) -> BotAction:
@@ -218,7 +218,8 @@ class ChatBot(Bot):
                 thoughts_text += f"思考：{assistant_thoughts_text}\n"
             if assistant_thoughts_criticism:
                 thoughts_text += f"反思：{assistant_thoughts_criticism}\n"
-
+            if assistant_thoughts_speak:
+                LOG.info(f"{self.ai_prefix.upper()}想和你说：{assistant_thoughts_speak}")
             self.console.print(Panel(thoughts_text,
                                      title=f"{self.ai_prefix.upper()}的内心独白",
                                      highlight=True, style='dim'))
