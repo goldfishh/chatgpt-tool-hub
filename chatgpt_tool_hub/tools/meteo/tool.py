@@ -15,9 +15,10 @@ default_tool_name = "meteo-weather"
 class MeteoWeatherTool(BaseTool):
     name: str = default_tool_name
     description: str = (
-        "当你想要获取天气信息时应该使用本工具。"
-        "你需要分析用户想要哪些天气信息，严谨地用自然语言描述问题，然后将该问题传入本工具。"
-        "你最好能在输入末尾添加返回天气信息的粒度，支持：按时 或 按天，查询某天的天气优先用按时"
+        "When you want to obtain weather information, use this tool. Analyze which weather information the user wants, "
+        "describe the problem rigorously in natural language, and then pass it on to this tool."
+        "It's best to append the weather granularity to the end of the input, such as 'by hour' or 'by day', "
+        "with priority given to 'by hour' when querying the weather on a specific day."
     )
     api_chain: APIChain = None
 
