@@ -6,6 +6,7 @@ from chatgpt_tool_hub.tools import get_packages
 from chatgpt_tool_hub.tools.tool_register import ToolRegister
 
 news_tool_register = ToolRegister()
+
 try:
     all_tool_package_list = get_packages(f"{os.path.dirname(os.path.abspath(__file__))}")
 except Exception as e:

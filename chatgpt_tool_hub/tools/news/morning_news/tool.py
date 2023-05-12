@@ -19,7 +19,7 @@ default_tool_name = "morning-news"
 class MorningNewsTool(BaseTool):
     name: str = default_tool_name
     description: str = (
-        "Use this tool when you want to get information about Daily 60 seconds morning news today. "
+        "Use this tool when you want to get information about Daily 60 seconds Chinese morning news today. "
         "no input."
     )
     bot: Any = None
@@ -42,9 +42,6 @@ class MorningNewsTool(BaseTool):
 
     def _run(self, query: str) -> str:
         """Use the tool."""
-        if not query:
-            return "the input of tool is empty"
-
         morning_news_url = f"https://v2.alapi.cn/api/zaobao?token={self.morning_news_api_key}&format=json"
         _response = RequestsWrapper().get(morning_news_url)
         _response_json = json.loads(_response)

@@ -1,11 +1,15 @@
 from typing import List
 
 from chatgpt_tool_hub.common.log import LOG
+from chatgpt_tool_hub.common.singleton import Singleton
 
 
-class ToolRegister:
+class ToolRegister(Singleton):
+    REGISTER_TOOLS = {}
+
     def __init__(self):
-        self.REGISTER_TOOLS = {}
+        if not self.REGISTER_TOOLS:
+            self.REGISTER_TOOLS = {}
 
     def register_tool(self, name: str, function: callable, tool_input_keys: list):
         self.REGISTER_TOOLS[name] = (function, tool_input_keys)

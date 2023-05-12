@@ -26,8 +26,8 @@ class NewsTool(BaseTool):
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容
         super().__init__(console=console, return_direct=True)
-
-        tools = load_tools(news_tool_register.get_registered_tool_names(), news_tool_register, console, **tool_kwargs)
+        # todo
+        tools = load_tools(["finance-news", "morning-news", "news-api"], news_tool_register, console, **tool_kwargs)
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
 
         # subtool 思考深度暂时固定为2

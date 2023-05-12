@@ -1,10 +1,10 @@
 import logging
-import os
 
 from rich.console import Console
 
 from chatgpt_tool_hub.apps import App
-from chatgpt_tool_hub.common.log import consoleHandler
+from chatgpt_tool_hub.common.constants import TRUE_VALUES_SET
+from chatgpt_tool_hub.common.log import refresh
 from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 from chatgpt_tool_hub.models import build_model_params
 from chatgpt_tool_hub.tools import dynamic_tool_loader
@@ -18,18 +18,18 @@ class AppFactory:
     def init_env(self, **kwargs):
         """ 环境初始化 """
         # set log level
-        nolog_flag = get_from_dict_or_env(kwargs, "nolog", "NOLOG", "false")
-        debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", "false")
-        if str(nolog_flag).lower() in {'true', 'enable', 'yes'}:
-            consoleHandler.setLevel(logging.CRITICAL)
-        elif str(debug_flag).lower() in {'true', 'enable', 'yes'}:
-            consoleHandler.setLevel(logging.DEBUG)
+        nolog_flag = get_from_dict_or_env(kwargs, "nolog", "NOLOG", False)
+        debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", False)
+        if str(nolog_flag).lower() in TRUE_VALUES_SET:
+            refresh(logging.CRITICAL)
+        elif str(debug_flag).lower() in TRUE_VALUES_SET:
+            refresh(logging.DEBUG)
         else:
-            consoleHandler.setLevel(logging.INFO)
+            refresh(logging.INFO)
 
         # default tools
-        no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", "")
-        if str(no_default_flag).lower() in {'true', 'enable', 'yes'}:
+        no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", False)
+        if str(no_default_flag).lower() in TRUE_VALUES_SET:
             self.default_tools_list = []
         else:
             self.default_tools_list = ["python", "terminal", "url-get", "meteo-weather"]

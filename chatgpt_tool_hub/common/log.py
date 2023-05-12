@@ -6,6 +6,11 @@ from chatgpt_tool_hub.common.constants import LOGGING_LEVEL, LOGGING_FMT, LOGGIN
 
 def _get_logger(level: int = LOGGING_LEVEL):
     logger = logging.getLogger("tool")
+
+    for h in logger.handlers:
+        h.close()
+        logger.removeHandler(h)
+
     logger.setLevel(level)
 
     ch = logging.StreamHandler(sys.stdout)
@@ -16,8 +21,13 @@ def _get_logger(level: int = LOGGING_LEVEL):
 
     logger.addHandler(ch)
     logger.addHandler(fh)
-    return logger, ch
+    return logger
+
+
+def refresh(level: int = LOGGING_LEVEL):
+    global LOG
+    LOG = _get_logger(level)
 
 
 # 日志句柄
-LOG, consoleHandler = _get_logger()
+LOG = _get_logger()

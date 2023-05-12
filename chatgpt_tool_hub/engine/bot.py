@@ -71,6 +71,7 @@ class Bot(BaseModel):
     ) -> Union[str, List[BaseMessage]]:
         """Construct the scratchpad that lets the bot continue its thought process."""
         thoughts = ""
+        # todo 区分当前对话和历史对话的scratchpad描述
         for action, observation in intermediate_steps:
             thoughts += f"previous constructed JSON: {action.log}\n"
             thoughts += f"{action.tool} tool was called and it returned: {observation}\n\n"
