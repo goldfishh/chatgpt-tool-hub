@@ -145,7 +145,7 @@ class Bot(BaseModel):
         """Create the full inputs for the LLMChain from intermediate steps."""
         thoughts = self._construct_scratchpad(intermediate_steps)
         new_inputs = {"bot_scratchpad": self._crop_full_input(thoughts), "stop": self._stop}
-        return {**kwargs, **new_inputs}
+        return kwargs | new_inputs
 
     def prepare_for_new_call(self) -> None:
         """Prepare the bot for new call, if needed."""
@@ -245,7 +245,7 @@ class Bot(BaseModel):
                 "你需要生成一个final answer:"
             )
             new_inputs = {"bot_scratchpad": thoughts, "stop": self._stop}
-            full_inputs = {**kwargs, **new_inputs}
+            full_inputs = kwargs | new_inputs
             full_output = self.llm_chain.predict(**full_inputs)
             # We try to extract a final answer
             action, action_input = self._extract_tool_and_input(full_output)

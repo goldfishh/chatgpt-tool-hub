@@ -123,7 +123,7 @@ class BasePromptTemplate(BaseModel, ABC):
             k: v if isinstance(v, str) else v()
             for k, v in self.partial_variables.items()
         }
-        return {**kwargs, **partial_kwargs}
+        return kwargs | partial_kwargs
 
     @abstractmethod
     def format(self, **kwargs: Any) -> str:

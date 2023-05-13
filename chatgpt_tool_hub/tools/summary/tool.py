@@ -163,12 +163,16 @@ class SummaryTool(BaseTool):
             self.console.print(Panel(f"{_text}",
                                      title=f"[bright_magenta]Summary tool[/] 第{ctn}轮总结",
                                      highlight=True))
-            
+
         if ctn > 2:
-            self.console.print(Panel(f"{_text}",
-                                     title=f"[bright_magenta]Summary tool[/] 最终总结",
-                                     highlight=True))
-            
+            self.console.print(
+                Panel(
+                    f"{_text}",
+                    title="[bright_magenta]Summary tool[/] 最终总结",
+                    highlight=True,
+                )
+            )
+
         return _text
 
     async def _arun(self, file_path: str) -> str:
