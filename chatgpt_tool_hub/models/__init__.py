@@ -32,7 +32,7 @@ def build_model_params(kwargs: dict) -> dict:
 
     # tool llm need them
     os.environ["LLM_API_KEY"] = str(_api_key)
-    if not _proxy.startswith("http://") and not _proxy.startswith("https://"):
+    if _proxy and not _proxy.startswith("http://") and not _proxy.startswith("https://"):
         _proxy = "http://" + _proxy
     os.environ["PROXY"] = str(_proxy)
     os.environ["MODEL_NAME"] = str(_model)
