@@ -10,9 +10,11 @@ def _get_logger(level: int = LOGGING_LEVEL):
     for h in logger.handlers:
         h.close()
         logger.removeHandler(h)
+        del h
+    logger.handlers.clear()
+    logger.propagate = False
 
     logger.setLevel(level)
-
     ch = logging.StreamHandler(sys.stdout)
     ch.setFormatter(logging.Formatter(LOGGING_FMT, datefmt=LOGGING_DATEFMT))
 

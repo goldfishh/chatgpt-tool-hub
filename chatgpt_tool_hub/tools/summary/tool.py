@@ -87,10 +87,9 @@ class SummaryTool(BaseTool):
     name = default_tool_name
     description = (
         "Useful when you want to summarize the content of a file. "
-        "The input is a comma-separated of file_path and a number. "
-        "The number represents summarizing only the first N lines of the file, "
-        "and when the number is 0, it means summarizing the entire file. "
-        "If you don't know what the file path is, you cannot use this tool."
+        "The input is a comma-separated of absolute path of the file and a number, like 'fakepath, 0'."
+        "The number indicates how many lines to summarize, with 0 meaning the entire file."
+        "You must know the file path to use this tool."
     )
 
     message_num: int = 100

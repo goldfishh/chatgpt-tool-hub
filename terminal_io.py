@@ -492,7 +492,7 @@ def create_key_bindings():
     @key_bindings.add(Keys.Enter, eager=True)
     def _(event):
         buffer = event.current_buffer
-        text = buffer.text.strip()
+        text = str(buffer.text).strip()
         if text.startswith('/') or not ChatMode.multi_line_mode:
             buffer.validate_and_handle()
         else:
@@ -579,7 +579,7 @@ def main(args):
                                      complete_while_typing=True, key_bindings=key_bindings)
 
             if message.startswith('/'):
-                command = message.strip().lower()
+                command = str(message).strip().lower()
                 handle_command(command, llm_os)
             else:
                 if not message:

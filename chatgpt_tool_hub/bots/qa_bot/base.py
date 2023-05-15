@@ -123,8 +123,8 @@ class QABot(Bot):
         if not match:
             return None
 
-        action = match[1].strip()
-        action_input = match[2].strip()
+        action = str(match[1]).strip()
+        action_input = str(match[2]).strip()
         LOG.info(f"执行Tool: {action}中...")
 
         return action, action_input

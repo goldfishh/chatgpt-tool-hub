@@ -175,7 +175,7 @@ class ChatBot(Bot):
             self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...")
 
         LOG.info(f"执行Tool: {action}中...")
-        return action.strip(), action_input.strip()
+        return str(action).strip(), str(action_input).strip()
 
     def parse_reply_json(self, assistant_reply) -> dict:
         """Prints the assistant's thoughts to the console"""
