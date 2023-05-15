@@ -57,3 +57,17 @@
 ---
 
 ### 0.4.4
+
+#### tool-hub
+
+1. 支持azure、api转发服务
+
+2. 修复browser代理无前缀报错的问题
+
+3. 优化core prompt
+
+4. 修复系列issue提到的问题
+
+#### llm-os
+
+1. google-colab demo
