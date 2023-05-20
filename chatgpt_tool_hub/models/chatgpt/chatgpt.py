@@ -171,6 +171,9 @@ class ChatOpenAI(BaseChatModel, BaseModel):
         _proxy = get_from_dict_or_env(
             values, "proxy", "PROXY", ""
         )
+        _deployment_id = get_from_dict_or_env(
+            values, "deployment_id", "DEPLOYMENT_ID", ""
+        )
         try:
             import openai
 
@@ -191,6 +194,10 @@ class ChatOpenAI(BaseChatModel, BaseModel):
                 openai.api_key = _llm_api_key
                 values["llm_api_key"] = _llm_api_key
                 LOG.debug(f"success use llm api key: {_llm_api_key}")
+
+            if _deployment_id:
+                openai.api_type = "azure"
+                openai.api_version = "2023-03-15-preview"
 
         except ImportError:
             raise ValueError(

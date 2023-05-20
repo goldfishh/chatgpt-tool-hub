@@ -29,6 +29,7 @@ def build_model_params(kwargs: dict) -> dict:
     _model = get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo")
     _timeout = get_from_dict_or_env(kwargs, "request_timeout", "REQUEST_TIMEOUT", 120)
     _llm_api_base_url = get_from_dict_or_env(kwargs, "llm_api_base_url", "LLM_API_BASE_URL", openai_default_api_base)
+    _deployment_id = get_from_dict_or_env(kwargs, "deployment_id", "DEPLOYMENT_ID", "")
 
     # tool llm need them
     os.environ["LLM_API_KEY"] = str(_api_key)
@@ -38,7 +39,9 @@ def build_model_params(kwargs: dict) -> dict:
     os.environ["MODEL_NAME"] = str(_model)
     os.environ["REQUEST_TIMEOUT"] = str(_timeout)
     os.environ["LLM_API_BASE_URL"] = str(_llm_api_base_url)
-    return {
+    os.environ["DEPLOYMENT_ID"] = str(_deployment_id)
+
+    model_params_dict = {
         "temperature": get_from_dict_or_env(kwargs, "temperature", "TEMPERATURE", 0),
         "llm_api_key": _api_key,
         "llm_api_base_url": _llm_api_base_url,
@@ -50,6 +53,13 @@ def build_model_params(kwargs: dict) -> dict:
         "request_timeout": _timeout,
         "max_retries": 2
     }
+
+    if _deployment_id:
+        model_params_dict["model_kwargs"] = {
+            "deployment_id": _deployment_id
+        }
+
+    return model_params_dict
 
 
 from chatgpt_tool_hub.models.base import BaseLLM, LLM
