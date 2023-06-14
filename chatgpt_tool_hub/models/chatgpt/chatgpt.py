@@ -377,7 +377,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
         return len(tokenized_text)
 
     def get_num_tokens_from_messages(
-        self, messages: List[BaseMessage], model: str = "gpt-3.5-turbo-0301"
+        self, messages: List[BaseMessage], model: str = "gpt-3.5-turbo"
     ) -> int:
         """Calculate num tokens for gpt-3.5-turbo with tiktoken package."""
         try:
@@ -394,7 +394,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
             encoding = tiktoken.encoding_for_model(model)
         except KeyError:
             encoding = tiktoken.get_encoding("cl100k_base")
-        if model != "gpt-3.5-turbo-0301":
+        if not model.startswith("gpt-3.5-turbo"):
             raise NotImplementedError(
                 f"get_num_tokens_from_messages() is not presently implemented "
                 f"for model {model}."
