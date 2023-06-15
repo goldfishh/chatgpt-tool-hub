@@ -12,13 +12,16 @@ class ModelFactory:
             "gpt-4-32k": "chatgpt",
             "gpt-35-turbo": "chatgpt",            
         }
-        pass
 
     def match_model(self, name: str) -> str:
-        for k, v in self.available_models_prefix.items():
-            if name.startswith(k):
-                return v
-        return ""
+        return next(
+            (
+                v
+                for k, v in self.available_models_prefix.items()
+                if name.startswith(k)
+            ),
+            "",
+        )
 
     def create_llm_model(self, **model_kwargs):
         _model = get_from_dict_or_env(model_kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo")
