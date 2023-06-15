@@ -10,6 +10,7 @@ class ModelFactory:
             "gpt-3.5-turbo": "chatgpt",
             "gpt-4": "chatgpt",
             "gpt-4-32k": "chatgpt",
+            "gpt-35-turbo": "chatgpt",            
         }
         pass
 
