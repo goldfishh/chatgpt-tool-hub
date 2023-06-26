@@ -142,11 +142,13 @@ class SummaryTool(BaseTool):
         ctn = 0
         while get_token_num(_text) >= self.max_segment_length:
             ctn += 1
-            if ctn > 8:
+            if ctn > 3:
                 LOG.warning(f"[summary] 我已经map-reduce {ctn}轮了，但是文本量还是很长，避免死循环我帮你关掉了~")
+                break
             # map
             _clip_text_list = _clipper.clip(_text, self.message_num)
             # async call llm to get summary of each clip_text
+            # TODO need stop when receive reset signal
             map_text_list = asyncio.run(self._acall(self.map_bot, _clip_text_list))
             map_text = _clipper.seperator.join(map_text_list)
 
