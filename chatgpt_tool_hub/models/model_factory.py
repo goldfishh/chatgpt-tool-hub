@@ -21,7 +21,7 @@ class ModelFactory:
         return ""
 
     def create_llm_model(self, **model_kwargs):
-        _model = get_from_dict_or_env(model_kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo")
+        _model = get_from_dict_or_env(model_kwargs, "model_name", "MODEL_NAME", "gpt-35-turbo")
         match_llm_model = self.match_model(_model)
         if match_llm_model == "chatgpt":
             return ChatOpenAI(**model_kwargs)

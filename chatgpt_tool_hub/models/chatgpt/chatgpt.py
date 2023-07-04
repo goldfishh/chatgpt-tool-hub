@@ -114,12 +114,12 @@ class ChatOpenAI(BaseChatModel, BaseModel):
         .. code-block:: python
 
             from lib.chat_models import ChatOpenAI
-            openai = ChatOpenAI(model_name="gpt-3.5-turbo")
+            openai = ChatOpenAI(model_name="gpt-35-turbo")
     """
 
     client: Any  #: :meta private:
     """Model name to use."""
-    model_name: str = "gpt-3.5-turbo"
+    model_name: str = "gpt-35-turbo"
     """Holds any model parameters valid for `create` call not explicitly specified."""
     model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """llm api base url"""
@@ -367,19 +367,19 @@ class ChatOpenAI(BaseChatModel, BaseModel):
                 "This is needed in order to calculate get_num_tokens. "
                 "Please it install it with `pip install tiktoken`."
             )
-        # create a GPT-3.5-Turbo encoder instance
+        # create a gpt-35-Turbo encoder instance
         enc = tiktoken.encoding_for_model(self.model_name)
 
-        # encode the text using the GPT-3.5-Turbo encoder
+        # encode the text using the gpt-35-Turbo encoder
         tokenized_text = enc.encode(text)
 
         # calculate the number of tokens in the encoded text
         return len(tokenized_text)
 
     def get_num_tokens_from_messages(
-        self, messages: List[BaseMessage], model: str = "gpt-3.5-turbo"
+        self, messages: List[BaseMessage], model: str = "gpt-35-turbo"
     ) -> int:
-        """Calculate num tokens for gpt-3.5-turbo with tiktoken package."""
+        """Calculate num tokens for gpt-35-turbo with tiktoken package."""
         try:
             import tiktoken
         except ImportError:
@@ -394,7 +394,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
             encoding = tiktoken.encoding_for_model(model)
         except KeyError:
             encoding = tiktoken.get_encoding("cl100k_base")
-        if not model.startswith("gpt-3.5-turbo"):
+        if not model.startswith("gpt-35-turbo"):
             raise NotImplementedError(
                 f"get_num_tokens_from_messages() is not presently implemented "
                 f"for model {model}."

@@ -122,7 +122,7 @@ class LLMOS:
 
         self.app = self.create_app()
 
-        self.model = 'gpt-3.5-turbo'
+        self.model = 'gpt-35-turbo'
         self.timeout = timeout
 
         # todo 需要llm-os model支持
@@ -215,7 +215,7 @@ class LLMOS:
             tokens_limit = 32768
         elif self.model.startswith("gpt-4"):
             tokens_limit = 8192
-        elif self.model.startswith("gpt-3.5-turbo"):
+        elif self.model.startswith("gpt-35-turbo"):
             tokens_limit = 4096
         else:
             console.print(f"[red]没有该模型 {new_model} tokens信息，模型未变更: [bold cyan]{old_model}[/].")
@@ -246,11 +246,11 @@ class CustomCompleter(Completer):
     ]
 
     available_models = [
-        "gpt-3.5-turbo",
-        "gpt-3.5-turbo-0301",
-        "gpt-3.5-turbo-0613",
-        "gpt-3.5-turbo-16k",
-        "gpt-3.5-turbo-16k-0613",
+        "gpt-35-turbo",
+        "gpt-35-turbo-0301",
+        "gpt-35-turbo-0613",
+        "gpt-35-turbo-16k",
+        "gpt-35-turbo-16k-0613",
         "gpt-4",
         "gpt-4-0314",
         "gpt-4-32k",
@@ -478,7 +478,7 @@ def handle_command(command: str, llm_os: LLMOS):
     /depth                   - 设置LLM-OS思考深度 (设置过大可能无法停止)
     /reset                   - LLM-OS重置 (重新加载配置并重置聊天记录)
     /timeout \[new_timeout]   - 修改访问llm的请求超时时间
-    /model   \[model_name]    - 切换模型 (目前仅支持gpt-3.5)
+    /model   \[model_name]    - 切换模型 (目前仅支持gpt-35)
     /last                    - 显示上一次LLM-OS的回复内容
     /copy                    - 复制上一次LLM-OS的回复内容到粘贴板
     /undo                    - 清除上一次与llm的对话记录 (包含问题和回复)

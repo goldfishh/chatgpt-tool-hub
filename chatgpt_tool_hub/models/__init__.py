@@ -8,7 +8,7 @@ from chatgpt_tool_hub.common.utils import get_from_dict_or_env
 verbose: bool = False
 llm_cache: Optional[BaseCache] = None
 
-# default for gpt-3.5
+# default for gpt-35
 ALL_MAX_TOKENS_NUM = 4000
 
 # token manage strategy
@@ -26,7 +26,7 @@ def change_memory_max_tokens(memory_max_tokens_num: int):
 def build_model_params(kwargs: dict) -> dict:
     _api_key = get_from_dict_or_env(kwargs, "llm_api_key", "LLM_API_KEY")
     _proxy = get_from_dict_or_env(kwargs, "proxy", "PROXY", "")
-    _model = get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-3.5-turbo")
+    _model = get_from_dict_or_env(kwargs, "model_name", "MODEL_NAME", "gpt-35-turbo")
     _timeout = get_from_dict_or_env(kwargs, "request_timeout", "REQUEST_TIMEOUT", 120)
     _llm_api_base_url = get_from_dict_or_env(kwargs, "llm_api_base_url", "LLM_API_BASE_URL", openai_default_api_base)
     _deployment_id = get_from_dict_or_env(kwargs, "deployment_id", "DEPLOYMENT_ID", "")
