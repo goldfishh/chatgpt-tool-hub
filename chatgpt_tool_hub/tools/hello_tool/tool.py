@@ -2,7 +2,7 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+from .. import BaseTool
 
 
 default_tool_name = "hello-tool"
@@ -30,7 +30,7 @@ class HelloTool(BaseTool):
         raise NotImplementedError("HelloTool does not support async")
 
 
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+from ..all_tool_list import main_tool_register
 main_tool_register.register_tool(default_tool_name,
                                  lambda console, kwargs: HelloTool(console, **kwargs),
                                  tool_input_keys=[])

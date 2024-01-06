@@ -15,8 +15,8 @@ from typing import (
     Union,
 )
 
-from chatgpt_tool_hub.common.document import Document
-from chatgpt_tool_hub.common.log import LOG
+from .document import Document
+from .log import LOG
 
 class TextSplitter(ABC):
     """Interface for splitting text into chunks."""

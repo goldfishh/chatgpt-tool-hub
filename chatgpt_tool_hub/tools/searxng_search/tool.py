@@ -4,9 +4,9 @@ from typing import Any
 from pydantic import Extra
 from rich.console import Console
 
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.searxng_search.wrapper import SearxSearchWrapper
+from .. import BaseTool
+from ..all_tool_list import main_tool_register
+from .wrapper import SearxSearchWrapper
 
 default_tool_name = "searxng-search"
 

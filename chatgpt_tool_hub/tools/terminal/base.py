@@ -7,9 +7,9 @@ from typing import List, Union
 from pydantic import Field
 from rich.console import Console
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+from ...common.log import LOG
+from .. import BaseTool
+from ..all_tool_list import main_tool_register
 
 default_tool_name = "terminal"
 

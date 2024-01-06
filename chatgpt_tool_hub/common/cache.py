@@ -11,7 +11,7 @@ try:
 except ImportError:
     from sqlalchemy.ext.declarative import declarative_base
 
-from chatgpt_tool_hub.common.schema import Generation
+from .schema import Generation
 
 RETURN_VAL_TYPE = List[Generation]
 

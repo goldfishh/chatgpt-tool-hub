@@ -1,4 +1,4 @@
-from chatgpt_tool_hub.prompts import PromptTemplate
+from ...prompts import PromptTemplate
 
 PROMPT = """
 你是一位专业的研究分析师。我会给你提供某个长文档的一部分，你需要使用你的编辑和写作技能为它生成一个总结。

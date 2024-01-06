@@ -1,9 +1,9 @@
-from chatgpt_tool_hub.apps import App
-from chatgpt_tool_hub.apps import AppFactory
-from chatgpt_tool_hub.chains import LLMChain
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.prompts import PromptTemplate
+from ..apps import App
+from ..apps import AppFactory
+from ..chains import LLMChain
+from ..common.log import LOG
+from ..models.model_factory import ModelFactory
+from ..prompts import PromptTemplate
 
 
 class LiteApp(App):

@@ -1,2 +1,9 @@
-from chatgpt_tool_hub.tools.searxng_search.tool import SearxSearchJsonTool, SearxSearchTool
-from chatgpt_tool_hub.tools.searxng_search.wrapper import SearxSearchWrapper
+from .tool import SearxSearchJsonTool, SearxSearchTool
+from .wrapper import SearxSearchWrapper
+
+
+__all__ = [
+    "SearxSearchJsonTool", 
+    "SearxSearchTool",
+    "SearxSearchWrapper"
+]

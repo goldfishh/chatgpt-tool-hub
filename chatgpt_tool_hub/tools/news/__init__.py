@@ -1,9 +1,9 @@
 import importlib
 import os
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools import get_packages
-from chatgpt_tool_hub.tools.tool_register import ToolRegister
+from ...common.log import LOG
+from .. import get_packages
+from .. import ToolRegister
 
 news_tool_register = ToolRegister()
 
@@ -21,7 +21,7 @@ for package_name in all_tool_package_list:
         LOG.info(f"[news.{package_name}] init failed, error_info: {repr(e)}")
 
 
-from chatgpt_tool_hub.tools.news.tool import NewsTool
+from .tool import NewsTool
 
 __all__ = [
     "NewsTool",

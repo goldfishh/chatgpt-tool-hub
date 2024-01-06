@@ -3,10 +3,10 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, filter_text, RequestsWrapper
+from ...common.log import LOG
+from ..all_tool_list import main_tool_register
+from .. import BaseTool
+from . import BaseRequestsTool, filter_text, RequestsWrapper
 
 default_tool_name = "url-get"
 

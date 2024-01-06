@@ -2,12 +2,12 @@ import logging
 
 from rich.console import Console
 
-from chatgpt_tool_hub.apps import App
-from chatgpt_tool_hub.common.constants import TRUE_VALUES_SET
-from chatgpt_tool_hub.common.log import refresh
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.models import build_model_params
-from chatgpt_tool_hub.tools import dynamic_tool_loader
+from . import App
+from ..common.constants import TRUE_VALUES_SET
+from ..common.log import refresh
+from ..common.utils import get_from_dict_or_env
+from ..models import build_model_params
+from ..tools import dynamic_tool_loader
 
 
 class AppFactory:
@@ -55,13 +55,13 @@ class AppFactory:
         self.init_env(**kwargs)
 
         if app_type == 'lite':
-            from chatgpt_tool_hub.apps.lite_app import LiteApp
+            from ..apps.lite_app import LiteApp
             app = LiteApp(**build_model_params(kwargs))
             app.create(tools_list, **kwargs)
             return app
 
         elif app_type == 'victorinox':
-            from chatgpt_tool_hub.apps.victorinox import Victorinox
+            from ..apps.victorinox import Victorinox
 
             for default_tool in self.default_tools_list:
                 if default_tool not in tools_list:

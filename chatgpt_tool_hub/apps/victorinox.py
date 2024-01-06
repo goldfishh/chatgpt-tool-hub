@@ -2,17 +2,17 @@ from typing import List
 
 from rich.console import Console
 
-from chatgpt_tool_hub.apps import App
-from chatgpt_tool_hub.apps import AppFactory
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.database import ConversationTokenBufferMemory
-from chatgpt_tool_hub.engine.initialize import init_tool_engine as init_engine
-from chatgpt_tool_hub.models import MEMORY_MAX_TOKENS_NUM
-from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.load_tools import load_tools
+from ..apps import App
+from ..apps import AppFactory
+from ..common.log import LOG
+from ..common.utils import get_from_dict_or_env
+from ..database import ConversationTokenBufferMemory
+from ..engine.initialize import init_tool_engine as init_engine
+from ..models import MEMORY_MAX_TOKENS_NUM
+from ..models.model_factory import ModelFactory
+from ..tools.all_tool_list import main_tool_register
+from ..tools.base_tool import BaseTool
+from ..tools.load_tools import load_tools
 
 
 class Victorinox(App):

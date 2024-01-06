@@ -5,11 +5,11 @@ from typing import Any, Dict, Optional
 from pydantic import BaseModel, Extra, root_validator
 from rich.console import Console
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.web_requests import filter_text
+from ...common.log import LOG
+from ...common.utils import get_from_dict_or_env
+from ..all_tool_list import main_tool_register
+from .. import BaseTool
+from . import filter_text
 default_tool_name = "browser"
 
 

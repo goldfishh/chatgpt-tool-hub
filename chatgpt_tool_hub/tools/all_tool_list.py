@@ -1,6 +1,6 @@
 from typing import List
 
-from chatgpt_tool_hub.tools.tool_register import ToolRegister
+from .tool_register import ToolRegister
 
 
 main_tool_register = ToolRegister()

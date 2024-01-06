@@ -2,8 +2,8 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+from .. import BaseTool
+from ..all_tool_list import main_tool_register
 
 default_tool_name = "answer-user"
 

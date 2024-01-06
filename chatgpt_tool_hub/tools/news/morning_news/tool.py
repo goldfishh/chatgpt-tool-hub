@@ -3,15 +3,16 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.chains import LLMChain
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.models import build_model_params
-from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.prompts import PromptTemplate
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.news import news_tool_register
-from chatgpt_tool_hub.tools.news.morning_news.prompt import SUMMARY_DOCS
-from chatgpt_tool_hub.tools.web_requests.get import RequestsWrapper
+from ....chains import LLMChain
+from ....common.utils import get_from_dict_or_env
+from ....models import build_model_params
+from ....models.model_factory import ModelFactory
+from ....prompts import PromptTemplate
+
+from ... import BaseTool
+from .. import news_tool_register
+from ...web_requests.get import RequestsWrapper
+from .prompt import SUMMARY_DOCS
 
 default_tool_name = "morning-news"
 

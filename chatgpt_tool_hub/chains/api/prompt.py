@@ -1,5 +1,5 @@
 
-from chatgpt_tool_hub.prompts.prompt import PromptTemplate
+from ...prompts.prompt import PromptTemplate
 
 API_URL_PROMPT_TEMPLATE = """你收到一个的调用API文档: {api_docs}
 你的任务是使用这个文档，生成完整的API URL以回答用户的问题

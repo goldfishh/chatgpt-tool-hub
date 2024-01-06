@@ -4,8 +4,8 @@ import functools
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Union
 
-from chatgpt_tool_hub.common.schema import BotAction, BotFinish, LLMResult
-from chatgpt_tool_hub.common.singleton import Singleton
+from .schema import BotAction, BotFinish, LLMResult
+from .singleton import Singleton
 
 
 class BaseCallbackHandler(ABC):

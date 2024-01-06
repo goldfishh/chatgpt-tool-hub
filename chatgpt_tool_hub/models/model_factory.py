@@ -1,5 +1,5 @@
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.models import ChatOpenAI
+from ..common.utils import get_from_dict_or_env
+from . import ChatOpenAI
 
 
 class ModelFactory:

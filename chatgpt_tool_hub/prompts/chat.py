@@ -7,7 +7,7 @@ from typing import Any, Callable, List, Sequence, Tuple, Type, Union
 
 from pydantic import BaseModel, Field
 
-from chatgpt_tool_hub.common.schema import (
+from ..common.schema import (
     AIMessage,
     BaseMessage,
     ChatMessage,
@@ -15,9 +15,8 @@ from chatgpt_tool_hub.common.schema import (
     PromptValue,
     SystemMessage,
 )
-from chatgpt_tool_hub.common.schema import get_buffer_string
-from chatgpt_tool_hub.prompts.base import BasePromptTemplate, StringPromptTemplate
-from chatgpt_tool_hub.prompts.prompt import PromptTemplate
+from ..common.schema import get_buffer_string
+from . import BasePromptTemplate, StringPromptTemplate, PromptTemplate
 
 
 class BaseMessagePromptTemplate(BaseModel, ABC):

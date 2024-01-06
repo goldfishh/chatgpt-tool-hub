@@ -5,11 +5,11 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 from pydantic import BaseModel, Extra
 
-from chatgpt_tool_hub.chains.base import Chain
-from chatgpt_tool_hub.common.input import get_colored_text
-from chatgpt_tool_hub.common.schema import BaseLanguageModel, LLMResult, PromptValue
-from chatgpt_tool_hub.prompts.base import BasePromptTemplate
-from chatgpt_tool_hub.prompts.prompt import PromptTemplate
+from ..common.input import get_colored_text
+from ..common.schema import BaseLanguageModel, LLMResult, PromptValue
+from ..prompts.base import BasePromptTemplate
+from ..prompts.prompt import PromptTemplate
+from .base import Chain
 
 
 class LLMChain(Chain, BaseModel):

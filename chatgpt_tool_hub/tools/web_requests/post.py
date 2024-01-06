@@ -1,9 +1,9 @@
 import json
 import logging
 
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, _parse_input, RequestsWrapper
-from chatgpt_tool_hub.common.log import LOG
+from ...common.log import LOG
+from .. import BaseTool
+from . import BaseRequestsTool, _parse_input, RequestsWrapper
 
 
 class RequestsPostTool(BaseRequestsTool, BaseTool):

@@ -5,14 +5,14 @@ from typing import Any, List, Optional, Sequence, Tuple
 
 from rich.console import Console
 
-from chatgpt_tool_hub.bots.qa_bot.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
-from chatgpt_tool_hub.chains import LLMChain
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.engine import Bot
-from chatgpt_tool_hub.models.base import BaseLLM
-from chatgpt_tool_hub.prompts import PromptTemplate
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+from .prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
+from ...chains import LLMChain
+from ...common.callbacks import BaseCallbackManager
+from ...common.log import LOG
+from ...engine import Bot
+from ...models.base import BaseLLM
+from ...prompts import PromptTemplate
+from ...tools.base_tool import BaseTool
 
 FINAL_ANSWER_ACTION = "Final Answer:"
 

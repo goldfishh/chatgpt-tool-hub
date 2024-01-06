@@ -3,9 +3,9 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.google_search.wrapper import GoogleSearchAPIWrapper
+from .. import BaseTool
+from ..all_tool_list import main_tool_register
+from . import GoogleSearchAPIWrapper
 
 default_tool_name = "google-search"
 

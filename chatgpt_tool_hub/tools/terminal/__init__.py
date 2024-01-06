@@ -1,1 +1,5 @@
-from chatgpt_tool_hub.tools.terminal.base import TerminalTool
+from .base import TerminalTool
+
+__all__ = [
+    "TerminalTool"
+]

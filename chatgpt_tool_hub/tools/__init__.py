@@ -1,6 +1,6 @@
 import os
 
-from chatgpt_tool_hub.common.log import LOG
+from ..common.log import LOG
 
 
 def get_packages(path):
@@ -24,22 +24,26 @@ def dynamic_tool_loader():
     for package_name in all_tool_package_list:
         try:
             import importlib
-            importlib.import_module(f"chatgpt_tool_hub.tools.{package_name}")
+            importlib.import_module(f"..tools.{package_name}")
         except Exception as e:
             LOG.info(f"[{package_name}] init failed, error_info: {repr(e)}")
 
-
-from chatgpt_tool_hub.tools.python import PythonREPLTool
-from chatgpt_tool_hub.tools.summary import SummaryTool
-from chatgpt_tool_hub.tools.terminal import TerminalTool
-from chatgpt_tool_hub.tools.web_requests import BrowserTool
-
+from .base_tool import BaseTool
+from .python import PythonREPLTool
+from .summary import SummaryTool
+from .terminal import TerminalTool
+from .web_requests import BrowserTool
+from .tool_register import ToolRegister
 
 __all__ = [
+    "BaseTool",
     "SummaryTool",
     "PythonREPLTool",
     "TerminalTool",
     "BrowserTool",
+
+    "ToolRegister",
+    
     "get_packages",
-    "dynamic_tool_loader"
+    "dynamic_tool_loader",
 ]

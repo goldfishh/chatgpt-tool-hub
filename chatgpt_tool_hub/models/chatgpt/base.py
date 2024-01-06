@@ -3,9 +3,9 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Extra, Field, validator
 
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
-from chatgpt_tool_hub.common.callbacks import get_callback_manager
-from chatgpt_tool_hub.common.schema import (
+from ...common.callbacks import BaseCallbackManager
+from ...common.callbacks import get_callback_manager
+from ...common.schema import (
     AIMessage,
     BaseLanguageModel,
     BaseMessage,

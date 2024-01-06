@@ -3,7 +3,7 @@ from inspect import signature
 from typing import Any, Callable, Optional
 from typing import Awaitable, Union
 
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+from . import BaseTool
 
 
 class Tool(BaseTool):

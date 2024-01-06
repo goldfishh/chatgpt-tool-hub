@@ -1,1 +1,5 @@
-from chatgpt_tool_hub.tools.news.morning_news.tool import MorningNewsTool
+from .tool import MorningNewsTool
+
+__all__ = [
+    "MorningNewsTool"
+]

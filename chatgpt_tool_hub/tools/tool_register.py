@@ -1,7 +1,7 @@
 from typing import List
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.singleton import Singleton
+from ..common.log import LOG
+from ..common.singleton import Singleton
 
 
 class ToolRegister(Singleton):

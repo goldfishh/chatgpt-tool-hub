@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Union
 
 from pydantic import BaseModel, Extra, root_validator
 
-from chatgpt_tool_hub.prompts.base import (
+from .base import (
     DEFAULT_FORMATTER_MAPPING,
     StringPromptTemplate,
     check_valid_template,

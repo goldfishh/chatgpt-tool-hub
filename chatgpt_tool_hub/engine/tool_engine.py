@@ -5,14 +5,14 @@ from pydantic import BaseModel, root_validator
 from rich.console import Console
 from rich.panel import Panel
 
-from chatgpt_tool_hub.chains.base import Chain
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
-from chatgpt_tool_hub.common.input import get_color_mapping
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.schema import BotAction, BotFinish
-from chatgpt_tool_hub.engine import Bot
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.tool import InvalidTool
+from . import Bot
+from ..chains.base import Chain
+from ..common.callbacks import BaseCallbackManager
+from ..common.input import get_color_mapping
+from ..common.log import LOG
+from ..common.schema import BotAction, BotFinish
+from ..tools.base_tool import BaseTool
+from ..tools.tool import InvalidTool
 
 
 class ToolEngine(Chain, BaseModel):

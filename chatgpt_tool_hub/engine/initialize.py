@@ -3,12 +3,12 @@ from typing import Any, Optional, Sequence
 
 from rich.console import Console
 
-from chatgpt_tool_hub.bots.all_bot_list import BOT_TO_CLASS
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
-from chatgpt_tool_hub.common.callbacks import get_callback_manager
-from chatgpt_tool_hub.engine import ToolEngine
-from chatgpt_tool_hub.models.base import BaseLanguageModel
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+from . import ToolEngine
+from ..bots.all_bot_list import BOT_TO_CLASS
+from ..common.callbacks import BaseCallbackManager
+from ..common.callbacks import get_callback_manager
+from ..models.base import BaseLanguageModel
+from ..tools.base_tool import BaseTool
 
 
 def init_tool_engine(

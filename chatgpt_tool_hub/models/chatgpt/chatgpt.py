@@ -14,9 +14,10 @@ from tenacity import (
     wait_exponential,
 )
 
-from chatgpt_tool_hub.common.constants import openai_default_api_base
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.schema import (
+from . import BaseChatModel
+from ...common.constants import openai_default_api_base
+from ...common.log import LOG
+from ...common.schema import (
     AIMessage,
     BaseMessage,
     ChatGeneration,
@@ -25,8 +26,7 @@ from chatgpt_tool_hub.common.schema import (
     HumanMessage,
     SystemMessage,
 )
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.models.chatgpt.base import BaseChatModel
+from ...common.utils import get_from_dict_or_env
 
 
 def _create_retry_decorator(llm: ChatOpenAI) -> Callable[[Any], Any]:

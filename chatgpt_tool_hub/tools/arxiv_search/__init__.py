@@ -1,1 +1,6 @@
-from chatgpt_tool_hub.tools.arxiv_search.tool import ArxivTool
+from .tool import ArxivTool
+
+
+__all__ = [
+    "ArxivTool"
+]

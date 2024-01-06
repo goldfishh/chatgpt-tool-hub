@@ -1,3 +1,7 @@
-from chatgpt_tool_hub.models.chatgpt.chatgpt import ChatOpenAI
+from .base import BaseChatModel
+from .chatgpt import ChatOpenAI
 
-__all__ = ["ChatOpenAI"]
+__all__ = [
+    "BaseChatModel",
+    "ChatOpenAI"
+]

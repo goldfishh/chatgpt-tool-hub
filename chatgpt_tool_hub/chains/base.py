@@ -8,9 +8,9 @@ import yaml
 from pydantic import BaseModel, Field, validator
 from rich.console import Console
 
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
-from chatgpt_tool_hub.common.callbacks import get_callback_manager
-from chatgpt_tool_hub.common.schema import BaseMemory
+from ..common.callbacks import BaseCallbackManager
+from ..common.callbacks import get_callback_manager
+from ..common.schema import BaseMemory
 
 
 def _get_verbosity() -> bool:

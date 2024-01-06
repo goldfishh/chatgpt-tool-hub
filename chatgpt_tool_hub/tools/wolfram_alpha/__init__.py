@@ -1,2 +1,7 @@
-from chatgpt_tool_hub.tools.wolfram_alpha.wolfram_alpha import WolframAlphaTool
-from chatgpt_tool_hub.tools.wolfram_alpha.wolfram_alpha import WolframAlphaAPIWrapper
+from .wolfram_alpha import WolframAlphaTool
+from .wolfram_alpha import WolframAlphaAPIWrapper
+
+__all__ = [
+    "WolframAlphaTool",
+    "WolframAlphaAPIWrapper"
+]

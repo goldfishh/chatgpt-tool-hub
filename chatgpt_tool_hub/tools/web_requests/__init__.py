@@ -7,8 +7,8 @@ from typing import Any, Dict
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools import SummaryTool
+from ...common.log import LOG
+from .. import SummaryTool
 
 
 def filter_text(html: str) -> str:
@@ -54,7 +54,7 @@ DEFAULT_HEADER = {
     "Accept-Encoding": "*"
 }
 
-from chatgpt_tool_hub.tools.web_requests.wrapper import RequestsWrapper
+from .wrapper import RequestsWrapper
 
 
 class BaseRequestsTool(BaseModel):
@@ -63,12 +63,12 @@ class BaseRequestsTool(BaseModel):
     requests_wrapper: RequestsWrapper
 
 
-from chatgpt_tool_hub.tools.web_requests.browser import BrowserTool
-from chatgpt_tool_hub.tools.web_requests.delete import RequestsDeleteTool
-from chatgpt_tool_hub.tools.web_requests.get import RequestsGetTool
-from chatgpt_tool_hub.tools.web_requests.patch import RequestsPatchTool
-from chatgpt_tool_hub.tools.web_requests.post import RequestsPostTool
-from chatgpt_tool_hub.tools.web_requests.put import RequestsPutTool
+from .browser import BrowserTool
+from .delete import RequestsDeleteTool
+from .get import RequestsGetTool
+from .patch import RequestsPatchTool
+from .post import RequestsPostTool
+from .put import RequestsPutTool
 
 
 __all__ = (

@@ -5,10 +5,10 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.news import news_tool_register
-from chatgpt_tool_hub.tools.web_requests.wrapper import RequestsWrapper
+from ....common.log import LOG
+from ... import BaseTool
+from ...web_requests.wrapper import RequestsWrapper
+from .. import news_tool_register
 
 default_tool_name = "finance-news"
 

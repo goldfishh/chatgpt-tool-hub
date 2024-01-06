@@ -2,12 +2,12 @@ from datetime import datetime
 
 from rich.console import Console
 
-from chatgpt_tool_hub.chains.api import APIChain
-from chatgpt_tool_hub.models import build_model_params
-from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.meteo.docs_prompt import OPEN_METEO_DOCS
+from ...chains.api import APIChain
+from ...models import build_model_params
+from ...models.model_factory import ModelFactory
+from ..all_tool_list import main_tool_register
+from .. import BaseTool
+from .docs_prompt import OPEN_METEO_DOCS
 
 default_tool_name = "meteo-weather"
 

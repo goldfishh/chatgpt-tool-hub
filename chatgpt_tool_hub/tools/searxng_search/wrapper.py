@@ -97,8 +97,8 @@ from typing import Any, Dict, List, Optional
 import aiohttp
 from pydantic import BaseModel, Extra, Field, PrivateAttr, root_validator, validator
 
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.tools.web_requests import RequestsWrapper
+from ...common.utils import get_from_dict_or_env
+from ..web_requests import RequestsWrapper
 
 
 def _get_default_params() -> dict:

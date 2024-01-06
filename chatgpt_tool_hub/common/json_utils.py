@@ -2,7 +2,7 @@ import json
 import re
 from typing import Any, Dict, Optional, Union
 
-from chatgpt_tool_hub.common.log import LOG
+from .log import LOG
 
 
 def fix_and_parse_json(

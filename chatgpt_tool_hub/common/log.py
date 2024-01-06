@@ -1,7 +1,7 @@
 import os
 import sys
 import logging
-from chatgpt_tool_hub.common.constants import LOGGING_LEVEL, LOGGING_FMT, LOGGING_DATEFMT
+from .constants import LOGGING_LEVEL, LOGGING_FMT, LOGGING_DATEFMT
 
 
 def _get_logger(level: int = LOGGING_LEVEL):

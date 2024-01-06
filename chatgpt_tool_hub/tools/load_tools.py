@@ -2,10 +2,9 @@
 from typing import Any, List
 from typing import Optional
 
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.tool_register import ToolRegister
+from ..common.callbacks import BaseCallbackManager
+from ..common.log import LOG
+from . import BaseTool, ToolRegister
 from rich.console import Console
 
 

@@ -4,10 +4,10 @@ from typing import Dict, List
 
 from pydantic import BaseModel, Extra, validator, root_validator
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.tools.web_requests import filter_text
-from chatgpt_tool_hub.tools.web_requests.wrapper import RequestsWrapper
+from ...common.log import LOG
+from ...common.utils import get_from_dict_or_env
+from ..web_requests import filter_text
+from ..web_requests.wrapper import RequestsWrapper
 
 
 class BingSearchAPIWrapper(BaseModel):

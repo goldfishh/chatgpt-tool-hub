@@ -1,7 +1,9 @@
 """Chains are easily reusable components which can be linked together."""
 
-from chatgpt_tool_hub.chains.llm import LLMChain
+from .llm import LLMChain
+from .base import Chain
 
 __all__ = [
-    "LLMChain",
+    "Chain",
+    "LLMChain"
 ]

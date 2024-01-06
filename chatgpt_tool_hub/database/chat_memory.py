@@ -1,10 +1,10 @@
 from abc import ABC
 from typing import Any, Dict, List, Optional
 
-from chatgpt_tool_hub.database.utils import get_prompt_input_key
+from .utils import get_prompt_input_key
 from pydantic import BaseModel, Field
 
-from chatgpt_tool_hub.common.schema import AIMessage, BaseMemory, BaseMessage, HumanMessage
+from ..common.schema import AIMessage, BaseMemory, BaseMessage, HumanMessage
 
 
 class ChatMessageHistory(BaseModel):

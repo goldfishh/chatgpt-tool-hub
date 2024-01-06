@@ -5,15 +5,15 @@ from typing import Any, List
 from rich.console import Console
 from rich.panel import Panel
 
-from chatgpt_tool_hub.chains.llm import LLMChain
-from chatgpt_tool_hub.common.calculate_token import count_string_tokens as get_token_num
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.models import build_model_params
-from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.summary import MAP_PROMPT, REDUCE_PROMPT
+from ...chains.llm import LLMChain
+from ...common.calculate_token import count_string_tokens as get_token_num
+from ...common.log import LOG
+from ...common.utils import get_from_dict_or_env
+from ...models import build_model_params
+from ...models.model_factory import ModelFactory
+from ..all_tool_list import main_tool_register
+from .. import BaseTool
+from . import MAP_PROMPT, REDUCE_PROMPT
 
 
 class TextClipper:

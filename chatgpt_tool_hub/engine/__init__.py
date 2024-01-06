@@ -1,2 +1,8 @@
-from chatgpt_tool_hub.engine.bot import Bot
-from chatgpt_tool_hub.engine.tool_engine import ToolEngine
+from .bot import Bot
+from .tool_engine import ToolEngine
+
+
+__all__ = [
+    "Bot",
+    "ToolEngine"
+]

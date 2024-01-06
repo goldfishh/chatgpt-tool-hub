@@ -1,3 +1,7 @@
-from chatgpt_tool_hub.tools.bing_search.wrapper import BingSearchAPIWrapper
-from chatgpt_tool_hub.tools.bing_search.tool import BingSearch
+from .wrapper import BingSearchAPIWrapper
+from .tool import BingSearch
 
+__all__ = [
+    "BingSearchAPIWrapper",
+    "BingSearch"
+]

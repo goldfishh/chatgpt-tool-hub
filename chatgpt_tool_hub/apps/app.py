@@ -2,9 +2,9 @@ from abc import abstractmethod
 
 from typing import List
 
-from chatgpt_tool_hub.engine.tool_engine import ToolEngine
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+from ..engine.tool_engine import ToolEngine
+from ..common.log import LOG
+from ..tools.base_tool import BaseTool
 
 
 class App:

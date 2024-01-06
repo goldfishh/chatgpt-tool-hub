@@ -2,14 +2,14 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.engine import ToolEngine
-from chatgpt_tool_hub.engine.initialize import init_tool_engine
-from chatgpt_tool_hub.models import build_model_params
-from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.load_tools import load_tools
-from chatgpt_tool_hub.tools.news import news_tool_register
+from ...engine import ToolEngine
+from ...engine.initialize import init_tool_engine
+from ...models import build_model_params
+from ...models.model_factory import ModelFactory
+from ..all_tool_list import main_tool_register
+from .. import BaseTool
+from ..load_tools import load_tools
+from . import news_tool_register
 
 default_tool_name = "news"
 

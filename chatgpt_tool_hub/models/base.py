@@ -7,10 +7,10 @@ from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
 import yaml
 from pydantic import BaseModel, Extra, Field, validator
 
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
-from chatgpt_tool_hub.common.callbacks import get_callback_manager
-from chatgpt_tool_hub.common.schema import BaseLanguageModel, Generation, LLMResult, PromptValue
-from chatgpt_tool_hub.models import llm_cache
+from ..common.callbacks import BaseCallbackManager
+from ..common.callbacks import get_callback_manager
+from ..common.schema import BaseLanguageModel, Generation, LLMResult, PromptValue
+from . import llm_cache
 
 
 def _get_verbosity() -> bool:

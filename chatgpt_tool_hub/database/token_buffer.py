@@ -2,9 +2,9 @@ from typing import Any, Dict, List
 
 from pydantic import BaseModel
 
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.schema import BaseLanguageModel, BaseMessage, get_buffer_string
-from chatgpt_tool_hub.database.chat_memory import BaseChatMemory
+from ..common.log import LOG
+from ..common.schema import BaseLanguageModel, BaseMessage, get_buffer_string
+from .chat_memory import BaseChatMemory
 
 
 class ConversationTokenBufferMemory(BaseChatMemory, BaseModel):

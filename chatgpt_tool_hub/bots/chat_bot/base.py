@@ -7,16 +7,17 @@ from typing import Any, List, Optional, Sequence, Tuple, Union, Dict
 
 from rich.console import Console
 from rich.panel import Panel
-from chatgpt_tool_hub.bots.chat_bot.prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
-from chatgpt_tool_hub.chains import LLMChain
-from chatgpt_tool_hub.common import json_utils
-from chatgpt_tool_hub.common.callbacks import BaseCallbackManager
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.schema import BotAction, BotFinish
-from chatgpt_tool_hub.engine import Bot
-from chatgpt_tool_hub.models.base import BaseLLM
-from chatgpt_tool_hub.prompts import PromptTemplate
-from chatgpt_tool_hub.tools.base_tool import BaseTool
+
+from .prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
+from ...chains import LLMChain
+from ...common import json_utils
+from ...common.callbacks import BaseCallbackManager
+from ...common.log import LOG
+from ...common.schema import BotAction, BotFinish
+from ...engine import Bot
+from ...models.base import BaseLLM
+from ...prompts import PromptTemplate
+from ...tools.base_tool import BaseTool
 
 default_ai_prefix = "LLM-OS"
 default_human_prefix = "user"

@@ -1,1 +1,5 @@
-from chatgpt_tool_hub.tools.meteo.tool import MeteoWeatherTool
+from .tool import MeteoWeatherTool
+
+__all__ = [
+    "MeteoWeatherTool"
+]

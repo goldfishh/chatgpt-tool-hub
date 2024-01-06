@@ -1,5 +1,5 @@
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool
+from ..import BaseTool
+from . import BaseRequestsTool
 
 
 class RequestsDeleteTool(BaseRequestsTool, BaseTool):

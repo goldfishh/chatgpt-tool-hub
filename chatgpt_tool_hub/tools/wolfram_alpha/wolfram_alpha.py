@@ -4,9 +4,9 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.wolfram_alpha.wrapper import WolframAlphaAPIWrapper
+from ..all_tool_list import main_tool_register
+from .. import BaseTool
+from .wrapper import WolframAlphaAPIWrapper
 
 default_tool_name = "wolfram-alpha"
 

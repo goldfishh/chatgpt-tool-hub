@@ -7,13 +7,13 @@ from pydantic import BaseModel, Field, root_validator
 from rich.console import Console
 from rich.panel import Panel
 
-from chatgpt_tool_hub.chains.api.prompt import API_RESPONSE_PROMPT, API_URL_PROMPT
-from chatgpt_tool_hub.chains.base import Chain
-from chatgpt_tool_hub.chains.llm import LLMChain
-from chatgpt_tool_hub.common.log import LOG
-from chatgpt_tool_hub.common.schema import BaseLanguageModel
-from chatgpt_tool_hub.prompts import BasePromptTemplate
-from chatgpt_tool_hub.tools.web_requests import RequestsWrapper
+from .prompt import API_RESPONSE_PROMPT, API_URL_PROMPT
+from .. import Chain, LLMChain
+
+from ...common.log import LOG
+from ...common.schema import BaseLanguageModel
+from ...prompts import BasePromptTemplate
+from ...tools.web_requests import RequestsWrapper
 
 
 class APIChain(Chain, BaseModel):

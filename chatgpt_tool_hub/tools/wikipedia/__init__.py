@@ -1,2 +1,8 @@
-from chatgpt_tool_hub.tools.wikipedia.wikipedia import WikipediaTool
-from chatgpt_tool_hub.tools.wikipedia.wrapper import WikipediaAPIWrapper
+from .wikipedia import WikipediaTool
+from .wrapper import WikipediaAPIWrapper
+
+
+__all__ = [
+    "WikipediaTool",
+    "WikipediaAPIWrapper"
+]

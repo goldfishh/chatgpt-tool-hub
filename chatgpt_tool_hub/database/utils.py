@@ -1,6 +1,6 @@
 from typing import Any, Dict, List
 
-from chatgpt_tool_hub.common.schema import get_buffer_string  # noqa: 401
+from ..common.schema import get_buffer_string  # noqa: 401
 
 
 def get_prompt_input_key(inputs: Dict[str, Any], memory_variables: List[str]) -> str:

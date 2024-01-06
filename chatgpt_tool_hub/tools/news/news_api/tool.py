@@ -2,13 +2,13 @@ from typing import Any
 
 from rich.console import Console
 
-from chatgpt_tool_hub.chains.api import APIChain
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
-from chatgpt_tool_hub.models import build_model_params
-from chatgpt_tool_hub.models.model_factory import ModelFactory
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.news import news_tool_register
-from chatgpt_tool_hub.tools.news.news_api.docs_prompt import NEWS_DOCS
+from ....chains.api import APIChain
+from ....common.utils import get_from_dict_or_env
+from ....models import build_model_params
+from ....models.model_factory import ModelFactory
+from ... import BaseTool
+from .. import news_tool_register
+from .docs_prompt import NEWS_DOCS
 
 default_tool_name = "news-api"
 

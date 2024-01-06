@@ -1,4 +1,4 @@
-from chatgpt_tool_hub.prompts import PromptTemplate
+from ...prompts import PromptTemplate
 
 PROMPT = """
 你是文案编辑，你的工作是组合下列的文本，同时做一些转述

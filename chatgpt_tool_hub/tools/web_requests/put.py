@@ -1,5 +1,5 @@
-from chatgpt_tool_hub.tools.base_tool import BaseTool
-from chatgpt_tool_hub.tools.web_requests import BaseRequestsTool, _parse_input
+from .. import BaseTool
+from . import BaseRequestsTool, _parse_input
 
 
 class RequestsPutTool(BaseRequestsTool, BaseTool):

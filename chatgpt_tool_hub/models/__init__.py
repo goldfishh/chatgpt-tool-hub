@@ -1,9 +1,9 @@
 import os
 from typing import Optional
 
-from chatgpt_tool_hub.common.cache import BaseCache
-from chatgpt_tool_hub.common.constants import openai_default_api_base
-from chatgpt_tool_hub.common.utils import get_from_dict_or_env
+from ..common.cache import BaseCache
+from ..common.constants import openai_default_api_base
+from ..common.utils import get_from_dict_or_env
 
 verbose: bool = False
 llm_cache: Optional[BaseCache] = None
@@ -62,8 +62,8 @@ def build_model_params(kwargs: dict) -> dict:
     return model_params_dict
 
 
-from chatgpt_tool_hub.models.base import BaseLLM, LLM
-from chatgpt_tool_hub.models.chatgpt.chatgpt import ChatOpenAI
+from .base import BaseLLM, LLM
+from .chatgpt.chatgpt import ChatOpenAI
 
 
 __all__ = [

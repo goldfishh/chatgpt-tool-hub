@@ -9,8 +9,8 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Union
 import yaml
 from pydantic import BaseModel, Extra, Field, root_validator
 
-from chatgpt_tool_hub.common.formatting import formatter
-from chatgpt_tool_hub.common.schema import BaseMessage, BaseOutputParser, HumanMessage, PromptValue
+from ..common.formatting import formatter
+from ..common.schema import BaseMessage, BaseOutputParser, HumanMessage, PromptValue
 
 
 def jinja2_formatter(template: str, **kwargs: Any) -> str:

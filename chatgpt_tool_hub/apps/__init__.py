@@ -1,2 +1,7 @@
-from chatgpt_tool_hub.apps.app import App
-from chatgpt_tool_hub.apps.app_factory import AppFactory
+from .app import App
+from .app_factory import AppFactory
+
+__all__ = [
+    "App",
+    "AppFactory"
+]

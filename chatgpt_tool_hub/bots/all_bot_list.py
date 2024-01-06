@@ -1,7 +1,6 @@
 """Functionality for loading bots."""
 
-from chatgpt_tool_hub.bots import ChatBot
-from chatgpt_tool_hub.bots import QABot
+from . import ChatBot, QABot
 
 
 BOT_TO_CLASS = {
