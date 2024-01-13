@@ -28,5 +28,5 @@ class AnswerUserTool(BaseTool):
         """Use the AnswerUserTool asynchronously."""
         raise NotImplementedError("AnswerUserTool does not support async")
 
-
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: AnswerUserTool(console, **kwargs), [])
+# register the tool
+# main_tool_register.register_tool(default_tool_name, lambda console=None, **kwargs: AnswerUserTool(console, **kwargs), [])

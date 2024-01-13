@@ -1,5 +1,5 @@
-from .tool import PythonREPLTool
+from .tool import PythonTool
 
 __all__ = [
-    "PythonREPLTool"
+    "PythonTool"
 ]

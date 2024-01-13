@@ -39,5 +39,5 @@ class DebugTool(BaseTool):
         """Use the DebugTool asynchronously."""
         raise NotImplementedError("DebugTool does not support async")
 
-
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: DebugTool(console, **kwargs), [])
+# register the tool
+# main_tool_register.register_tool(default_tool_name, lambda console=None, **kwargs: DebugTool(console, **kwargs), [])

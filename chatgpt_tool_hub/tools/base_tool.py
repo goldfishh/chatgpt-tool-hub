@@ -18,6 +18,7 @@ class BaseTool(BaseModel):
     author: str = ""
     return_direct: bool = False
     verbose: bool = False
+    bot: Any = None  # TODO replace `Any`
     console: Console = None
     callback_manager: BaseCallbackManager = Field(default_factory=get_callback_manager)
 

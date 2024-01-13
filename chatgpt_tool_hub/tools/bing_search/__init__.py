@@ -1,7 +1,5 @@
-from .wrapper import BingSearchAPIWrapper
-from .tool import BingSearch
+from .tool import BingSearchTool
 
 __all__ = [
-    "BingSearchAPIWrapper",
-    "BingSearch"
+    "BingSearchTool"
 ]

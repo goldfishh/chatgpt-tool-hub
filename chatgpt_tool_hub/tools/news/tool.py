@@ -51,5 +51,5 @@ class NewsTool(BaseTool):
     def get_tool_list(self):
         return news_tool_register.get_registered_tool_names()
 
-
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: NewsTool(console, **kwargs), [])
+# register the tool
+# main_tool_register.register_tool(default_tool_name, lambda console=None, **kwargs: NewsTool(console, **kwargs), [])

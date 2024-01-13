@@ -1,7 +1,7 @@
 import os
 
 from ..common.log import LOG
-
+from .tool_register import ToolRegister
 
 def get_packages(path):
     """获取指定路径下的所有包名"""
@@ -24,21 +24,20 @@ def dynamic_tool_loader():
     for package_name in all_tool_package_list:
         try:
             import importlib
-            importlib.import_module(f"..tools.{package_name}")
+            importlib.import_module(f".tools.{package_name}", package="chatgpt_tool_hub")
         except Exception as e:
             LOG.info(f"[{package_name}] init failed, error_info: {repr(e)}")
 
 from .base_tool import BaseTool
-from .python import PythonREPLTool
+from .python import PythonTool
+from .web_requests import BrowserTool
 from .summary import SummaryTool
 from .terminal import TerminalTool
-from .web_requests import BrowserTool
-from .tool_register import ToolRegister
 
 __all__ = [
     "BaseTool",
     "SummaryTool",
-    "PythonREPLTool",
+    "PythonTool",
     "TerminalTool",
     "BrowserTool",
 

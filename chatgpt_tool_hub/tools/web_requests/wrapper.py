@@ -9,8 +9,6 @@ from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
 from .  import DEFAULT_HEADER
 
-browser: Any = None  # ChromeWebDriver or None
-
 
 class RequestsWrapper(BaseModel):
     """Lightweight wrapper around requests library."""

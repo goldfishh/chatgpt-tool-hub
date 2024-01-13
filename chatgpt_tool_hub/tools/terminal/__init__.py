@@ -1,4 +1,4 @@
-from .base import TerminalTool
+from .tool import TerminalTool
 
 __all__ = [
     "TerminalTool"

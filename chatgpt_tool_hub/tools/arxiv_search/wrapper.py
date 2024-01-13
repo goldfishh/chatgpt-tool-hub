@@ -1,8 +1,24 @@
 import json
 from typing import Any, Dict
-
+from enum import Enum
 from pydantic import BaseModel, Extra, root_validator
 
+from ...common.utils import get_from_dict_or_env
+from ...common.log import LOG
+
+class OutputType(str, Enum):
+    Text = "text"
+    PDF = "pdf"
+    ALL = "all"
+
+class SortBy(str, Enum):
+    Relevance = "relevance"
+    LastUpdatedDate = "lastUpdatedDate"
+    SubmittedDate = "submittedDate"
+
+class SortOrder(str, Enum):
+    Ascending = "ascending"
+    Descending = "descending"
 
 class ArxivAPIWrapper(BaseModel):
     """Wrapper around ArvixAPI.
@@ -13,7 +29,14 @@ class ArxivAPIWrapper(BaseModel):
     of the top-k results of an input search.
     """
     arxiv_client: Any
-    top_k_results: int = 3
+    max_retry_num: int = 3
+    
+    arxiv_simple: bool = True
+    arxiv_top_k_results: int = 3
+    
+    arxiv_sort_by: SortBy = SortBy.Relevance
+    arxiv_sort_order: SortOrder = SortOrder.Descending
+    arxiv_output_type: OutputType = OutputType.Text
 
     class Config:
         """Configuration for this pydantic object."""
@@ -31,6 +54,13 @@ class ArxivAPIWrapper(BaseModel):
                 delay_seconds=3,  # "arXiv's Terms of Use" asks you no more than one request per three seconds
                 num_retries=3
             )
+
+            values["arxiv_simple"] = get_from_dict_or_env(values, "arxiv_simple", "ARXIV_SIMPLE", True)
+            values["arxiv_top_k_results"] = get_from_dict_or_env(values, "arxiv_top_k_results", "ARXIV_TOP_K_RESULTS", 3)
+            
+            values["arxiv_sort_by"] = get_from_dict_or_env(values, "arxiv_sort_by", "ARXIV_SORT_BY", SortBy.Relevance)
+            values["arxiv_sort_order"] = get_from_dict_or_env(values, "arxiv_max_results", "ARXIV_MAX_RESULTS", SortOrder.Descending)
+            values["arxiv_output_type"] = get_from_dict_or_env(values, "arxiv_output_type", "ARXIV_OUTPUT_TYPE",  OutputType.Text)
         except ImportError:
             raise ValueError(
                 "Could not import arxiv python package. "
@@ -38,49 +68,54 @@ class ArxivAPIWrapper(BaseModel):
             )
         return values
 
-    def run(self, query_json_str: str) -> str:
+    def run(self, query_json_str: str, retry_num: int = 0, **kwargs) -> str:
         import arxiv
-
+        if (retry_num > self.max_retry_num):
+            return "exceed max_retry_num"
+        
         query_json = json.loads(query_json_str)
 
         search_query = query_json.get("search_query", "")
-        max_results = query_json.get("max_results", self.top_k_results)
-        sort_by = query_json.get("sort_by", "relevance")
-        sort_order = query_json.get("sort_order", "descending")
 
-        # todo avoid it in future
         query = search_query.replace("'", "").replace("\"", "").replace("+", " ")
 
-        if sort_by == "lastUpdatedDate":
+        if self.arxiv_sort_by == "lastUpdatedDate":
             sort_by_input = arxiv.SortCriterion.LastUpdatedDate
-        elif sort_by == "submittedDate":
+        elif self.arxiv_sort_by == "submittedDate":
             sort_by_input = arxiv.SortCriterion.SubmittedDate
         else:
             sort_by_input = arxiv.SortCriterion.Relevance
 
-        if sort_order == "ascending":
+        if self.arxiv_sort_order == "ascending":
             sort_order_input = arxiv.SortOrder.Ascending
         else:
             sort_order_input = arxiv.SortOrder.Descending
 
-        search = arxiv.Search(query=query,
-                              max_results=max_results,
-                              sort_by=sort_by_input,
-                              sort_order=sort_order_input)
+        try:
+            search = arxiv.Search(query=query,
+                                max_results=self.arxiv_top_k_results,
+                                sort_by=sort_by_input,
+                                sort_order=sort_order_input)
+            _content = ""
+            for idx, result in enumerate(self.arxiv_client.results(search)):
+                # 标题、作者、published、总结、primary_category、comment、pdf_url
+                _content += f"No.{idx+1}:《{str(result.title)}》\n" if not self.arxiv_simple else f"《{str(result.title)}》\n"
+                if self.arxiv_output_type in [OutputType.Text, OutputType.ALL]:
+                    _content += f"Author: {' '.join([author.name for author in result.authors])}\n"
+                    try:
+                        _content += f"submitted date: {result.published.strftime('%Y-%m-%d %H:%M:%S')}\n" if not self.arxiv_simple else ""
+                    except Exception as e:
+                        LOG.exception(e)
+                    _content += f"Abstract: {result.summary}\n"
+                    if result.primary_category:
+                        _content += f"Category: {result.primary_category}\n" if not self.arxiv_simple else ""
+                    if result.comment:
+                        _content += f"备注: {repr(result.comment)}\n" if not self.arxiv_simple else ""
 
-        _content = ""
-        for idx, result in enumerate(self.arxiv_client.results(search)):
-            # 标题、作者、published、总结、primary_category、comment、pdf_url
-            _content += f"\n第{idx+1}篇：{repr(result.title)}\n"
-            _content += f"作者: {[author.name for author in result.authors]}\n"
-            try:
-                _content += f"发布时间: {result.published.strftime('%Y-%m-%d %H:%M:%S')}\n"
-            except Exception as e:
-                _content += f"发布时间: None\n"
-            _content += f"摘要: {result.summary}\n"
-            _content += f"分类: {result.primary_category}\n"
-            if result.comment:
-                _content += f"备注: {repr(result.comment)}\n"
-            _content += f"pdf: {result.pdf_url}\n"
-            _content += "\n---\n"
+                if self.arxiv_output_type in [OutputType.PDF, OutputType.ALL]:
+                    _content += f"pdf: {result.pdf_url}\n"
+                _content += "\n---\n\n"
+        except Exception as e:
+            # LOG.DEBUG(e)
+            return self.run(query_json_str, retry_num+1)
         return _content

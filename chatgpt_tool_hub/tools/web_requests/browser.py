@@ -1,5 +1,4 @@
 import logging
-import time
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Extra, root_validator
@@ -10,8 +9,8 @@ from ...common.utils import get_from_dict_or_env
 from ..all_tool_list import main_tool_register
 from .. import BaseTool
 from . import filter_text
-default_tool_name = "browser"
 
+default_tool_name = "browser"
 
 browser: Any = None  # ChromeWebDriver or None
 
@@ -22,7 +21,7 @@ class ChromeBrowser(BaseModel):
     headers: Optional[Dict[str, str]] = dict()
 
     proxy: Optional[str]
-
+    
     class Config:
         """Configuration for this pydantic object."""
 
@@ -73,12 +72,17 @@ class ChromeBrowser(BaseModel):
         options.add_argument("--disable-extensions")
         options.add_argument("--ignore-certificate-errors")
         options.add_argument("--no-sandbox")
-        options.add_argument(f"--proxy-server={proxy}")
+        if proxy:
+            options.add_argument(f"--proxy-server={proxy}")
 
         # 设置代理
         from webdriver_manager.chrome import ChromeDriverManager
+        from selenium.webdriver.chrome.service import Service as ChromeService
+        # only for selenium 4
+        # reference to: https://github.com/SergeyPirogov/webdriver_manage
         return webdriver.Chrome(
-            executable_path=ChromeDriverManager().install(), options=options
+            service=ChromeService(ChromeDriverManager().install()), 
+            options=options
         )
 
     def get(self, url: str, **kwargs) -> str:
@@ -119,6 +123,7 @@ class BrowserTool(BaseTool):
     )
 
     browser: ChromeBrowser = None
+    use_summary: bool = False
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容
@@ -126,11 +131,15 @@ class BrowserTool(BaseTool):
 
         self.browser = ChromeBrowser(**tool_kwargs)
 
+        self.use_summary = get_from_dict_or_env(
+            tool_kwargs, 'use_summary', "USE_SUMMARY", ""
+        )
+
     def _run(self, url: str) -> str:
         """Run the tool."""
         try:
             html = self.browser.get(url)
-            _content = filter_text(html)
+            _content = filter_text(html, self.use_summary, self.console)
             LOG.debug(f"[browser] output: {str(_content)}")
         except Exception as e:
             LOG.error(f"[browser] {str(e)}")
@@ -141,8 +150,8 @@ class BrowserTool(BaseTool):
         """Run the tool asynchronously."""
         raise NotImplementedError("not support run this tool in async")
 
-
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: BrowserTool(console, **kwargs), [])
+# register the tool
+main_tool_register.register_tool(default_tool_name, lambda console=None, **kwargs: BrowserTool(console, **kwargs), [])
 
 
 if __name__ == "__main__":

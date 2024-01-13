@@ -18,7 +18,8 @@ class WikipediaAPIWrapper(BaseModel):
     """
 
     wiki_client: Any  #: :meta private:
-    top_k_results: int = 2
+    wikipedia_top_k_results: int = 2
+    max_retry_num: int = 3
 
     class Config:
         """Configuration for this pydantic object."""
@@ -31,11 +32,11 @@ class WikipediaAPIWrapper(BaseModel):
             import wikipedia
             # 本土化
             wikipedia.set_lang("zh")
-
-            values["top_k_results"] = get_from_dict_or_env(
-                values, 'top_k_results', "TOP_K_RESULTS", 2
-            )
             values["wiki_client"] = wikipedia
+
+            values["wikipedia_top_k_results"] = get_from_dict_or_env(
+                values, 'wikipedia_top_k_results', "WIKIPEDIA_TOP_K_RESULTS", 2
+            )
         except ImportError:
             raise ValueError(
                 "Could not import wikipedia python package. "
@@ -47,19 +48,20 @@ class WikipediaAPIWrapper(BaseModel):
         """Run Wikipedia search and get page summaries."""
         search_results = self.wiki_client.search(query)
         summaries = []
-        for i in range(min(self.top_k_results, len(search_results))):
+        for i in range(min(self.wikipedia_top_k_results, len(search_results))):
             retry_num = 0
-            while retry_num <= 1:
+            while retry_num <= self.max_retry_num:
                 summary = self.fetch_formatted_page_summary(search_results[i])
                 if summary is not None:
                     summaries.append(summary)
+                    time.sleep(1)
                     break
                 else:
                     # wikipedia api 限制
-                    time.sleep(2)
+                    time.sleep(1)
                     retry_num += 1
-        _content = "\n\n".join(summaries)
-        LOG.debug(f"[wikipedia]: {_content}")
+        _content = "\n---\n".join(summaries)
+        LOG.debug(f"[wikipedia] output: \n{_content}")
         return _content
 
     def fetch_formatted_page_summary(self, page: str) -> Optional[str]:
@@ -67,5 +69,5 @@ class WikipediaAPIWrapper(BaseModel):
             wiki_page = self.wiki_client.page(title=page, auto_suggest=False)
             return f"Page: {page}\nSummary: {wiki_page.summary}"
         except Exception as e:
-            LOG.info(f"[wikipedia]: {repr(e)}")
+            LOG.info(f"[wikipedia] error: \n{repr(e)}")
             return None

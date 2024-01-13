@@ -1,7 +1,6 @@
 import os
 import tempfile
 from typing import Any
-
 from rich.console import Console
 
 from ...chains import LLMChain
@@ -14,68 +13,52 @@ from ..all_tool_list import main_tool_register
 from .api_prompt import ARXIV_PROMPT
 from .wrapper import ArxivAPIWrapper
 from .. import BaseTool
-from ..summary import SummaryTool
 
 default_tool_name = "arxiv"
 
 
 class ArxivTool(BaseTool):
     """ a tool to call arxiv api """
-
     name = default_tool_name
     description = (
         "Useful for when you need to answer questions about scientific research or search for papers "
         "Like: which papers has a certain author published? "
         "Input should be the title or abstract keywords or author names of a paper you want to search. "
     )
-    bot: Any = None
-
     api_wrapper: ArxivAPIWrapper = None
-    arxiv_summary: bool = True
+    debug: bool = False
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console, return_direct=True)
-
         self.api_wrapper = ArxivAPIWrapper(**tool_kwargs)
-        self.arxiv_summary = get_from_dict_or_env(tool_kwargs, "arxiv_summary", "ARXIV_SUMMARY", True)
+
+        self.debug = get_from_dict_or_env(tool_kwargs, "arxiv_debug", "ARXIV_DEBUG", False)
 
         llm = ModelFactory().create_llm_model(**build_model_params(tool_kwargs))
-        prompt = PromptTemplate(
+        self.bot = LLMChain(llm=llm, prompt=PromptTemplate(
             input_variables=["input"],
             template=ARXIV_PROMPT,
-        )
-        self.bot = LLMChain(llm=llm, prompt=prompt)
+        ))
 
     def _run(self, query: str) -> str:
         """Use the Arxiv tool."""
 
         _llm_response = self.bot.run(query)
-        LOG.info(f"[arxiv]: search_query: {_llm_response}")
+        LOG.debug(f"[arxiv]: search_query: {_llm_response}")
+
+        if self.debug:
+            return _llm_response
 
         _api_response = self.api_wrapper.run(_llm_response)
 
-        if not self.arxiv_summary:
-            return _api_response
-
-        temp_file = tempfile.mkstemp()
-        file_path = temp_file[1]
-        with open(file_path, "w") as f:
-            f.write(_api_response + "\n")
-
-        _input = SummaryTool(self.console, max_segment_length=2400).run(f"{str(file_path)}, 0")
-        try:
-            os.remove(file_path)
-        except Exception as e:
-            LOG.debug(f"remove {file_path} failed... error_info: {repr(e)}")
-
-        return _input
+        return _api_response
 
     async def _arun(self, query: str) -> str:
         """Use the Arxiv tool asynchronously."""
         raise NotImplementedError("ArxivTool does not support async")
 
-
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: ArxivTool(console, **kwargs), [])
+# register the tool
+main_tool_register.register_tool(default_tool_name, lambda console=None, **kwargs: ArxivTool(console, **kwargs), [])
 
 
 if __name__ == "__main__":

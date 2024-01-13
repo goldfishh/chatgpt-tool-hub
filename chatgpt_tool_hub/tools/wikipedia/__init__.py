@@ -1,8 +1,5 @@
-from .wikipedia import WikipediaTool
-from .wrapper import WikipediaAPIWrapper
-
+from .tool import WikipediaTool
 
 __all__ = [
-    "WikipediaTool",
-    "WikipediaAPIWrapper"
+    "WikipediaTool"
 ]

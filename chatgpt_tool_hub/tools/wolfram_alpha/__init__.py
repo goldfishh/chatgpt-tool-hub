@@ -1,7 +1,5 @@
-from .wolfram_alpha import WolframAlphaTool
-from .wolfram_alpha import WolframAlphaAPIWrapper
+from .tool import WolframAlphaTool
 
 __all__ = [
-    "WolframAlphaTool",
-    "WolframAlphaAPIWrapper"
+    "WolframAlphaTool"
 ]

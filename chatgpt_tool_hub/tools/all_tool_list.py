@@ -2,9 +2,7 @@ from typing import List
 
 from .tool_register import ToolRegister
 
-
 main_tool_register = ToolRegister()
-
 
 # used by chatgpt-on-wechat now , don't move it
 def get_all_tool_names() -> List[str]:

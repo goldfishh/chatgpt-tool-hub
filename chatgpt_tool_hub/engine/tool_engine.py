@@ -127,9 +127,10 @@ class ToolEngine(Chain, BaseModel):
         )
         # Otherwise we lookup the tool
         if output.tool in name_to_tool_map:
-            self.console.print(Panel(f"{output.tool_input}",
-                                     title=f"我将给工具 [bright_magenta]{output.tool}[/] 发送如下信息",
-                                     highlight=True))
+            if self.console:
+                self.console.print(Panel(f"{output.tool_input}",
+                                        title=f"我将给工具 [bright_magenta]{output.tool}[/] 发送如下信息",
+                                        highlight=True))
             
             LOG.info(f"我将给工具发送如下信息: \n{output.tool_input}")
             tool = name_to_tool_map[output.tool]
@@ -145,7 +146,8 @@ class ToolEngine(Chain, BaseModel):
                 observation_prefix=self.bot.observation_prefix,
             )
         else:
-            self.console.print(f"× 该工具 [bright_magenta]{output.tool}[/] 无效")
+            if self.console:
+                self.console.print(f"× 该工具 [bright_magenta]{output.tool}[/] 无效")
             
             LOG.info(f"该工具 {output.tool} 无效")
             observation = InvalidTool().run(
@@ -155,10 +157,10 @@ class ToolEngine(Chain, BaseModel):
                 llm_prefix="",
                 observation_prefix=self.bot.observation_prefix,
             )
-
-        self.console.print(Panel(observation + "\n",
-                                 title=f"工具 [bright_magenta]{output.tool}[/] 返回内容",
-                                 highlight=True, style='dim'))
+        if self.console:
+            self.console.print(Panel(observation + "\n",
+                                    title=f"工具 [bright_magenta]{output.tool}[/] 返回内容",
+                                    highlight=True, style='dim'))
         
         LOG.info(f"工具 {output.tool} 返回内容: {observation}")
         return output, observation

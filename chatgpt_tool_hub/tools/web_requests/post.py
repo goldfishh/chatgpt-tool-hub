@@ -3,7 +3,7 @@ import logging
 
 from ...common.log import LOG
 from .. import BaseTool
-from . import BaseRequestsTool, _parse_input, RequestsWrapper
+from . import BaseRequestsTool, RequestsWrapper
 
 
 class RequestsPostTool(BaseRequestsTool, BaseTool):
@@ -21,7 +21,7 @@ class RequestsPostTool(BaseRequestsTool, BaseTool):
     def _run(self, text: str) -> str:
         """Run the tool."""
         try:
-            _data = _parse_input(text)
+            _data = json.loads(text)
             _content = self.requests_wrapper.post(_data["url"], _data["data"])
             LOG.debug(f"[requests_post] output: {str(_content)}")
             return _content
@@ -32,7 +32,7 @@ class RequestsPostTool(BaseRequestsTool, BaseTool):
     async def _arun(self, text: str) -> str:
         """Run the tool asynchronously."""
         try:
-            _data = _parse_input(text)
+            _data = json.loads(text)
             _content = await self.requests_wrapper.apost(_data["url"], _data["data"])
             LOG.debug(f"[requests_post] output: {str(_content)}")
             return _content

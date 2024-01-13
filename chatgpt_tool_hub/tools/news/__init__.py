@@ -5,7 +5,8 @@ from ...common.log import LOG
 from .. import get_packages
 from .. import ToolRegister
 
-news_tool_register = ToolRegister()
+# news_tool_register = ToolRegister()
+from ..all_tool_list import main_tool_register as news_tool_register
 
 try:
     all_tool_package_list = get_packages(f"{os.path.dirname(os.path.abspath(__file__))}")
@@ -16,14 +17,21 @@ except Exception as e:
 
 for package_name in all_tool_package_list:
     try:
-        importlib.import_module(f"chatgpt_tool_hub.tools.news.{package_name}")
+        importlib.import_module(f".tools.news.{package_name}", package="chatgpt_tool_hub")
     except Exception as e:
         LOG.info(f"[news.{package_name}] init failed, error_info: {repr(e)}")
 
 
 from .tool import NewsTool
+from .finance_news.tool import FinanceNewsTool
+from .morning_news.tool import MorningNewsTool
+from .news_api.tool import NewsApiTool
 
 __all__ = [
     "NewsTool",
+    "FinanceNewsTool",
+    "MorningNewsTool",
+    "NewsApiTool",
+    
     "news_tool_register"
 ]

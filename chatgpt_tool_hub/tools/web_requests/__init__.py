@@ -1,17 +1,18 @@
 """Tools for making requests to an API endpoint."""
-import json
+import re
 import os
 import tempfile
 from typing import Any, Dict
 
 from bs4 import BeautifulSoup
 from pydantic import BaseModel
+from rich.console import Console
 
 from ...common.log import LOG
-from .. import SummaryTool
+from ..summary import SummaryTool
 
 
-def filter_text(html: str) -> str:
+def filter_text(html: str, use_summary=False, console: Console=None) -> str:
     soup = BeautifulSoup(html, "lxml")
     # kill all script and style elements
     for script in soup(["script", "style"]):
@@ -27,25 +28,30 @@ def filter_text(html: str) -> str:
     # drop blank lines
     text = '\n'.join(chunk for chunk in chunks if chunk)
 
+    # Remove all HTML tags and contents
+    text = re.sub(r'<[^>]*>', '', str(text))
+
     # compress text size
-    temp_file = tempfile.mkstemp()
-    file_path = temp_file[1]
+    if use_summary:
+        try:
+            temp_file = tempfile.mkstemp()
+            file_path = temp_file[1]
 
-    with open(file_path, "w") as f:
-        f.write(text + "\n")
-    # todo should input console
-    _summary = SummaryTool().run(f"{str(file_path)}, 0")
-    try:
-        os.remove(file_path)
-    except Exception as e:
-        LOG.debug(f"remove {file_path} failed... error_info: {repr(e)}")
+            with open(file_path, "w") as f:
+                f.write(text + "\n")
 
+            _summary = SummaryTool(console=console).path(file_path)
+            os.remove(file_path)
+        except Exception as e:
+            LOG.error(f"summary {file_path} failed... error_info: {repr(e)}")
+            # fake summary
+            _text_list = text.split()
+            if len(_text_list) >= 500:
+                text = _text_list[:3000]  # english or any others
+            else:
+                text = text[:3000]  # chinese
+    _summary = text
     return _summary.encode('utf-8').decode()
-
-
-def _parse_input(text: str) -> Dict[str, Any]:
-    """Parse the json string into a dict."""
-    return json.loads(text)
 
 
 DEFAULT_HEADER = {
@@ -64,20 +70,15 @@ class BaseRequestsTool(BaseModel):
 
 
 from .browser import BrowserTool
-from .delete import RequestsDeleteTool
 from .get import RequestsGetTool
-from .patch import RequestsPatchTool
 from .post import RequestsPostTool
-from .put import RequestsPutTool
 
 
 __all__ = (
-    "BrowserTool",
     "BaseRequestsTool",
     "RequestsWrapper",
-    "RequestsDeleteTool",
+
+    "BrowserTool",
     "RequestsGetTool",
-    "RequestsPatchTool",
-    "RequestsPostTool",
-    "RequestsPutTool"
+    "RequestsPostTool"
 )

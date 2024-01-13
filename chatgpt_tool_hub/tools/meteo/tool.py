@@ -9,7 +9,7 @@ from ..all_tool_list import main_tool_register
 from .. import BaseTool
 from .docs_prompt import OPEN_METEO_DOCS
 
-default_tool_name = "meteo-weather"
+default_tool_name = "meteo"
 
 
 class MeteoWeatherTool(BaseTool):
@@ -42,5 +42,5 @@ class MeteoWeatherTool(BaseTool):
         """Use the tool asynchronously."""
         raise NotImplementedError("MeteoWeatherTool does not support async")
 
-
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: MeteoWeatherTool(console, **kwargs), [])
+# register the tool
+main_tool_register.register_tool(default_tool_name, lambda console=None, **kwargs: MeteoWeatherTool(console, **kwargs), [])

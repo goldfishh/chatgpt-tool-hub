@@ -3,7 +3,7 @@ from typing import Any
 from rich.console import Console
 
 from .. import BaseTool
-
+from ..all_tool_list import main_tool_register
 
 default_tool_name = "hello-tool"
 
@@ -30,7 +30,7 @@ class HelloTool(BaseTool):
         raise NotImplementedError("HelloTool does not support async")
 
 
-from ..all_tool_list import main_tool_register
+# register the tool
 main_tool_register.register_tool(default_tool_name,
-                                 lambda console, kwargs: HelloTool(console, **kwargs),
+                                 lambda console=None, **kwargs: HelloTool(console, **kwargs),
                                  tool_input_keys=[])

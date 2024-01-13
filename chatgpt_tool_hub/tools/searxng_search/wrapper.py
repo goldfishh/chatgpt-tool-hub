@@ -1,75 +1,22 @@
 """Utility for using SearxNG meta search API.
 
-SearxNG is a privacy-friendly free metasearch engine that aggregates results from
-`multiple search engines
-<https://docs.searxng.org/admin/engines/configured_engines.html>`_ and databases and
-supports the `OpenSearch
-<https://github.com/dewitt/opensearch/blob/master/opensearch-1-1-draft-6.md>`_
-specification.
-
-More detailes on the installtion instructions `here. <../../ecosystem/searx.html>`_
-
-For the search API refer to https://docs.searxng.org/dev/search_api.html
+the search API refer to https://docs.searxng.org/dev/search_api.html
 
 Quick Start
 -----------
 
-
 In order to use this utility you need to provide the searx host. This can be done
 by passing the named parameter :attr:`searx_search_host <SearxSearchWrapper.searx_search_host>`
 or exporting the environment variable SEARX_SEARCH_HOST.
-Note: this is the only required parameter.
 
-Then create a searx search instance like this:
+1. https://docs.searxng.org/admin/installation-searxng.html#installation-basic
 
-    .. code-block:: python
-
-        from chatgpt-tool-hub.tools.searxng_search.wrapper import SearxSearchWrapper
-
-        # when the host starts with `http` SSL is disabled and the connection
-        # is assumed to be on a private network
-        searx_search_host='http://self.hosted'
-
-        search = SearxSearchWrapper(searx_search_host=searx_search_host)
-
+2. change `/etc/searxng/settings.yml`
+search.formats: ["html", "json"]
+server.bind_address: "0.0.0.0"
+server.limiter: false
 
 You can now use the ``search`` instance to query the searx API.
-
-Searching
----------
-
-Use the :meth:`run() <SearxSearchWrapper.run>` and
-:meth:`results() <SearxSearchWrapper.results>` methods to query the searx API.
-Other methods are are available for convenience.
-
-:class:`SearxResults` is a convenience wrapper around the raw json result.
-
-Example usage of the ``run`` method to make a search:
-
-    .. code-block:: python
-
-        s.run(query="what is the best search engine?")
-
-Engine Parameters
------------------
-
-You can pass any `accepted searx search API
-<https://docs.searxng.org/dev/search_api.html>`_ parameters to the
-:py:class:`SearxSearchWrapper` instance.
-
-In the following example we are using the
-:attr:`engines <SearxSearchWrapper.engines>` and the ``language`` parameters:
-
-    .. code-block:: python
-
-        # assuming the searx host is set as above or exported as an env variable
-        s = SearxSearchWrapper(engines=['google', 'bing'],
-                            language='es')
-
-*NOTE*: A search suffix can be defined on both the instance and the method level.
-The resulting query will be the concatenation of the two with the former taking
-precedence.
-
 
 See `SearxNG Configured Engines
 <https://docs.searxng.org/admin/engines/configured_engines.html>`_ and
@@ -80,25 +27,17 @@ Notes
 -----
 This wrapper is based on the SearxNG fork https://github.com/searxng/searxng which is
 better maintained than the original Searx project and offers more features.
-
-Public searxNG instances often use a rate limiter for API usage, so you might want to
-use a self hosted instance and disable the rate limiter.
-
-If you are self-hosting an instance you can customize the rate limiter for your
-own network as described `here <https://github.com/searxng/searxng/pull/2129>`_.
-
-
-For a list of public SearxNG instances see https://searx.space/
 """
 
 import json
+from enum import Enum
 from typing import Any, Dict, List, Optional
 
 import aiohttp
 from pydantic import BaseModel, Extra, Field, PrivateAttr, root_validator, validator
-
+from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
-from ..web_requests import RequestsWrapper
+from ..web_requests import RequestsWrapper, filter_text
 
 
 def _get_default_params() -> dict:
@@ -134,6 +73,10 @@ class SearxResults(dict):
         return self.get("answers")
 
 
+class OutputType(str, Enum):
+    Text = "text"
+    JSON = "json"
+
 class SearxSearchWrapper(BaseModel):
     """Wrapper for Searx API.
 
@@ -163,14 +106,15 @@ class SearxSearchWrapper(BaseModel):
     """
 
     _result: SearxResults = PrivateAttr()
-    searx_search_host: str = ""
+    searx_search_host: Optional[str] = None
+    searx_search_output_type: OutputType = OutputType.Text
     unsecure: bool = False
     params: dict = Field(default_factory=_get_default_params)
-    headers: Optional[dict] = None
+    headers: Optional[dict] = dict()
     engines: Optional[List[str]] = []
     categories: Optional[List[str]] = []
     query_suffix: Optional[str] = ""
-    top_k_results: int = 2
+    searx_search_top_k_results: int = 2
     aiosession: Optional[Any] = None
 
     @validator("unsecure")
@@ -209,8 +153,12 @@ class SearxSearchWrapper(BaseModel):
             cls.disable_ssl_warnings(True)
         values["searx_search_host"] = searx_search_host
 
-        values["top_k_results"] = get_from_dict_or_env(
-            values, 'top_k_results', "TOP_K_RESULTS", 2
+        values["searx_search_top_k_results"] = get_from_dict_or_env(
+            values, 'searx_search_top_k_results', "SEARX_SEARCH_TOP_K_RESULTS", 2
+        )
+
+        values["searx_search_output_type"] = get_from_dict_or_env(
+            values, 'searx_search_output_type', "SEARX_SEARCH_OUTPUT_TYPE", OutputType.Text
         )
 
         return values
@@ -296,6 +244,8 @@ class SearxSearchWrapper(BaseModel):
                 # to select the engine using `query_suffix`
                 searx.run("what is the weather in France ?", query_suffix="!qwant")
         """
+        if self.searx_search_output_type == OutputType.JSON:
+            return self.to_json(query, engines, categories, query_suffix, **kwargs)
         _params = {
             "q": query,
         }
@@ -314,16 +264,21 @@ class SearxSearchWrapper(BaseModel):
             params["categories"] = ",".join(categories)
 
         res = self._searx_api_query(params)
-
         if len(res.answers) > 0:
             return res.answers[0]
 
-        elif len(res.results) > 0:
-            return "\n\n".join(
-                [r.get("content", "") for r in res.results[: self.top_k_results]]
-            )
-        else:
-            return "No good search result found"
+        if len(res.results) > 0:
+            LOG.debug(f"[searxng-search] output: {res.results}")
+
+            _contents = []
+            for idx, result in enumerate(res.results[: self.searx_search_top_k_results]):
+                _header = f"《{filter_text(result.get('title', ''))}》"
+                _body = f"{filter_text(result.get('content', ''))}"
+                _link = f"{result.get('url', '')}"
+                _contents.append(f"{_header}\n{_body}\n[{_link}]\n\n---\n")
+            return "\n".join(_contents)
+
+        return "No good search result found"
 
     async def arun(
         self,
@@ -333,6 +288,7 @@ class SearxSearchWrapper(BaseModel):
         **kwargs: Any,
     ) -> str:
         """Asynchronously version of `run`."""
+        raise RuntimeError("implement me!")
         _params = {
             "q": query,
         }
@@ -354,12 +310,12 @@ class SearxSearchWrapper(BaseModel):
 
         elif len(res.results) > 0:
             return "\n\n".join(
-                [r.get("content", "") for r in res.results[: self.top_k_results]]
+                [r.get("content", "") for r in res.results[: self.searx_search_top_k_results]]
             )
         else:
             return "No good search result found"
 
-    def results(
+    def to_json(
         self,
         query: str,
         num_results: int,
@@ -415,7 +371,7 @@ class SearxSearchWrapper(BaseModel):
         results = self._searx_api_query(params).results[:num_results]
         if len(results) == 0:
             return [{"Result": "No good Search Result was found"}]
-
+        LOG.debug(f"[searxng-search] output: {results}")
         return [
             {
                 "snippet": result.get("content", ""),
@@ -427,7 +383,7 @@ class SearxSearchWrapper(BaseModel):
             for result in results
         ]
 
-    async def aresults(
+    async def ato_json(
         self,
         query: str,
         num_results: int,
@@ -439,6 +395,7 @@ class SearxSearchWrapper(BaseModel):
 
         Uses aiohttp. See `results` for more info.
         """
+        raise RuntimeError("implement me!")
         _params = {
             "q": query,
         }

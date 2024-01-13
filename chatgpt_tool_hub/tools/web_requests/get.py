@@ -4,6 +4,7 @@ from typing import Any
 from rich.console import Console
 
 from ...common.log import LOG
+from ...common.utils import get_from_dict_or_env
 from ..all_tool_list import main_tool_register
 from .. import BaseTool
 from . import BaseRequestsTool, filter_text, RequestsWrapper
@@ -20,16 +21,21 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         "Input should be a url (i.e. https://www.google.com). "
         "The output will be the text response of the GET request."
     )
+    use_summary: bool = False
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         # 这个工具直接返回内容
         super().__init__(console=console, requests_wrapper=RequestsWrapper(**tool_kwargs), return_direct=False)
 
+        self.use_summary = get_from_dict_or_env(
+            tool_kwargs, 'use_summary', "USE_SUMMARY", ""
+        )
+
     def _run(self, url: str) -> str:
         """Run the tool."""
         try:
             html = self.requests_wrapper.get(url)
-            _content = filter_text(html)
+            _content = filter_text(html, self.use_summary, self.console)
             LOG.debug(f"[url-get] output: {str(_content)}")
         except Exception as e:
             LOG.error(f"[url-get] {str(e)}")
@@ -40,15 +46,15 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         """Run the tool asynchronously."""
         try:
             html = await self.requests_wrapper.aget(url)
-            _content = filter_text(html)
+            _content = filter_text(html, self.use_summary, self.console)
             LOG.debug(f"[url-get] output: {str(_content)}")
         except Exception as e:
             LOG.error(f"[url-get] {str(e)}")
             _content = repr(e)
         return _content
 
-
-main_tool_register.register_tool(default_tool_name, lambda console, kwargs: RequestsGetTool(console, **kwargs), [])
+# register the tool
+main_tool_register.register_tool(default_tool_name, lambda console=None, **kwargs: RequestsGetTool(console, **kwargs), [])
 
 
 if __name__ == "__main__":

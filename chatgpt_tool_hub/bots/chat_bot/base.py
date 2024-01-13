@@ -172,7 +172,7 @@ class ChatBot(Bot):
         if action.lower() not in self.allowed_tools:
             return "answer-user", action_input
 
-        if action.lower() != "answer-user":
+        if self.console and action.lower() != "answer-user":
             self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...")
 
         LOG.info(f"执行Tool: {action}中...")
@@ -221,9 +221,10 @@ class ChatBot(Bot):
                 thoughts_text += f"反思：{assistant_thoughts_criticism}\n"
             if assistant_thoughts_speak:
                 LOG.info(f"{self.ai_prefix.upper()}想和你说：{assistant_thoughts_speak}")
-            self.console.print(Panel(thoughts_text,
-                                     title=f"{self.ai_prefix.upper()}的内心独白",
-                                     highlight=True, style='dim'))
+            if self.console:
+                self.console.print(Panel(thoughts_text,
+                                        title=f"{self.ai_prefix.upper()}的内心独白",
+                                        highlight=True, style='dim'))
             # it's useful for avoid splitting Panel
             LOG.info(f"{self.ai_prefix.upper()}的内心独白: \n{thoughts_text}")
             

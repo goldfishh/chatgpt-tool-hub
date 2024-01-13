@@ -18,11 +18,11 @@ def _get_logger(level: int = LOGGING_LEVEL):
     ch = logging.StreamHandler(sys.stdout)
     ch.setFormatter(logging.Formatter(LOGGING_FMT, datefmt=LOGGING_DATEFMT))
 
-    fh = logging.FileHandler(f'{os.getcwd()}/tool.log', encoding='utf-8')
-    fh.setFormatter(logging.Formatter(LOGGING_FMT, datefmt=LOGGING_DATEFMT))
+    # fh = logging.FileHandler(f'{os.getcwd()}/tool.log', encoding='utf-8')
+    # fh.setFormatter(logging.Formatter(LOGGING_FMT, datefmt=LOGGING_DATEFMT))
 
     logger.addHandler(ch)
-    logger.addHandler(fh)
+    # logger.addHandler(fh)
     return logger
 
 

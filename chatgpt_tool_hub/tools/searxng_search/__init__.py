@@ -1,9 +1,5 @@
-from .tool import SearxSearchJsonTool, SearxSearchTool
-from .wrapper import SearxSearchWrapper
-
+from .tool import SearXNGSearchTool
 
 __all__ = [
-    "SearxSearchJsonTool", 
-    "SearxSearchTool",
-    "SearxSearchWrapper"
+    "SearXNGSearchTool"
 ]

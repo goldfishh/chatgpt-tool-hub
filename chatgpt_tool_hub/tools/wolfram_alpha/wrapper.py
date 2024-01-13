@@ -46,7 +46,7 @@ class WolframAlphaAPIWrapper(BaseModel):
         try:
             assumption = next(res.pods).text
             answer = next(res.results).text
-            LOG.debug(f"[wolfram alpha]: {str(assumption)}, {str(answer)}")
+            LOG.debug(f"[wolfram alpha] output: \n{str(assumption)}, {str(answer)}")
         except StopIteration:
             return "Wolfram Alpha wasn't able to answer it"
 
@@ -54,4 +54,4 @@ class WolframAlphaAPIWrapper(BaseModel):
             # We don't want to return the assumption alone if answer is empty
             return "No good Wolfram Alpha Result was found"
         else:
-            return f"Assumption: {assumption} \nAnswer: {answer}"
+            return f"Assumption: {assumption}\nAnswer: {answer}"

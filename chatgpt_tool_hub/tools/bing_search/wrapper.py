@@ -1,7 +1,7 @@
 """Util that calls Bing Search."""
 import json
 from typing import Dict, List
-
+from enum import Enum
 from pydantic import BaseModel, Extra, validator, root_validator
 
 from ...common.log import LOG
@@ -9,13 +9,19 @@ from ...common.utils import get_from_dict_or_env
 from ..web_requests import filter_text
 from ..web_requests.wrapper import RequestsWrapper
 
+class OutputType(str, Enum):
+    Text = "text"
+    JSON = "json"
 
 class BingSearchAPIWrapper(BaseModel):
     """Wrapper for Bing Search API."""
 
     bing_subscription_key: str
     bing_search_url: str
-    top_k_results: int = 2
+    
+    bing_search_top_k_results: int = 2
+    bing_search_simple: bool = True
+    bing_search_output_type: OutputType = OutputType.Text
 
     class Config:
         """Configuration for this pydantic object."""
@@ -50,29 +56,40 @@ class BingSearchAPIWrapper(BaseModel):
         )
 
         values["bing_search_url"] = get_from_dict_or_env(
-            values,
-            "bing_search_url",
-            "BING_SEARCH_URL",
+            values, "bing_search_url", "BING_SEARCH_URL",
             default="https://api.bing.microsoft.com/v7.0/search",
         )
 
-        values["top_k_results"] = get_from_dict_or_env(
-            values, 'top_k_results', "TOP_K_RESULTS", 2
-        )
+        values["bing_search_top_k_results"] = get_from_dict_or_env(
+            values, 'bing_search_top_k_results', "BING_SEARCH_TOP_K_RESULTS", 2)
+
+        values["bing_search_simple"] = get_from_dict_or_env(
+            values, 'bing_search_simple', "BING_SEARCH_SIMPLE", True)
+
+        values["bing_search_output_type"] = get_from_dict_or_env(
+            values, 'bing_search_output_type', "BING_SEARCH_OUTPUT_TYPE", 
+            OutputType.Text)
 
         return values
 
     def run(self, query: str) -> str:
-        """Run query through BingSearch and parse result."""
-        results = self._bing_search_results(query, count=self.top_k_results)
+        """Run query through BingSearchTool and parse result."""
+        if self.bing_search_output_type == OutputType.JSON:
+            return self.to_json(query)
+        results = self._bing_search_results(query, count=self.bing_search_top_k_results)
         if len(results) == 0:
             return "No good Bing Search Result was found"
+        
+        _contents = []
+        for idx, result in enumerate(results):
+            _header = f"{idx+1}. 《{filter_text(result.get('name', ''))}》" if not self.bing_search_simple else f"《{filter_text(result.get('name', ''))}》"
+            _body = f"{filter_text(result.get('snippet', ''))}"
+            _link = f"{result.get('url', '')}"
+            _contents.append(f"{_header}\n{_body}\n[{_link}]\n\n---\n")
+        return "\n".join(_contents)
 
-        snippets = [filter_text(result["snippet"]) for result in results]
-        return " ".join(snippets)
-
-    def results(self, query: str, num_results: int) -> List[Dict]:
-        """(for json result): Run query through BingSearch and return metadata.
+    def to_json(self, query: str) -> List[Dict]:
+        """(for json result): Run query through BingSearchTool and return metadata.
 
         Args:
             query: The query to search for.
@@ -85,15 +102,20 @@ class BingSearchAPIWrapper(BaseModel):
                 link - The link to the result.
         """
         metadata_results = []
-        results = self._bing_search_results(query, count=num_results)
+        results = self._bing_search_results(query, count=self.bing_search_top_k_results)
         if len(results) == 0:
             return [{"Result": "No good Bing Search Result was found"}]
         for result in results:
             metadata_result = {
-                "snippet": result["snippet"],
-                "title": result["name"],
+                "snippet": filter_text(result["snippet"]),
+                "title": filter_text(result["name"]),
                 "link": result["url"],
+                "cache": result["cachedPageUrl"],
             }
             metadata_results.append(metadata_result)
 
         return metadata_results
+
+
+if __name__ == "__main__":
+    pass
