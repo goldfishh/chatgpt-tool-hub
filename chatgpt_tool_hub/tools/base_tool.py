@@ -2,7 +2,7 @@
 from abc import abstractmethod
 from typing import Any, Optional
 
-from pydantic import BaseModel, Extra, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from rich.console import Console
 
 from ..common.callbacks import BaseCallbackManager
@@ -19,16 +19,16 @@ class BaseTool(BaseModel):
     return_direct: bool = False
     verbose: bool = False
     bot: Any = None  # TODO replace `Any`
-    console: Console = None
-    callback_manager: BaseCallbackManager = Field(default_factory=get_callback_manager)
+    console: Optional[Console]
+    callback_manager: BaseCallbackManager = Field(default_factory=get_callback_manager, validate_default=True)
 
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = 'forbid'
         arbitrary_types_allowed = True
 
-    @validator("callback_manager", pre=True, always=True)
+    @field_validator("callback_manager", mode='before')
     def set_callback_manager(
         cls, callback_manager: Optional[BaseCallbackManager]
     ) -> BaseCallbackManager:

@@ -34,7 +34,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 import aiohttp
-from pydantic import BaseModel, Extra, Field, PrivateAttr, root_validator, validator
+from pydantic import BaseModel, Field, PrivateAttr, model_validator, field_validator
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
 from ..web_requests import RequestsWrapper, filter_text
@@ -117,7 +117,7 @@ class SearxSearchWrapper(BaseModel):
     searx_search_top_k_results: int = 2
     aiosession: Optional[Any] = None
 
-    @validator("unsecure")
+    @field_validator("unsecure")
     def disable_ssl_warnings(cls, v: bool) -> bool:
         """Disable SSL warnings."""
         if v:
@@ -129,11 +129,10 @@ class SearxSearchWrapper(BaseModel):
                 print(e)
         return v
 
-    @root_validator()
+    @model_validator(mode='before')
     def validate_params(cls, values: Dict) -> Dict:
         """Validate that custom searx params are merged with default ones."""
-
-        values["params"] = {**_get_default_params(), **values["params"]}
+        values["params"] = {**_get_default_params(), **values["params"]} if values.get("params") else {**_get_default_params()}
 
         if engines := values.get("engines"):
             values["params"]["engines"] = ",".join(engines)
@@ -166,11 +165,11 @@ class SearxSearchWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.ignore
+        extra = 'ignore'
 
     def _searx_api_query(self, params: dict) -> SearxResults:
         """Actual request to searx API."""
-        requests_wrapper = RequestsWrapper(headers=self.headers)
+        requests_wrapper = RequestsWrapper(headers=self.headers, proxy="")
         raw_result = requests_wrapper.get(self.searx_search_host, params=params,
                                           raise_for_status=True, verify=not self.unsecure)
         # test if http result is ok

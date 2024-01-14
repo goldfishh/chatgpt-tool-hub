@@ -1,12 +1,14 @@
 """Load tools."""
+import os
 from typing import Any, List
 from typing import Optional
 
 from ..common.callbacks import BaseCallbackManager
 from ..common.log import LOG
+from ..common.utils import get_from_dict_or_env
 from . import BaseTool, ToolRegister
-from rich.console import Console
 
+from rich.console import Console
 
 def load_tools(
     tool_names: List[str],
@@ -34,10 +36,14 @@ def load_tools(
             # consistency validation between input and required params
             try:
                 if missing_keys := set(extra_keys).difference(kwargs):
-                    raise ValueError(
-                        f"Tool {name} requires some parameters that were not "
-                        f"provided: {missing_keys}"
-                    )
+                    # add env validation
+                    for key in missing_keys:
+                        env_key = key.upper()
+                        if env_key not in os.environ or not os.environ[env_key]:
+                            raise ValueError(
+                                f"Tool {name} requires some parameters that were not "
+                                f"provided: {env_key}"
+                            )
             except Exception as e:
                 LOG.info(f"[{name}] init failed, error_info: {repr(e)}")
                 tool_register.unregister_tool(name)
@@ -47,9 +53,9 @@ def load_tools(
             #
             try:
                 # sub_kwargs = {k: kwargs[k] for k in extra_keys if k in kwargs}
-                tool = _get_tool_func(console, kwargs)
+                tool = _get_tool_func(console=console, **kwargs)
             except Exception as e:
-                console.log(f"[dim][bold red]{name}[/] init failed, error_info: {repr(e)}")
+                if console: console.log(f"[dim][bold red]{name}[/] init failed, error_info: {repr(e)}")
                 tool_register.unregister_tool(name)
                 continue
 

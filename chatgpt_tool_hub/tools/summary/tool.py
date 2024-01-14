@@ -6,7 +6,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from ...chains.llm import LLMChain
-from ...common.calculate_token import count_string_tokens as get_token_num
+from ...models.calculate_token import count_string_tokens as get_token_num
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
 from ...models import build_model_params
@@ -21,8 +21,8 @@ default_tool_name = "summary"
 
 
 class SummaryTool(BaseTool):
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "Useful when you want to summarize the content of a file. "
         "The input is a comma-separated of absolute path of the file and a number, like 'fakepath, 0'."
         "The number indicates how many lines to summarize, with 0 meaning the entire file."

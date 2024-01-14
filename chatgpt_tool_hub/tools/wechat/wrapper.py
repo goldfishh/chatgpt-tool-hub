@@ -1,8 +1,8 @@
 import os
 import json
-import tempfile
-from typing import Any, Dict
-from pydantic import BaseModel, Extra, root_validator
+from typing import Any, Dict, Optional
+
+from pydantic import BaseModel, model_validator
 
 from ...common.utils import get_from_dict_or_env
 from ...common.log import LOG
@@ -44,20 +44,6 @@ def qrCallback(uuid, status, qrcode):
         qr.make(fit=True)
         qr.print_ascii(invert=True)
 
-def qrCallback(uuid, status, qrcode):
-
-    # logger.debug("qrCallback: {} {}".format(uuid,status))
-    if status == "0":
-        import qrcode
-
-        url = f"https://login.weixin.qq.com/l/{uuid}"
-
-        qr = qrcode.QRCode(border=1)
-        qr.add_data(url)
-        qr.make(fit=True)
-        qr.print_ascii(invert=True)
-
-
 class Response(BaseModel):
     code: int = 0
     msg: str
@@ -67,18 +53,19 @@ class WechatWrapper(BaseModel):
     wechat_client: Any
     max_retry_num: int = 3
     
-    wechat_hot_reload: bool = None
-    wechat_cpt_path: str = None
-    wechat_send_group: bool = None
-    wechat_nickname_mapping: dict = None
+    wechat_hot_reload: Optional[bool]
+    wechat_cpt_path: Optional[str]
+    wechat_send_group: Optional[bool]
+    wechat_nickname_mapping: Optional[dict]
 
     class Config:
         """Configuration for this pydantic object."""
-        extra = Extra.ignore
+        extra = 'ignore'
 
-    @root_validator()
+    @model_validator(mode='before')
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that the python package exists in environment."""
+        import tempfile
         try:
             from lib import itchat
             values["wechat_client"] = itchat.instance
@@ -98,7 +85,8 @@ class WechatWrapper(BaseModel):
                     values["wechat_client"].logout()
                     raise RuntimeError("Login expired, please renew `itchat.pkl`")
             else:
-                values["wechat_cpt_path"] = os.path.join(tempfile.mktemp(), "itchat.pkl")
+                temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pkl")
+                values["wechat_cpt_path"] = temp_file.name
                 LOG.debug(f"[wechat] use default path: {values['wechat_cpt_path']} to save.")
             values["wechat_send_group"] = get_from_dict_or_env(values, "wechat_send_group", "WECHAT_SEND_GROUP", False)
             if values["wechat_send_group"] and values["wechat_send_group"].lower() == 'true':
@@ -124,23 +112,23 @@ class WechatWrapper(BaseModel):
 
     def _default_json_config(self):
         return {
-            "ensure_ascii": False
+            "indent": 4
         }
 
     def run(self, command: str, **kwargs) -> str:
         login_status = self.wechat_client.load_login_status(fileDir=self.wechat_cpt_path)
         LOG.debug(f"[Wechat] load_login_status result: {login_status}")
         if not login_status:
-            return Response(code=-1, msg="login expired, please log in and try again.").json()
+            return Response(code=-1, msg="login expired, please log in and try again.").model_dump_json()
                 
         try:
             _json = json.loads(command)
             _to_addr, _body = str(_json["to_addr"]), str(_json["body"])
             if not _to_addr or not _body:
-                return Response(code=-1, msg=f"无需发送").json(**self._default_json_config())
+                return Response(code=-1, msg=f"无需发送").model_dump_json()
         except Exception as e:
             LOG.error(f"[wechat] parse json error : {repr(e)}, command: {command}")
-            return Response(code=-1, msg=f"文本解析错误").json(**self._default_json_config())
+            return Response(code=-1, msg=f"文本解析错误").model_dump_json()
         
         try:
             author_list = self.wechat_client.search_friends(name=_to_addr)
@@ -148,14 +136,14 @@ class WechatWrapper(BaseModel):
                 if author.userName == self.wechat_client.search_friends().userName:  # 排除自己
                     continue
                 author.send(_body)
-                return Response(msg=f"send wechat to people:{author.NickName} success").json(**self._default_json_config())
+                return Response(msg=f"send wechat to people:{author.NickName} success").model_dump_json()
             if self.wechat_send_group:
                 _to_addr = _to_addr.replace("群", "")  # todo
                 group_list = self.wechat_client.search_chatrooms(name=_to_addr)
                 for group in group_list:
                     group.send(_body)
-                    return Response(msg=f"send wechat to group:{group.NickName} success").json(**self._default_json_config())
-            return Response(code=-1, msg=f"我找不到这个地址：{_to_addr}.").json(**self._default_json_config())
+                    return Response(msg=f"send wechat to group:{group.NickName} success").model_dump_json()
+            return Response(code=-1, msg=f"我找不到这个地址：{_to_addr}.").model_dump_json()
         except Exception as e:
             LOG.error(f"[wechat]: {repr(e)}")
-            return Response(code=-1, msg="未知错误").json(**self._default_json_config())
+            return Response(code=-1, msg="未知错误").model_dump_json()

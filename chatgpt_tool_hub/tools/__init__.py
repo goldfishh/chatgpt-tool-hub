@@ -18,8 +18,8 @@ def dynamic_tool_loader():
         all_tool_package_list = get_packages(f"{os.path.dirname(os.path.abspath(__file__))}")
     except Exception as e:
         LOG.debug(f"get_packages error: {repr(e)}")
-        all_tool_package_list = ["meteo", "system", "web_requests", "wikipedia"]
-        LOG.info(f"Detected main tool package: {repr(all_tool_package_list)}")
+        all_tool_package_list = ["meteo", "python", "web_requests", "terminal"]
+        LOG.info(f"reset to default-tool package: {repr(all_tool_package_list)}")
 
     for package_name in all_tool_package_list:
         try:

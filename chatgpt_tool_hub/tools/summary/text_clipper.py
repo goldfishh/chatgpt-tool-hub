@@ -1,6 +1,6 @@
 from typing import List
 
-from ...common.calculate_token import count_string_tokens as get_token_num
+from ...models.calculate_token import count_string_tokens as get_token_num
 
 
 class TextClipper:

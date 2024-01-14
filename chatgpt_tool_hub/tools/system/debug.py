@@ -18,8 +18,8 @@ def _print_func(text: str) -> None:
 class DebugTool(BaseTool):
     """Tool for asking for help."""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "You can ask a helper for guidance when you think you "
         "got stuck or you are not sure what to do next. "
         "The input should be a question for the human in chinese."

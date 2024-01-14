@@ -1,7 +1,7 @@
 import logging
 from typing import Any, Dict, Optional
 
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel, model_validator
 from rich.console import Console
 
 from ...common.log import LOG
@@ -18,17 +18,17 @@ browser: Any = None  # ChromeWebDriver or None
 class ChromeBrowser(BaseModel):
     """Lightweight wrapper around requests library."""
 
-    headers: Optional[Dict[str, str]] = dict()
+    headers: Dict[str, str] = dict()
 
     proxy: Optional[str]
     
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.ignore
+        extra = 'ignore'
         arbitrary_types_allowed = True
 
-    @root_validator()
+    @model_validator(mode='before')
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that browser param exists in environment."""
         proxy = get_from_dict_or_env(
@@ -115,8 +115,8 @@ class ChromeBrowser(BaseModel):
 class BrowserTool(BaseTool):
     """Tool for making a GET request to an API endpoint."""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A Google Chrome browser. Use this when you need to get specific content from a website. "
         "Input should be a url (i.e. https://github.com/goldfishh/chatgpt-tool-hub). "
         "The output will be the text response of browser. "

@@ -5,12 +5,13 @@ from ...common.log import LOG
 from .. import BaseTool
 from . import BaseRequestsTool, RequestsWrapper
 
+default_tool_name = "requests_post"
 
 class RequestsPostTool(BaseRequestsTool, BaseTool):
     """Tool for making a POST request to an API endpoint."""
 
-    name = "requests_post"
-    description = """Use this when you want to POST to a website.
+    name: str = default_tool_name
+    description: str = """Use this when you want to POST to a website.
     Input should be a json string with two keys: "url" and "data".
     The value of "url" should be a string, and the value of "data" should be a dictionary of 
     key-value pairs you want to POST to the url.

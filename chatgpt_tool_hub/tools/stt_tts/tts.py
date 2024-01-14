@@ -7,7 +7,7 @@ from langid import classify
 from typing import Any, Optional
 
 from rich.console import Console
-from ...common.calculate_token import count_string_tokens as get_token_num
+from ...models.calculate_token import count_string_tokens as get_token_num
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
 from ...models import build_model_params
@@ -17,15 +17,15 @@ from .. import BaseTool
 default_tool_name = "tts"
 
 class TTSTool(BaseTool):
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         ""
     )
 
-    api_key: Optional[str]
-    api_region: Optional[str]
-    speech_config: Optional[speechsdk.SpeechConfig]
-    tts_auto_detect: Optional[bool]
+    api_key: Optional[str] = None
+    api_region: Optional[str] = None
+    speech_config: Optional[speechsdk.SpeechConfig] = None
+    tts_auto_detect: Optional[bool] = None
     default_zh_speech_id: str = "zh-CN-XiaozhenNeural"
     default_speech_id: dict = {
         "speech_synthesis_zh": "zh-CN-XiaozhenNeural",

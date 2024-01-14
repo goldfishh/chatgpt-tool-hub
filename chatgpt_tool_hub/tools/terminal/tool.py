@@ -1,10 +1,8 @@
+import sys
 import string
 import subprocess
-import sys
-from typing import Any
-from typing import List, Union
+from typing import Any, List, Union, Optional
 
-from pydantic import Field
 from rich.console import Console
 
 from ...common.log import LOG
@@ -86,7 +84,7 @@ class BashProcess:
         except subprocess.CalledProcessError as error:
             LOG.error(f"[Terminal] {str(error)}")
             if self.return_err_output:
-                return f"ReturnCode: {error.returncode}, {str(error)}, {error.stderr.decode()}"
+                return f"(code): {error.returncode}, (cmd): {error.cmd}, (output): {error.output.decode()}"
             return "this tool can't run there commands"
         except subprocess.TimeoutExpired as error:
             LOG.error(f"[Terminal] {str(error)}")
@@ -96,15 +94,15 @@ class BashProcess:
 
 
 class TerminalTool(BaseTool):
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         f"Executes commands in a terminal. Input should be valid commands in {sys.platform} platform, "
         "and the output will be any output from running that command."
         "Don't input any backquote to this tool."
     )
 
-    bash_process: BashProcess = None
-    debug: bool = False
+    bash_process: Optional[BashProcess] = None
+    debug: Optional[bool] = False
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console)

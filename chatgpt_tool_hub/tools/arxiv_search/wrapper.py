@@ -1,7 +1,7 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from enum import Enum
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel, model_validator
 
 from ...common.utils import get_from_dict_or_env
 from ...common.log import LOG
@@ -31,19 +31,19 @@ class ArxivAPIWrapper(BaseModel):
     arxiv_client: Any
     max_retry_num: int = 3
     
-    arxiv_simple: bool = True
-    arxiv_top_k_results: int = 3
+    arxiv_simple: Optional[bool]
+    arxiv_top_k_results: Optional[int]
     
-    arxiv_sort_by: SortBy = SortBy.Relevance
-    arxiv_sort_order: SortOrder = SortOrder.Descending
-    arxiv_output_type: OutputType = OutputType.Text
+    arxiv_sort_by: Optional[SortBy]
+    arxiv_sort_order: Optional[SortOrder]
+    arxiv_output_type: Optional[OutputType]
 
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.ignore
+        extra = 'ignore'
 
-    @root_validator()
+    @model_validator(mode='before')
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that the python package exists in environment."""
         try:

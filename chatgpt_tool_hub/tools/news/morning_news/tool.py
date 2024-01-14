@@ -3,16 +3,11 @@ from typing import Any
 from enum import Enum
 from rich.console import Console
 
-from ....chains import LLMChain
-from ....common.utils import get_from_dict_or_env
-from ....models import build_model_params
-from ....models.model_factory import ModelFactory
-from ....prompts import PromptTemplate
 
+from ....common.utils import get_from_dict_or_env
 from ... import BaseTool
 from .. import news_tool_register
 from ...web_requests.get import RequestsWrapper
-from .prompt import SUMMARY_DOCS
 
 default_tool_name = "morning-news"
 
@@ -42,7 +37,7 @@ class MorningNewsTool(BaseTool):
     def _run(self, _: str) -> str:
         """Use the tool."""
         morning_news_url = self.url_template.format(token=self.api_key)
-        _response = RequestsWrapper().get(morning_news_url)
+        _response = RequestsWrapper(proxy="").get(morning_news_url)
         _response_json = json.loads(_response)
         
         if _response_json.get("code") == 200 or _response_json.get("msg") == "success":

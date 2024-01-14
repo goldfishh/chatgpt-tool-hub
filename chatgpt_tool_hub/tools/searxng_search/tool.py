@@ -19,8 +19,8 @@ default_tool_name = "searxng-search"
 class SearXNGSearchTool(BaseTool):
     """Tool that adds the capability to query a Searx instance."""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A meta search engine."
         "Useful for when you need to answer questions about current events."
         "Input should be a search query."

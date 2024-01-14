@@ -2,7 +2,6 @@
 import re
 import os
 import tempfile
-from typing import Any, Dict
 
 from bs4 import BeautifulSoup
 from pydantic import BaseModel

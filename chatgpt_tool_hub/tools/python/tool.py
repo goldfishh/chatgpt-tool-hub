@@ -57,8 +57,8 @@ def _get_default_python_repl() -> PythonREPL:
 class PythonTool(BaseTool):
     """A tool for running python code in a REPL."""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A Python shell. Use this to execute python commands. "
         "Input should be a valid python command. "
         "If you want to see the output of a value, you should print it out with `print(...)`."

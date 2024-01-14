@@ -20,8 +20,8 @@ default_tool_name = "wolfram-alpha"
 class WolframAlphaTool(BaseTool):
     """Tool that adds the capability to query using the Wolfram Alpha SDK."""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A wrapper around Wolfram Alpha. "
         "Useful for when you need to answer questions about Math, "
         "Science, Technology, Culture, Society and Everyday Life. "

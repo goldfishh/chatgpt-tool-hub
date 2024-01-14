@@ -19,8 +19,8 @@ default_tool_name = "google-search"
 class GoogleSearchTool(BaseTool):
     """Tool that adds the capability to query the Google search API."""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A wrapper around Google Search. "
         "Useful for when you need to answer questions about current events. "
         "Input should be a search query."
@@ -47,8 +47,6 @@ class GoogleSearchTool(BaseTool):
         return self.api_wrapper.run(query["text"])
 
     async def _arun(self, query: str) -> str:
-        """Use the tool asynchronously."""
-        raise NotImplementedError("GoogleSearchRun does not support async")
         """Use the tool asynchronously."""
         raise NotImplementedError("GoogleSearchRun does not support async")
 

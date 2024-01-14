@@ -19,8 +19,8 @@ default_tool_name = "wikipedia"
 class WikipediaTool(BaseTool):
     """Tool that adds the capability to search using the Wikipedia API."""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "Useful for when you need to answer general questions about "
         "people, places, companies, historical events, or other subjects. "
         "Input should be a search query."

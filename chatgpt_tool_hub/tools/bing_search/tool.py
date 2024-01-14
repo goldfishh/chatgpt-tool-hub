@@ -1,6 +1,4 @@
 """Tool for the Bing search API."""
-from typing import Any
-
 from rich.console import Console
 
 from ...common.log import LOG
@@ -24,8 +22,8 @@ class BingSearchTool(BaseTool):
     https://levelup.gitconnected.com/api-tutorial-how-to-use-bing-web-search-api-in-python-4165d5592a7e
     """
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A wrapper around Bing Search. "
         "Useful for when you need to answer questions about current events. "
         "Input should be a search query."

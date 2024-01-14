@@ -22,15 +22,15 @@ class SMSTool(BaseTool):
     """Tool that sends short sessage.
     https://www.smsbao.com/openapi"""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A Tool can send short sessage. "
     )
     debug: bool = False
     sms_url: str = "https://api.smsbao.com/sms"
     sms_username: str = ""
     sms_apikey: str = ""
-    sms_content_template = '【toolhub】{content}'
+    sms_content_template: str = '【toolhub】{content}'
 
     nickname_mapping: dict = {}
 

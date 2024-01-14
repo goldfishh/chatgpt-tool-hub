@@ -1,7 +1,6 @@
 import json
-import logging
 from datetime import datetime, timedelta, timezone
-from typing import Any, List
+from typing import Any, List, Set
 
 from rich.console import Console
 
@@ -27,7 +26,7 @@ class FinanceNewsTool(BaseTool):
     filter_list: List[str] = []  # 过滤词，非空时生效
     simple: bool = True
     repeat_news: bool = False
-    history_ids: set[int] = set()
+    history_ids: Set[int] = set()
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console, return_direct=True)
@@ -84,7 +83,7 @@ class FinanceNewsTool(BaseTool):
 
     def _run(self, _: str) -> str:
         try:
-            resp = RequestsWrapper().get(self.jin10_url)
+            resp = RequestsWrapper(proxy="").get(self.jin10_url)
             _parse_resp = self._parse_js(resp)
             _output_str = self._output_str_render(_parse_resp)
         except Exception as e:

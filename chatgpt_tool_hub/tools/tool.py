@@ -35,8 +35,8 @@ class Tool(BaseTool):
 class InvalidTool(BaseTool):
     """Tool that is run when invalid tool name is encountered by bot."""
 
-    name = "invalid_tool"
-    description = "Called when tool name is invalid."
+    name: str = "invalid_tool"
+    description: str = "Called when tool name is invalid."
 
     def _run(self, tool_name: str) -> str:
         """Use the tool."""
@@ -73,7 +73,7 @@ def tool(*args: Union[str, Callable], return_direct: bool = False, **kwargs) -> 
             assert func.__doc__, "Function must have a docstring"
             # Description example:
             #   search_api(query: str) - Searches the API for the query.
-            description = f"{tool_name}{signature(func)} - {func.__doc__.strip()}"
+            description: str = f"{tool_name}{signature(func)} - {func.__doc__.strip()}"
             tool_ = Tool(
                 name=tool_name,
                 func=func,

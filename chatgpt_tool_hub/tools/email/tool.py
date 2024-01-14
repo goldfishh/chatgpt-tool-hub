@@ -27,8 +27,8 @@ class EmailTool(BaseTool):
     邮箱设置 > 账号 > POP3/IMAP/SMTP/Exchange/CardDAV/CalDAV服务 > 显示服务已开启 并 获取授权码
     https://service.mail.qq.com/detail/0/75"""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A Tool can send email. "
     )
     debug: bool = False

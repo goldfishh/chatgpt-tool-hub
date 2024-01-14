@@ -11,8 +11,8 @@ default_tool_name = "answer-user"
 class AnswerUserTool(BaseTool):
     """Tool for answering User."""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "To provide your final answer, or if no other tool is needed, use this tool to communicate with user."
         "The input is the words you wish to say to the user."
     )

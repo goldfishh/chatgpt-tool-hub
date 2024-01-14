@@ -17,8 +17,8 @@ default_tool_name = "wechat"
 
 class WeChatTool(BaseTool):
     """Tool that sends wechat."""
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "A Tool can send wechat. "
     )
     debug: bool = False

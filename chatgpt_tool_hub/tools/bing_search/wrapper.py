@@ -1,8 +1,8 @@
 """Util that calls Bing Search."""
 import json
-from typing import Dict, List
+from typing import Dict, List, Optional
 from enum import Enum
-from pydantic import BaseModel, Extra, validator, root_validator
+from pydantic import BaseModel, model_validator
 
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
@@ -16,17 +16,17 @@ class OutputType(str, Enum):
 class BingSearchAPIWrapper(BaseModel):
     """Wrapper for Bing Search API."""
 
-    bing_subscription_key: str
-    bing_search_url: str
+    bing_subscription_key: Optional[str]
+    bing_search_url: Optional[str]
     
-    bing_search_top_k_results: int = 2
-    bing_search_simple: bool = True
-    bing_search_output_type: OutputType = OutputType.Text
+    bing_search_top_k_results: Optional[int]
+    bing_search_simple: Optional[bool]
+    bing_search_output_type: Optional[OutputType]
 
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.ignore
+        extra = 'ignore'
 
     def _bing_search_results(self, search_term: str, count: int) -> List[dict]:
         headers = {"Ocp-Apim-Subscription-Key": self.bing_subscription_key}
@@ -47,7 +47,7 @@ class BingSearchAPIWrapper(BaseModel):
             LOG.error(f"[bing_search] {repr(e)}")
         return result
 
-    @root_validator(pre=True)
+    @model_validator(mode='before')
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that api key and endpoint exists in environment."""
 

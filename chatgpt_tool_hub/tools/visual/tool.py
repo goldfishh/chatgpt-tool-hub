@@ -1,7 +1,8 @@
-from http import HTTPStatus
-from typing import Any, Dict
 import time
-from pydantic import BaseModel, Extra, root_validator
+from http import HTTPStatus
+from typing import Any, Dict, Optional
+
+from pydantic import BaseModel, model_validator
 from rich.console import Console
 
 from ...common.log import LOG
@@ -17,14 +18,14 @@ class DashScopeWrapper(BaseModel):
     """Wrapper for modelscope."""
     caption_client: Any
     caption_model: str = 'qwen-vl-plus'
-    caption_api_key: str = None
+    caption_api_key: Optional[str]
 
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.ignore
+        extra = 'ignore'
 
-    @root_validator()
+    @model_validator(mode='before')
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate python package exists in environment."""
         try:
@@ -101,8 +102,8 @@ class DashScopeWrapper(BaseModel):
 class ImageCaptionTool(BaseTool):
     """Tool for get image captioning from image_path or url"""
 
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "useful when you want to know what is inside the photo. receives image_path as input."
         "The input to this tool should be a string, representing the image_path, you MUST use absolute path."
     )

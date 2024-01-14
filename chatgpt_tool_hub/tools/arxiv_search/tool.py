@@ -1,5 +1,3 @@
-import os
-import tempfile
 from typing import Any
 from rich.console import Console
 
@@ -19,8 +17,8 @@ default_tool_name = "arxiv"
 
 class ArxivTool(BaseTool):
     """ a tool to call arxiv api """
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "Useful for when you need to answer questions about scientific research or search for papers "
         "Like: which papers has a certain author published? "
         "Input should be the title or abstract keywords or author names of a paper you want to search. "

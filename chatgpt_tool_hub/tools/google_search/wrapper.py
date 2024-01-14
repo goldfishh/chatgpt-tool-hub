@@ -1,7 +1,8 @@
 """Util that calls Google Search."""
-from typing import Any, Dict, List, Optional
+import re
 from enum import Enum
-from pydantic import BaseModel, Extra, root_validator
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, model_validator
 
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
@@ -15,17 +16,17 @@ class GoogleSearchAPIWrapper(BaseModel):
     """Wrapper for Google Search API."""
 
     search_engine: Any
-    google_api_key: Optional[str] = None
-    google_cse_id: Optional[str] = None
+    google_api_key: Optional[str]
+    google_cse_id: Optional[str]
 
-    google_top_k_results: int = 2
-    google_simple: bool = True
-    google_output_type: OutputType = OutputType.Text
+    google_top_k_results: Optional[int]
+    google_simple: Optional[bool]
+    google_output_type: Optional[OutputType]
 
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.ignore
+        extra = 'ignore'
 
     def _google_search_results(self, search_term: str, **kwargs: Any) -> List[dict]:
         res = (
@@ -35,7 +36,7 @@ class GoogleSearchAPIWrapper(BaseModel):
         )
         return res.get("items", [])
 
-    @root_validator()
+    @model_validator(mode='before')
     def validate_environment(cls, values: Dict) -> Dict:
         """Validate that api key and python package exists in environment."""
         google_api_key = get_from_dict_or_env(
@@ -43,19 +44,48 @@ class GoogleSearchAPIWrapper(BaseModel):
         )
         values["google_api_key"] = google_api_key
 
-        google_cse_id = get_from_dict_or_env(values, "google_cse_id", "GOOGLE_CSE_ID")
-        values["google_cse_id"] = google_cse_id
+        values["google_cse_id"] = get_from_dict_or_env(values, "google_cse_id", "GOOGLE_CSE_ID")
+
+        proxy = get_from_dict_or_env(values, "proxy", "PROXY", "")
 
         try:
             from googleapiclient.discovery import build
-
         except ImportError:
             raise ImportError(
                 "google-api-python-client is not installed. "
                 "Please install it with `pip install google-api-python-client`"
             )
+        
+        def _parse_proxy_url(proxy_url):
+            # 定义正则表达式，匹配代理地址和端口号
+            pattern = re.compile(r'(?:(?P<protocol>https?://)?(?P<host>[^:/]+)(?::(?P<port>\d+))?|(?P<host_only>[^:/]+))')
+            match = pattern.match(proxy_url)
 
-        service = build("customsearch", "v1", developerKey=google_api_key)
+            if match:
+                groups = match.groupdict()
+                host = groups.get('host') or groups.get('host_only', '')
+                port = groups.get('port', '80')  # 默认端口为 80
+
+                return host, int(port)
+            else:
+                return None
+
+        if proxy and _parse_proxy_url(proxy):
+            import httplib2
+            import google_auth_httplib2
+            from google.auth.credentials import AnonymousCredentials
+
+            PROXY_IP, PROXY_PORT = _parse_proxy_url(proxy)
+            http = httplib2.Http(proxy_info=httplib2.ProxyInfo(
+                        httplib2.socks.PROXY_TYPE_HTTP, PROXY_IP, PROXY_PORT
+            ))
+
+            authorized_http = google_auth_httplib2.AuthorizedHttp(AnonymousCredentials(), http=http)
+
+            service = build("customsearch", "v1", developerKey=google_api_key, http=authorized_http)
+        else:
+            service = build("customsearch", "v1", developerKey=google_api_key)
+
         values["search_engine"] = service
 
         values["google_top_k_results"] = get_from_dict_or_env(

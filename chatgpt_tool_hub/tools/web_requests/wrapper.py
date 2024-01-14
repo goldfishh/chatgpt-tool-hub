@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 import aiohttp
 import requests
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel, model_validator
 
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
@@ -13,7 +13,7 @@ from .  import DEFAULT_HEADER
 class RequestsWrapper(BaseModel):
     """Lightweight wrapper around requests library."""
 
-    headers: Optional[Dict[str, str]] = dict()
+    headers: Dict[str, str] = dict()
     aiosession: Optional[aiohttp.ClientSession] = None
 
     proxy: Optional[str]
@@ -21,10 +21,10 @@ class RequestsWrapper(BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.ignore
+        extra = 'ignore'
         arbitrary_types_allowed = True
 
-    @root_validator()
+    @model_validator(mode='before')
     def validate_environment(cls, values: Dict) -> Dict:
         """get proxy param from environment."""
         proxy = get_from_dict_or_env(
@@ -50,14 +50,14 @@ class RequestsWrapper(BaseModel):
 
         return response.text
 
-    def post(self, url: str, data: Dict[str, Any]) -> str:
+    def post(self, url: str, data: Dict[str, Any], **kwargs) -> str:
         """POST to the URL and return the text."""
-        self.headers = (
-            self.headers.update(DEFAULT_HEADER)
-            if self.headers
-            else {}.update(DEFAULT_HEADER)
-        )
-        return requests.post(url, data=data, headers=self.headers).text
+        self.headers.update(DEFAULT_HEADER)
+        proxies = {
+            'http': self.proxy,
+            'https': self.proxy,
+        }
+        return requests.post(url, data=data, headers=self.headers, proxies=proxies, **kwargs).text
 
     def patch(self, url: str, data: Dict[str, Any]) -> str:
         """PATCH the URL and return the text."""
@@ -88,20 +88,20 @@ class RequestsWrapper(BaseModel):
 
     async def _arequest(self, method: str, url: str, **kwargs: Any) -> str:
         """Make an async request."""
-        self.headers = (
-            self.headers.update(DEFAULT_HEADER)
-            if self.headers
-            else {}.update(DEFAULT_HEADER)
-        )
+        self.headers.update(DEFAULT_HEADER)
+        proxies = {
+            'http': self.proxy,
+            'https': self.proxy,
+        }
         if not self.aiosession:
             async with aiohttp.ClientSession() as session:
                 async with session.request(
-                    method, url, headers=self.headers, **kwargs
+                    method, url, headers=self.headers, proxies=proxies, **kwargs
                 ) as response:
                     return await response.text()
         else:
             async with self.aiosession.request(
-                method, url, headers=self.headers, **kwargs
+                method, url, headers=self.headers, proxies=proxies, **kwargs
             ) as response:
                 return await response.text()
 

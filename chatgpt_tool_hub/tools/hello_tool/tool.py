@@ -9,8 +9,8 @@ default_tool_name = "hello-tool"
 
 
 class HelloTool(BaseTool):
-    name = default_tool_name
-    description = (
+    name: str = default_tool_name
+    description: str = (
         "This is a Starship launch controller, "
         "using which one can initiate the launch of a Starship named SpaceX to Mars."
     )
@@ -31,6 +31,6 @@ class HelloTool(BaseTool):
 
 
 # register the tool
-main_tool_register.register_tool(default_tool_name,
-                                 lambda console=None, **kwargs: HelloTool(console, **kwargs),
-                                 tool_input_keys=[])
+# main_tool_register.register_tool(default_tool_name,
+#                                  lambda console=None, **kwargs: HelloTool(console, **kwargs),
+#                                  tool_input_keys=[])
