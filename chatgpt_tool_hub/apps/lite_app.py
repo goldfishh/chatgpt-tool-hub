@@ -10,15 +10,13 @@ class LiteApp(App):
 
     def __init__(self, **app_kwargs):
         super().__init__()
-        if not self.init_flag:
-            self.llm = ModelFactory.create_llm_model(temperature=0.9, **app_kwargs)
+        
+        self.llm = ModelFactory.create_llm_model(temperature=0.9, **app_kwargs)
 
-            self.prompt = PromptTemplate(
-                input_variables=["question"],
-                template="{question}?",
-            )
-
-            self.init_flag = True
+        self.prompt = PromptTemplate(
+            input_variables=["question"],
+            template="{question}?",
+        )
 
     def create(self, tools_list: list, **tools_kwargs):
         assert not tools_list

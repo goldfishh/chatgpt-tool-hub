@@ -9,11 +9,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import yaml
-from pydantic import BaseModel, root_validator, validator
+from pydantic import BaseModel, model_validator, field_validator
 from rich.console import Console
 
 from ..chains import LLMChain
-from ..common.calculate_token import count_string_tokens
+from ..models.calculate_token import count_string_tokens
 from ..common.callbacks import BaseCallbackManager
 from ..common.log import LOG
 from ..common.schema import BotAction, BotFinish, BaseMessage
@@ -47,7 +47,7 @@ class Bot(BaseModel):
 
         arbitrary_types_allowed = True
 
-    @validator("console")
+    @field_validator("console")
     def set_console(cls, console: Console) -> Console:
         return console or Console()
 
@@ -165,7 +165,7 @@ class Bot(BaseModel):
         """
         return list(set(self.llm_chain.input_keys) - {"bot_scratchpad"})
 
-    @root_validator(allow_reuse=True)
+    @model_validator(mode='before')
     def validate_prompt(cls, values: Dict) -> Dict:
         """Validate that prompt matches format."""
         prompt = values["llm_chain"].prompt

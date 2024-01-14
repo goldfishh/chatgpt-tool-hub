@@ -9,7 +9,7 @@ def get_from_dict_or_env(
         data: Dict[str, Any], key: str, env_key: str, default: Optional[Any] = None
 ) -> Any:
     """Get a value from a dictionary or an environment variable."""
-    if key in data and data[key] is not None:
+    if key in data and data[key] is not None: 
         return data[key]
     elif env_key in os.environ and os.environ[env_key]:
         return os.environ[env_key]

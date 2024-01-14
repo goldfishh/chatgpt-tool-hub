@@ -18,9 +18,9 @@ class AppFactory:
     def init_env(self, **kwargs):
         """ 环境初始化 """
         # set log level
-        nolog_flag = get_from_dict_or_env(kwargs, "nolog", "NOLOG", False)
+        use_log = get_from_dict_or_env(kwargs, "log", "LOG", True)
         debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", False)
-        if str(nolog_flag).lower() in TRUE_VALUES_SET:
+        if not str(use_log).lower() in TRUE_VALUES_SET:
             refresh(logging.CRITICAL)
         elif str(debug_flag).lower() in TRUE_VALUES_SET:
             refresh(logging.DEBUG)
@@ -32,10 +32,10 @@ class AppFactory:
         if str(no_default_flag).lower() in TRUE_VALUES_SET:
             self.default_tools_list = []
         else:
-            from chatgpt_tool_hub.tools.python.tool import default_tool_name as python_tool_name
-            from chatgpt_tool_hub.tools.terminal.tool import default_tool_name as terminal_tool_name
-            from chatgpt_tool_hub.tools.web_requests.get import default_tool_name as get_tool_name
-            from chatgpt_tool_hub.tools.meteo.tool import default_tool_name as meteo_name
+            from ..tools.python.tool import default_tool_name as python_tool_name
+            from ..tools.terminal.tool import default_tool_name as terminal_tool_name
+            from ..tools.web_requests.get import default_tool_name as get_tool_name
+            from ..tools.meteo.tool import default_tool_name as meteo_name
             self.default_tools_list = [python_tool_name, terminal_tool_name, get_tool_name, meteo_name]
 
         # set proxy
@@ -71,9 +71,9 @@ class AppFactory:
                 if default_tool not in tools_list:
                     tools_list.append(default_tool)
 
-            # todo refactor
-            if "browser" in tools_list:
-                tools_list = list(filter(lambda tool: tool != "url-get", tools_list))
+            from ..tools.all_tool_list import main_tool_register
+            if "browser" in main_tool_register.get_registered_tool_names():
+                tools_list = ["browser" if tool == "url-get" else tool for tool in tools_list]
 
             app = Victorinox(console, **build_model_params(kwargs))
             app.create(tools_list, **kwargs)

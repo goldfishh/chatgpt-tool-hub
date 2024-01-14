@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from pydantic import BaseModel, Extra
+from pydantic import BaseModel
 
 from ..common.input import get_colored_text
 from ..common.schema import BaseLanguageModel, LLMResult, PromptValue
@@ -34,7 +34,7 @@ class LLMChain(Chain, BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = 'forbid'
         arbitrary_types_allowed = True
 
     @property

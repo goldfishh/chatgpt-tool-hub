@@ -5,7 +5,6 @@ from typing import Any, List, Optional, Sequence, Tuple
 
 from rich.console import Console
 
-from .prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
 from ...chains import LLMChain
 from ...common.callbacks import BaseCallbackManager
 from ...common.log import LOG
@@ -13,6 +12,7 @@ from ...engine import Bot
 from ...models.base import BaseLLM
 from ...prompts import PromptTemplate
 from ...tools.base_tool import BaseTool
+from .prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
 
 FINAL_ANSWER_ACTION = "Final Answer:"
 

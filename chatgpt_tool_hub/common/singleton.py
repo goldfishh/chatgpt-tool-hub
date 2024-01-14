@@ -8,7 +8,7 @@ class Singleton:
     _instance = None
     _lock = threading.Lock()
 
-    def __new__(cls) -> Any:
+    def __new__(cls, *args, **kwargs) -> Any:
         """Create a new shared instance of the class."""
         if cls._instance is None:
             with cls._lock:

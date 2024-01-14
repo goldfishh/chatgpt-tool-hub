@@ -5,6 +5,7 @@ from rich.console import Console
 from ..apps import App
 from ..apps import AppFactory
 from ..common.log import LOG
+
 from ..common.utils import get_from_dict_or_env
 from ..database import ConversationTokenBufferMemory
 from ..engine.initialize import init_tool_engine as init_engine
@@ -14,23 +15,18 @@ from ..tools.all_tool_list import main_tool_register
 from ..tools.base_tool import BaseTool
 from ..tools.load_tools import load_tools
 
-
 class Victorinox(App):
+    bot_type: str = "chat-bot"
+
     def __init__(self, console=Console(), **app_kwargs):
         super().__init__()
-        if not self.init_flag:
-            self.llm = ModelFactory().create_llm_model(**app_kwargs)
+        self.llm = ModelFactory().create_llm_model(**app_kwargs)
 
-            self.memory = ConversationTokenBufferMemory(llm=self.llm, memory_key="chat_history",
-                                                        output_key='output', max_token_limit=MEMORY_MAX_TOKENS_NUM)
-            self.bot_type = "chat-bot"
+        self.memory = ConversationTokenBufferMemory(llm=self.llm, memory_key="chat_history",
+                                                    output_key='output', max_token_limit=MEMORY_MAX_TOKENS_NUM)
+        self.think_depth = get_from_dict_or_env(app_kwargs, "think_depth", "THINK_DEPTH", 3)
 
-            self.think_depth = get_from_dict_or_env(app_kwargs, "think_depth", "THINK_DEPTH", 3)
-
-            self.console = console
-
-            # todo don't remove it
-            self.init_flag = True
+        self.console = console
 
     def create(self, tools_list: list, **tools_kwargs):
         if tools_list is None:
@@ -60,6 +56,7 @@ class Victorinox(App):
         self.load_tools_into_bot()
 
     def update_tool_args(self, tools_list: list, is_del: bool = False, **tools_kwargs):
+        """if is_del is True, remove all tool in tools_list. otherwise, just update them"""
         if not tools_list:
             return
 

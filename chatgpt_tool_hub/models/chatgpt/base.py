@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from pydantic import BaseModel, Extra, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from ...common.callbacks import BaseCallbackManager
 from ...common.callbacks import get_callback_manager
@@ -24,15 +24,15 @@ def _get_verbosity() -> bool:
 class BaseChatModel(BaseLanguageModel, BaseModel, ABC):
     verbose: bool = Field(default_factory=_get_verbosity)
     """Whether to print out response text."""
-    callback_manager: BaseCallbackManager = Field(default_factory=get_callback_manager)
+    callback_manager: BaseCallbackManager = Field(default_factory=get_callback_manager, validate_default=True)
 
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = 'forbid'
         arbitrary_types_allowed = True
 
-    @validator("callback_manager", pre=True, always=True)
+    @field_validator("callback_manager", mode='before')
     def set_callback_manager(
         cls, callback_manager: Optional[BaseCallbackManager]
     ) -> BaseCallbackManager:

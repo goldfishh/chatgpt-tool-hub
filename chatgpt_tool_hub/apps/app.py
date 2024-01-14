@@ -1,16 +1,13 @@
 from abc import abstractmethod
-
 from typing import List
 
 from ..engine.tool_engine import ToolEngine
 from ..common.log import LOG
+from ..common.singleton import Singleton
 from ..tools.base_tool import BaseTool
 
 
-class App:
-    _instance = None  # 存储单例实例
-    init_flag = False  # 记录是否执行过初始化动作
-
+class App(Singleton):
     engine: ToolEngine = None
 
     # 当前已加载工具
@@ -24,15 +21,8 @@ class App:
     def get_class_name(cls) -> str:
         return str(cls.__name__)
 
-    def __new__(cls, *args, **kwargs):
-        instance_name = f"{cls.__name__}_instance"
-        cls._instance = getattr(cls, instance_name, None)
-        if not cls._instance:
-            cls._instance = super(App, cls).__new__(cls)
-            setattr(cls, instance_name, cls._instance)
-        return cls._instance
-
-    def __init__(self):
+    def __init__(self, **app_kwargs):
+        super().__init__()
         return
 
     @abstractmethod

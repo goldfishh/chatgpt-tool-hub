@@ -1,12 +1,11 @@
 """Base interface that all chains should implement."""
 import json
-from abc import ABC, abstractmethod
+import yaml
 from pathlib import Path
+from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Union
 
-import yaml
-from pydantic import BaseModel, Field, validator
-from rich.console import Console
+from pydantic import BaseModel, Field, field_validator
 
 from ..common.callbacks import BaseCallbackManager
 from ..common.callbacks import get_callback_manager
@@ -22,10 +21,10 @@ class Chain(BaseModel, ABC):
 
     memory: Optional[BaseMemory] = None
     callback_manager: BaseCallbackManager = Field(
-        default_factory=get_callback_manager, exclude=True
+        default_factory=get_callback_manager, exclude=True, validate_default=True
     )
     verbose: bool = Field(
-        default_factory=_get_verbosity
+        default_factory=_get_verbosity, validate_default=True
     )  # Whether to print the response text
 
     class Config:
@@ -37,7 +36,7 @@ class Chain(BaseModel, ABC):
     def _chain_type(self) -> str:
         raise NotImplementedError("Saving not supported for this chain type.")
 
-    @validator("callback_manager", pre=True, always=True)
+    @field_validator("callback_manager", mode='before')
     def set_callback_manager(
         cls, callback_manager: Optional[BaseCallbackManager]
     ) -> BaseCallbackManager:
@@ -47,7 +46,7 @@ class Chain(BaseModel, ABC):
         """
         return callback_manager or get_callback_manager()
 
-    @validator("verbose", pre=True, always=True)
+    @field_validator("verbose", mode='before')
     def set_verbose(cls, verbose: Optional[bool]) -> bool:
         """If verbose is None, set it.
 

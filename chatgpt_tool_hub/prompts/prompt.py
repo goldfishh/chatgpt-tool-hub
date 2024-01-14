@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from pathlib import Path
 from string import Formatter
-from typing import Any, Dict, List, Union
+from typing import Any, List, Union
 
-from pydantic import BaseModel, Extra, root_validator
+from pydantic import BaseModel
 
 from .base import (
     DEFAULT_FORMATTER_MAPPING,
@@ -44,7 +44,7 @@ class PromptTemplate(StringPromptTemplate, BaseModel):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = 'forbid'
 
     def format(self, **kwargs: Any) -> str:
         """Format the prompt with the inputs.
@@ -63,16 +63,6 @@ class PromptTemplate(StringPromptTemplate, BaseModel):
         """
         kwargs = self._merge_partial_and_user_variables(**kwargs)
         return DEFAULT_FORMATTER_MAPPING[self.template_format](self.template, **kwargs)
-
-    @root_validator()
-    def template_is_valid(cls, values: Dict) -> Dict:
-        """Check that template and input variables are consistent."""
-        if values["validate_template"]:
-            all_inputs = values["input_variables"] + list(values["partial_variables"])
-            check_valid_template(
-                values["template"], values["template_format"], all_inputs
-            )
-        return values
 
     @classmethod
     def from_examples(

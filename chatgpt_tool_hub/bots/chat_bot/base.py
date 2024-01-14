@@ -8,7 +8,6 @@ from typing import Any, List, Optional, Sequence, Tuple, Union, Dict
 from rich.console import Console
 from rich.panel import Panel
 
-from .prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
 from ...chains import LLMChain
 from ...common import json_utils
 from ...common.callbacks import BaseCallbackManager
@@ -18,6 +17,7 @@ from ...engine import Bot
 from ...models.base import BaseLLM
 from ...prompts import PromptTemplate
 from ...tools.base_tool import BaseTool
+from .prompt import FORMAT_INSTRUCTIONS, PREFIX, SUFFIX
 
 default_ai_prefix = "LLM-OS"
 default_human_prefix = "user"

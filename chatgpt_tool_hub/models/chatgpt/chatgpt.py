@@ -5,7 +5,7 @@ import logging
 import sys
 from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
 
-from pydantic import BaseModel, Extra, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 from tenacity import (
     before_sleep_log,
     retry,
@@ -14,7 +14,8 @@ from tenacity import (
     wait_exponential,
 )
 
-from . import BaseChatModel
+from .base import BaseChatModel
+from .. import DEFAULT_MODEL_NAME
 from ...common.constants import openai_default_api_base
 from ...common.log import LOG
 from ...common.schema import (
@@ -102,7 +103,7 @@ def _create_chat_result(response: Mapping[str, Any]) -> ChatResult:
 
 
 class ChatOpenAI(BaseChatModel, BaseModel):
-    """Wrapper around OpenAI Chat large language models.
+    f"""Wrapper around OpenAI Chat large language models.
 
     To use, you should have the ``openai`` python package installed, and the
     environment variable ``LLM_API_KEY`` set with your API key.
@@ -114,54 +115,58 @@ class ChatOpenAI(BaseChatModel, BaseModel):
         .. code-block:: python
 
             from lib.chat_models import ChatOpenAI
-            openai = ChatOpenAI(model_name="gpt-35-turbo")
+            openai = ChatOpenAI(llm_model_name={DEFAULT_MODEL_NAME})
     """
 
     client: Any  #: :meta private:
     """Model name to use."""
-    model_name: str = "gpt-35-turbo"
+    llm_model_name: str = Field(default=DEFAULT_MODEL_NAME)
     """Holds any model parameters valid for `create` call not explicitly specified."""
-    model_kwargs: Dict[str, Any] = Field(default_factory=dict)
+    llm_model_kwargs: Dict[str, Any] = Field(default_factory=dict)
     """llm api base url"""
-    llm_api_base_url: str = openai_default_api_base
+    llm_api_base_url: Optional[str]
     """a key to call llm api server"""
-    llm_api_key: Optional[str] = None
+    llm_api_key: Optional[str]
     """Timeout in seconds for the OpenAPI request."""
-    request_timeout: int = 60
+    request_timeout: int = Field(default=60)
     """Maximum number of retries to make when generating."""
-    max_retries: int = 6
+    max_retries: int = Field(default=6)
     """Whether to stream the results or not."""
-    streaming: bool = False
+    streaming: bool = Field(default=False)
     """Number of chat completions to generate for each prompt."""
-    n: int = 1
+    n: int = Field(default=1)
     """Maximum number of tokens to generate."""
-    max_tokens: Optional[int] = None
+    max_tokens: Optional[int] = Field(default=4096)
     """the proxy to use"""
-    proxy: Optional[str] = None
+    proxy: Optional[str] = Field(default="")
     """"""
 
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.ignore
+        extra = 'ignore'
 
-    @root_validator(pre=True)
-    def build_extra(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        """Build extra kwargs from additional params that were passed in."""
-        all_required_field_names = {field.alias for field in cls.__fields__.values()}
+    # 用于跟踪是否已经执行过验证
+    _validation_executed = False
 
-        extra = values.get("model_kwargs", {})
-        for field_name in list(values):
+    @model_validator(mode='before')
+    def validate_environment(cls, values: Dict) -> Dict:
+        """Validate that api key and python package exists in environment."""
+        
+        all_required_field_names = {field for field in cls.model_fields.keys()}
+
+        extra = values.get("llm_model_kwargs", {})
+        values_copy = values.copy()  # 创建 values 的副本
+
+        for field_name in list(values_copy):
             if field_name not in all_required_field_names:
                 if field_name in extra:
                     raise ValueError(f"Found {field_name} supplied twice.")
-                extra[field_name] = values.pop(field_name)
-        values["model_kwargs"] = extra
-        return values
+                extra[field_name] = values_copy.pop(field_name)
 
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that api key and python package exists in environment."""
+        values["llm_model_kwargs"] = extra
+
+
         _llm_api_key = get_from_dict_or_env(
             values, "llm_api_key", "LLM_API_KEY"
         )
@@ -181,19 +186,22 @@ class ChatOpenAI(BaseChatModel, BaseModel):
                 if _proxy:
                     openai.proxy = _proxy
                     values["proxy"] = _proxy
-                    LOG.info(f"success use proxy: {_proxy}")
-                else:
+                    if not cls._validation_executed:
+                        LOG.info(f"success use proxy: {_proxy}")
+                elif not cls._validation_executed:
                     LOG.info("proxy no find, directly request to chatgpt instead")
 
             if openai.api_base != _llm_api_base_url:
                 openai.api_base = _llm_api_base_url
                 values["llm_api_base_url"] = _llm_api_base_url
-                LOG.info(f"success use customized api base url: {_llm_api_base_url}")
+                if not cls._validation_executed:
+                    LOG.info(f"success use customized api base url: {_llm_api_base_url}")
 
             if openai.api_key != _llm_api_key:
                 openai.api_key = _llm_api_key
                 values["llm_api_key"] = _llm_api_key
-                LOG.debug(f"success use llm api key: {_llm_api_key}")
+                if not cls._validation_executed:
+                    LOG.debug(f"success use llm api key: {_llm_api_key}")
 
             if _deployment_id:
                 openai.api_type = "azure"
@@ -213,22 +221,24 @@ class ChatOpenAI(BaseChatModel, BaseModel):
                 "due to an old version of the openai package. Try upgrading it "
                 "with `pip install --upgrade openai`."
             )
-        if values["n"] < 1:
+        if values.get("n") and values["n"] < 1:
             raise ValueError("n must be at least 1.")
-        if values["n"] > 1 and values["streaming"]:
+        if values.get("n") and values["n"] > 1 and values.get("streaming"):
             raise ValueError("n must be 1 when streaming.")
+        
+        cls._validation_executed = True
         return values
 
     @property
     def _default_params(self) -> Dict[str, Any]:
         """Get the default parameters for calling OpenAI API."""
         return {
-            "model": self.model_name,
+            "model": self.llm_model_name,
             "request_timeout": self.request_timeout,
             "max_tokens": self.max_tokens,
             "stream": self.streaming,
             "n": self.n,
-            **self.model_kwargs,
+            **self.llm_model_kwargs,
         }
 
     def _create_retry_decorator(self) -> Callable[[Any], Any]:
@@ -307,7 +317,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
     def _create_message_dicts(
         self, messages: List[BaseMessage], stop: Optional[List[str]]
     ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
-        params: Dict[str, Any] = {**{"model": self.model_name}, **self._default_params}
+        params: Dict[str, Any] = {**{"model": self.llm_model_name}, **self._default_params}
         if stop is not None:
             if "stop" in params:
                 raise ValueError("`stop` found in both the input and default params.")
@@ -352,7 +362,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
     @property
     def _identifying_params(self) -> Mapping[str, Any]:
         """Get the identifying parameters."""
-        return {**{"model_name": self.model_name}, **self._default_params}
+        return {**{"llm_model_name": self.llm_model_name}, **self._default_params}
 
     def get_num_tokens(self, text: str) -> int:
         """Calculate num tokens with tiktoken package."""
@@ -367,19 +377,19 @@ class ChatOpenAI(BaseChatModel, BaseModel):
                 "This is needed in order to calculate get_num_tokens. "
                 "Please it install it with `pip install tiktoken`."
             )
-        # create a gpt-35-Turbo encoder instance
-        enc = tiktoken.encoding_for_model(self.model_name)
+        # create a gpt-3.5-Turbo encoder instance
+        enc = tiktoken.encoding_for_model(self.llm_model_name)
 
-        # encode the text using the gpt-35-Turbo encoder
+        # encode the text using the gpt-3.5-Turbo encoder
         tokenized_text = enc.encode(text)
 
         # calculate the number of tokens in the encoded text
         return len(tokenized_text)
 
     def get_num_tokens_from_messages(
-        self, messages: List[BaseMessage], model: str = "gpt-35-turbo"
+        self, messages: List[BaseMessage], model: str = DEFAULT_MODEL_NAME
     ) -> int:
-        """Calculate num tokens for gpt-35-turbo with tiktoken package."""
+        """Calculate num tokens for gpt-3.5-turbo with tiktoken package."""
         try:
             import tiktoken
         except ImportError:
@@ -394,7 +404,7 @@ class ChatOpenAI(BaseChatModel, BaseModel):
             encoding = tiktoken.encoding_for_model(model)
         except KeyError:
             encoding = tiktoken.get_encoding("cl100k_base")
-        if not model.startswith("gpt-35-turbo"):
+        if not model.startswith("gpt-3.5-turbo"):
             raise NotImplementedError(
                 f"get_num_tokens_from_messages() is not presently implemented "
                 f"for model {model}."

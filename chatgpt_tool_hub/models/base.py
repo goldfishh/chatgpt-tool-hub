@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Tuple, Union
 
 import yaml
-from pydantic import BaseModel, Extra, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 from ..common.callbacks import BaseCallbackManager
 from ..common.callbacks import get_callback_manager
@@ -57,17 +57,17 @@ class BaseLLM(BaseLanguageModel, BaseModel, ABC):
     """LLM wrapper should take in a prompt and return a string."""
 
     cache: Optional[bool] = None
-    verbose: bool = Field(default_factory=_get_verbosity)
+    verbose: bool = Field(default_factory=_get_verbosity, validate_default=True)
     """Whether to print out response text."""
-    callback_manager: BaseCallbackManager = Field(default_factory=get_callback_manager)
+    callback_manager: BaseCallbackManager = Field(default_factory=get_callback_manager, validate_default=True)
 
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = 'forbid'
         arbitrary_types_allowed = True
 
-    @validator("callback_manager", pre=True, always=True)
+    @field_validator("callback_manager", mode='before')
     def set_callback_manager(
         cls, callback_manager: Optional[BaseCallbackManager]
     ) -> BaseCallbackManager:
@@ -77,7 +77,7 @@ class BaseLLM(BaseLanguageModel, BaseModel, ABC):
         """
         return callback_manager or get_callback_manager()
 
-    @validator("verbose", pre=True, always=True)
+    @field_validator("verbose", mode='before')
     def set_verbose(cls, verbose: Optional[bool]) -> bool:
         """If verbose is None, set it.
 

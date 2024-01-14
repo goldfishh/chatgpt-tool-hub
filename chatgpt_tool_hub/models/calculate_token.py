@@ -1,13 +1,10 @@
-from .log import LOG
-
+from ..common.log import LOG
+from . import DEFAULT_MODEL_NAME
 
 # refer to https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
 
-def count_message_tokens(messages, model="gpt-3.5-turbo-0613"):
+def count_message_tokens(messages, model=DEFAULT_MODEL_NAME):
     import tiktoken
-
-    if model.startswith("gpt-35"):
-        model = model.replace("gpt-35-", "gpt-3.5-")
 
     """Return the number of tokens used by a list of messages."""
     try:
@@ -49,21 +46,18 @@ def count_message_tokens(messages, model="gpt-3.5-turbo-0613"):
     return num_tokens
 
 
-def count_string_tokens(string: str, model_name: str = "gpt-35-turbo") -> int:
-    """
+def count_string_tokens(string: str, model_name: str = DEFAULT_MODEL_NAME) -> int:
+    f"""
     Returns the number of tokens in a text string.
 
     Args:
     string (str): The text string.
-    model_name (str): The name of the encoding to use. (e.g., "gpt-35-turbo")
+    model_name (str): The name of the encoding to use. (e.g., {DEFAULT_MODEL_NAME})
 
     Returns:
     int: The number of tokens in the text string.
     """
     import tiktoken
-
-    if model_name.startswith("gpt-35"):
-        model_name = model_name.replace("gpt-35-", "gpt-3.5-")
 
     encoding = tiktoken.encoding_for_model(model_name)
     return len(encoding.encode(string))

@@ -1,8 +1,9 @@
 import json
 import sys
 
-from chatgpt_tool_hub.apps import AppFactory
 from dotenv import load_dotenv
+
+from chatgpt_tool_hub.apps import AppFactory
 from chatgpt_tool_hub.common.log import LOG
 
 if __name__ == "__main__":

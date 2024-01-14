@@ -4,7 +4,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, NamedTuple, Optional
 
-from pydantic import BaseModel, Extra, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 def get_buffer_string(
@@ -148,10 +148,10 @@ def messages_from_dict(messages: List[dict]) -> List[BaseMessage]:
 class ChatGeneration(Generation):
     """Output of a single generation."""
 
-    text = ""
+    text: str = Field(..., description="The generated text")
     message: BaseMessage
 
-    @root_validator
+    @model_validator(mode='before')
     def set_text(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         values["text"] = values["message"].content
         return values
@@ -231,7 +231,7 @@ class BaseMemory(BaseModel, ABC):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = 'forbid'
         arbitrary_types_allowed = True
 
     @property

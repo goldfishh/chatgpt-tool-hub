@@ -1,4 +1,3 @@
-
 from ...prompts.prompt import PromptTemplate
 
 API_URL_PROMPT_TEMPLATE = """You have received an API documentation: 

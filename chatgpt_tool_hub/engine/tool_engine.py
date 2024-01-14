@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, model_validator
 from rich.console import Console
 from rich.panel import Panel
 
@@ -45,7 +45,7 @@ class ToolEngine(Chain, BaseModel):
             bot=bot, tools=tools, console=console, callback_manager=callback_manager, **kwargs
         )
 
-    @root_validator(allow_reuse=True)
+    @model_validator(mode='before')
     def validate_tools(cls, values: Dict) -> Dict:
         """Validate that tools are compatible with bot."""
         bot = values["bot"]

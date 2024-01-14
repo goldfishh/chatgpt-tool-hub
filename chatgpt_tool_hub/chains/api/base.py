@@ -3,17 +3,16 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 from rich.console import Console
 from rich.panel import Panel
-
-from .prompt import API_RESPONSE_PROMPT, API_URL_PROMPT
-from .. import Chain, LLMChain
 
 from ...common.log import LOG
 from ...common.schema import BaseLanguageModel
 from ...prompts import BasePromptTemplate
 from ...tools.web_requests import RequestsWrapper
+from .. import Chain, LLMChain
+from .prompt import API_RESPONSE_PROMPT, API_URL_PROMPT
 
 
 class APIChain(Chain, BaseModel):
@@ -23,7 +22,7 @@ class APIChain(Chain, BaseModel):
     api_answer_chain: LLMChain
     requests_wrapper: RequestsWrapper = Field(exclude=True)
     api_docs: str
-    console: Console = None
+    console: Optional[Console] = None
     question_key: str = "question"  #: :meta private:
     output_key: str = "output"  #: :meta private:
 
@@ -43,7 +42,7 @@ class APIChain(Chain, BaseModel):
         """
         return [self.output_key]
 
-    @root_validator(pre=True)
+    @model_validator(mode='before')
     def validate_api_request_prompt(cls, values: Dict) -> Dict:
         """Check that api request prompt expects the right variables."""
         input_vars = values["api_request_chain"].prompt.input_variables
@@ -54,7 +53,7 @@ class APIChain(Chain, BaseModel):
             )
         return values
 
-    @root_validator(pre=True)
+    @model_validator(mode='before')
     def validate_api_answer_prompt(cls, values: Dict) -> Dict:
         """Check that api answer prompt expects the right variables."""
         input_vars = values["api_answer_chain"].prompt.input_variables
@@ -106,14 +105,12 @@ class APIChain(Chain, BaseModel):
         llm: BaseLanguageModel,
         api_docs: str,
         console: Console = Console(),
-        headers: Optional[dict] = None,
+        headers: dict = {},
         api_url_prompt: BasePromptTemplate = API_URL_PROMPT,
         api_response_prompt: BasePromptTemplate = API_RESPONSE_PROMPT,
         **kwargs: Any,
     ) -> APIChain:
         """Load chain from just an LLM and the api docs."""
-        if headers is None:
-            headers = {}
         get_request_chain = LLMChain(llm=llm, prompt=api_url_prompt)
         requests_wrapper = RequestsWrapper(headers=headers)
         get_answer_chain = LLMChain(llm=llm, prompt=api_response_prompt)

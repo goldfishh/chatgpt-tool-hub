@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, List, Mapping, Optional, Union
 
 import yaml
-from pydantic import BaseModel, Extra, Field, root_validator
+from pydantic import BaseModel, Field, model_validator
 
 from ..common.formatting import formatter
 from ..common.schema import BaseMessage, BaseOutputParser, HumanMessage, PromptValue
@@ -79,34 +79,12 @@ class BasePromptTemplate(BaseModel, ABC):
     class Config:
         """Configuration for this pydantic object."""
 
-        extra = Extra.forbid
+        extra = 'forbid'
         arbitrary_types_allowed = True
 
     @abstractmethod
     def format_prompt(self, **kwargs: Any) -> PromptValue:
         """Create Chat Messages."""
-
-    @root_validator()
-    def validate_variable_names(cls, values: Dict) -> Dict:
-        """Validate variable names do not include restricted names."""
-        if "stop" in values["input_variables"]:
-            raise ValueError(
-                "Cannot have an input variable named 'stop', as it is used internally,"
-                " please rename."
-            )
-        if "stop" in values["partial_variables"]:
-            raise ValueError(
-                "Cannot have an partial variable named 'stop', as it is used "
-                "internally, please rename."
-            )
-
-        if overall := set(values["input_variables"]).intersection(
-            values["partial_variables"]
-        ):
-            raise ValueError(
-                f"Found overlapping input and partial variables: {overall}"
-            )
-        return values
 
     def partial(self, **kwargs: Union[str, Callable[[], str]]) -> BasePromptTemplate:
         """Return a partial of the prompt template."""
