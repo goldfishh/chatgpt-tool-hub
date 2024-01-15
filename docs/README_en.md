@@ -20,7 +20,7 @@
 ---
 [简体中文](../README.md) | English
 
-## 简介
+### Introduction
 An open-source chatgpt tool ecosystem where you can combine tools with chatgpt and use natural language to do anything.
 If plugins are the App store for ChatGPT, then ChatGPT-Tool-Hub is the APK installer for Android.
 
