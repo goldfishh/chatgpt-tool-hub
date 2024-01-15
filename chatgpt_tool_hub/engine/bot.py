@@ -249,7 +249,7 @@ class Bot(BaseModel):
             if action:
                 return (
                     BotFinish({"output": action_input}, full_output)
-                    if action.lower() in ['answer-user']
+                    if str(action).lower() in ['answer-user']
                     else BotFinish({"output": "受think_depth限制，系统强制终止了LLM-OS"}, full_output)
                 )
             else:

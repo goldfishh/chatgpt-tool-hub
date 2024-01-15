@@ -11,7 +11,7 @@ from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
 from ...models import build_model_params
 from ...models.model_factory import ModelFactory
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .. import BaseTool
 from .prompt import MAP_QUERY_PROMPT, REDUCE_QUERY_PROMPT
 from .text_clipper import TextClipper
@@ -108,7 +108,7 @@ class SummaryTool(BaseTool):
 
     def _run(self, url: str) -> str:
         """run the tool"""
-        from chatgpt_tool_hub.tools.all_tool_list import main_tool_register
+        from chatgpt_tool_hub.tools.tool_register import main_tool_register
         try:
             _use_tool = "url-get"
             if main_tool_register.get_registered_tool().get('browser'):

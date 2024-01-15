@@ -166,13 +166,13 @@ class ChatBot(Bot):
         except Exception as e:
             LOG.error(f"Error: {repr(e)}")
 
-        if action.lower() == "answer-user" and action_input in ['', '空', '无']:
+        if str(action).lower() == "answer-user" and action_input in ['', '空', '无']:
             action_input = llm_reply_json.get('thoughts', {}).get('speak', '')
 
-        if action.lower() not in self.allowed_tools:
+        if str(action).lower() not in self.allowed_tools:
             return "answer-user", action_input
 
-        if self.console and action.lower() != "answer-user":
+        if self.console and str(action).lower() != "answer-user":
             self.console.print(f"√ 我在用 [bold cyan]{action}[/] 工具...")
 
         LOG.info(f"执行Tool: {action}中...")

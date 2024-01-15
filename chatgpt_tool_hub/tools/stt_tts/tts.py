@@ -11,7 +11,7 @@ from ...models.calculate_token import count_string_tokens as get_token_num
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
 from ...models import build_model_params
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .. import BaseTool
 
 default_tool_name = "tts"

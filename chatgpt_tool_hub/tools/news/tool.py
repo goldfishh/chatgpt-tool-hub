@@ -6,7 +6,7 @@ from ...engine import ToolEngine
 from ...engine.initialize import init_tool_engine
 from ...models import build_model_params
 from ...models.model_factory import ModelFactory
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .. import BaseTool
 from ..load_tools import load_tools
 from . import news_tool_register

@@ -13,7 +13,7 @@ def get_packages(path):
     return packages
 
 
-def dynamic_tool_loader():
+def dynamic_tool_loader(**kwargs):
     try:
         all_tool_package_list = get_packages(f"{os.path.dirname(os.path.abspath(__file__))}")
     except Exception as e:
@@ -26,20 +26,26 @@ def dynamic_tool_loader():
             import importlib
             importlib.import_module(f".tools.{package_name}", package="chatgpt_tool_hub")
         except Exception as e:
-            LOG.info(f"[{package_name}] init failed, error_info: {repr(e)}")
+            LOG.debug(f"import [{package_name}] failed, error_info: {repr(e)}")
+    
+    from .tool_register import main_tool_register
+    registered_tool = main_tool_register.get_registered_tool()
+    invalid_tool_list = []
+    for name, (func, _) in registered_tool.items():
+        try:
+            _ = func(**kwargs)
+        except Exception as e:
+            invalid_tool_list.append(name)
+            LOG.info(f"[{name}] initialization failed, error_info: {repr(e)}")
+    for tool in invalid_tool_list:
+        main_tool_register.unregister_tool(tool)
 
 from .base_tool import BaseTool
-from .python import PythonTool
-from .web_requests import BrowserTool
 from .summary import SummaryTool
-from .terminal import TerminalTool
 
 __all__ = [
     "BaseTool",
     "SummaryTool",
-    "PythonTool",
-    "TerminalTool",
-    "BrowserTool",
 
     "ToolRegister",
     

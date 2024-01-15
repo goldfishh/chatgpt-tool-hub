@@ -7,7 +7,7 @@ from ...common.utils import get_from_dict_or_env
 from ...models import build_model_params
 from ...models.model_factory import ModelFactory
 from ...prompts import PromptTemplate
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .api_prompt import ARXIV_PROMPT
 from .wrapper import ArxivAPIWrapper
 from .. import BaseTool

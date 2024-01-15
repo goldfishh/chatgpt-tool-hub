@@ -6,7 +6,7 @@ from rich.console import Console
 
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .. import BaseTool
 from . import filter_text
 
@@ -132,7 +132,7 @@ class BrowserTool(BaseTool):
         self.browser = ChromeBrowser(**tool_kwargs)
 
         self.use_summary = get_from_dict_or_env(
-            tool_kwargs, 'use_summary', "USE_SUMMARY", ""
+            tool_kwargs, 'browser_use_summary', "BROWSER_USE_SUMMARY", True
         )
 
     def _run(self, url: str) -> str:

@@ -72,7 +72,7 @@ class WechatWrapper(BaseModel):
             values["wechat_client"].receivingRetryCount = 600  # 修改断线超时时间
 
             values["wechat_hot_reload"] = get_from_dict_or_env(values, "wechat_hot_reload", "WECHAT_HOT_RELOAD", False)
-            if values["wechat_hot_reload"] and values["wechat_hot_reload"].lower() == 'true':
+            if str(values["wechat_hot_reload"]).lower() == 'true':
                 values["wechat_cpt_path"] =  get_from_dict_or_env(values, "wechat_cpt_path", "WECHAT_CPT_PATH")
                 load_result = values["wechat_client"].load_login_status(fileDir=values["wechat_cpt_path"])
                 # load_result: {'BaseResponse': {'ErrMsg': '请求成功', 'Ret': 0, 'RawMsg': 'loading login status succeeded.'}}
@@ -89,7 +89,7 @@ class WechatWrapper(BaseModel):
                 values["wechat_cpt_path"] = temp_file.name
                 LOG.debug(f"[wechat] use default path: {values['wechat_cpt_path']} to save.")
             values["wechat_send_group"] = get_from_dict_or_env(values, "wechat_send_group", "WECHAT_SEND_GROUP", False)
-            if values["wechat_send_group"] and values["wechat_send_group"].lower() == 'true':
+            if str(values["wechat_send_group"]).lower() == 'true':
                 values["wechat_send_group"] = True
 
             values["wechat_nickname_mapping"] = json.loads(get_from_dict_or_env(values, "wechat_nickname_mapping", "WECHAT_NICKNAME_MAPPING", "{}"))
@@ -101,14 +101,12 @@ class WechatWrapper(BaseModel):
         return values
 
     def login(self):
-        from lib import itchat
-        itchat.auto_login(
+        self.wechat_client.auto_login(
             enableCmdQR=2,
             hotReload=True,  # must be true to save cpt file
             statusStorageDir=self.wechat_cpt_path,
             qrCallback=qrCallback,
         )
-        # self.wechat_client = itchat.instance
 
     def _default_json_config(self):
         return {

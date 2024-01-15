@@ -11,7 +11,7 @@ from ..database import ConversationTokenBufferMemory
 from ..engine.initialize import init_tool_engine as init_engine
 from ..models import MEMORY_MAX_TOKENS_NUM
 from ..models.model_factory import ModelFactory
-from ..tools.all_tool_list import main_tool_register
+from ..tools.tool_register import main_tool_register
 from ..tools.base_tool import BaseTool
 from ..tools.load_tools import load_tools
 
@@ -24,7 +24,7 @@ class Victorinox(App):
 
         self.memory = ConversationTokenBufferMemory(llm=self.llm, memory_key="chat_history",
                                                     output_key='output', max_token_limit=MEMORY_MAX_TOKENS_NUM)
-        self.think_depth = get_from_dict_or_env(app_kwargs, "think_depth", "THINK_DEPTH", 3)
+        self.think_depth = get_from_dict_or_env(app_kwargs, "think_depth", "THINK_DEPTH", 2)
 
         self.console = console
 

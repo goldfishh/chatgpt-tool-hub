@@ -7,7 +7,7 @@ from ...models import build_model_params
 from ...models.model_factory import ModelFactory
 from ...common.utils import get_from_dict_or_env
 
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .. import BaseTool
 from .wrapper import BingSearchAPIWrapper
 from .prompt import QUERY_PROMPT

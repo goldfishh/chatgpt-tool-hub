@@ -9,7 +9,7 @@ from ...models import build_model_params
 from ...models.model_factory import ModelFactory
 from ...common.utils import get_from_dict_or_env
 from .. import BaseTool
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .wrapper import WikipediaAPIWrapper
 from .prompt import QUERY_PROMPT
 

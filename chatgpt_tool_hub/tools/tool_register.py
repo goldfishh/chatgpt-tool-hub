@@ -28,3 +28,6 @@ class ToolRegister(Singleton):
 
     def get_registered_tool(self) -> dict:
         return self.REGISTER_TOOLS
+
+
+main_tool_register = ToolRegister()

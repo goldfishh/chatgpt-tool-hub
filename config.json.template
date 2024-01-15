@@ -1,7 +1,6 @@
 {
   "tools": [],
   "kwargs": {
-      "no_default": false,
-      "top_k_results": 2
+      "no_default": false
   }
 }

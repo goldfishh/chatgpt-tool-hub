@@ -6,7 +6,7 @@ Quick Start
 -----------
 
 In order to use this utility you need to provide the searx host. This can be done
-by passing the named parameter :attr:`searx_search_host <SearxSearchWrapper.searx_search_host>`
+by passing the named parameter :attr:`searxng_search_host <SearxSearchWrapper.searxng_search_host>`
 or exporting the environment variable SEARX_SEARCH_HOST.
 
 1. https://docs.searxng.org/admin/installation-searxng.html#installation-basic
@@ -81,7 +81,7 @@ class SearxSearchWrapper(BaseModel):
     """Wrapper for Searx API.
 
     To use you need to provide the searx host by passing the named parameter
-    ``searx_search_host`` or exporting the environment variable ``SEARX_SEARCH_HOST``.
+    ``searxng_search_host`` or exporting the environment variable ``SEARX_SEARCH_HOST``.
 
     In some situations you might want to disable SSL verification, for example
     if you are running searx locally. You can do this by passing the named parameter
@@ -91,7 +91,7 @@ class SearxSearchWrapper(BaseModel):
         .. code-block:: python
 
             from chatgpt-tool-hub.tools.searxng_search.wrapper import SearxSearchWrapper
-            searx = SearxSearchWrapper(searx_search_host="http://localhost:8888")
+            searx = SearxSearchWrapper(searxng_search_host="http://localhost:8888")
 
     Example with SSL disabled:
         .. code-block:: python
@@ -99,22 +99,22 @@ class SearxSearchWrapper(BaseModel):
             from chatgpt-tool-hub.tools.searxng_search.wrapper import SearxSearchWrapper
             # note the unsecure parameter is not needed if you pass the url scheme as
             # http
-            searx = SearxSearchWrapper(searx_search_host="http://localhost:8888",
+            searx = SearxSearchWrapper(searxng_search_host="http://localhost:8888",
                                                     unsecure=True)
 
 
     """
 
     _result: SearxResults = PrivateAttr()
-    searx_search_host: Optional[str] = None
-    searx_search_output_type: OutputType = OutputType.Text
+    searxng_search_host: Optional[str] = None
+    searxng_search_output_type: OutputType = OutputType.Text
     unsecure: bool = False
     params: dict = Field(default_factory=_get_default_params)
     headers: Optional[dict] = dict()
     engines: Optional[List[str]] = []
     categories: Optional[List[str]] = []
     query_suffix: Optional[str] = ""
-    searx_search_top_k_results: int = 2
+    searxng_search_top_k_results: int = 2
     aiosession: Optional[Any] = None
 
     @field_validator("unsecure")
@@ -140,24 +140,24 @@ class SearxSearchWrapper(BaseModel):
         if categories := values.get("categories"):
             values["params"]["categories"] = ",".join(categories)
 
-        searx_search_host = get_from_dict_or_env(values, "searx_search_host", "SEARX_SEARCH_HOST")
-        if not searx_search_host.startswith("http"):
+        searxng_search_host = get_from_dict_or_env(values, "searxng_search_host", "SEARXNG_SEARCH_HOST")
+        if not searxng_search_host.startswith("http"):
             print(
                 f"Warning: missing the url scheme on host \
-                ! assuming secure https://{searx_search_host} "
+                ! assuming secure https://{searxng_search_host} "
             )
-            searx_search_host = f"https://{searx_search_host}"
-        elif searx_search_host.startswith("http://"):
+            searxng_search_host = f"https://{searxng_search_host}"
+        elif searxng_search_host.startswith("http://"):
             values["unsecure"] = True
             cls.disable_ssl_warnings(True)
-        values["searx_search_host"] = searx_search_host
+        values["searxng_search_host"] = searxng_search_host
 
-        values["searx_search_top_k_results"] = get_from_dict_or_env(
-            values, 'searx_search_top_k_results', "SEARX_SEARCH_TOP_K_RESULTS", 2
+        values["searxng_search_top_k_results"] = get_from_dict_or_env(
+            values, 'searxng_search_top_k_results', "SEARXNG_SEARCH_TOP_K_RESULTS", 2
         )
 
-        values["searx_search_output_type"] = get_from_dict_or_env(
-            values, 'searx_search_output_type', "SEARX_SEARCH_OUTPUT_TYPE", OutputType.Text
+        values["searxng_search_output_type"] = get_from_dict_or_env(
+            values, 'searxng_search_output_type', "SEARXNG_SEARCH_OUTPUT_TYPE", OutputType.Text
         )
 
         return values
@@ -170,7 +170,7 @@ class SearxSearchWrapper(BaseModel):
     def _searx_api_query(self, params: dict) -> SearxResults:
         """Actual request to searx API."""
         requests_wrapper = RequestsWrapper(headers=self.headers, proxy="")
-        raw_result = requests_wrapper.get(self.searx_search_host, params=params,
+        raw_result = requests_wrapper.get(self.searxng_search_host, params=params,
                                           raise_for_status=True, verify=not self.unsecure)
         # test if http result is ok
         res = SearxResults(raw_result)
@@ -181,7 +181,7 @@ class SearxSearchWrapper(BaseModel):
         if not self.aiosession:
             async with aiohttp.ClientSession() as session:
                 async with session.get(
-                    self.searx_search_host,
+                    self.searxng_search_host,
                     headers=self.headers,
                     params=params,
                     ssl=(lambda: False if self.unsecure else None)(),
@@ -192,7 +192,7 @@ class SearxSearchWrapper(BaseModel):
                     self._result = result
         else:
             async with self.aiosession.get(
-                self.searx_search_host,
+                self.searxng_search_host,
                 headers=self.headers,
                 params=params,
                 verify=not self.unsecure,
@@ -236,14 +236,14 @@ class SearxSearchWrapper(BaseModel):
             .. code-block:: python
 
                 from chatgpt-tool-hub.tools.searxng_search.wrapper import SearxSearchWrapper
-                searx = SearxSearchWrapper(searx_search_host="http://my.searx.host")
+                searx = SearxSearchWrapper(searxng_search_host="http://my.searx.host")
                 searx.run("what is the weather in France ?", engine="qwant")
 
                 # the same result can be achieved using the `!` syntax of searx
                 # to select the engine using `query_suffix`
                 searx.run("what is the weather in France ?", query_suffix="!qwant")
         """
-        if self.searx_search_output_type == OutputType.JSON:
+        if self.searxng_search_output_type == OutputType.JSON:
             return self.to_json(query, engines, categories, query_suffix, **kwargs)
         _params = {
             "q": query,
@@ -270,7 +270,7 @@ class SearxSearchWrapper(BaseModel):
             LOG.debug(f"[searxng-search] output: {res.results}")
 
             _contents = []
-            for idx, result in enumerate(res.results[: self.searx_search_top_k_results]):
+            for idx, result in enumerate(res.results[: self.searxng_search_top_k_results]):
                 _header = f"《{filter_text(result.get('title', ''))}》"
                 _body = f"{filter_text(result.get('content', ''))}"
                 _link = f"{result.get('url', '')}"
@@ -309,7 +309,7 @@ class SearxSearchWrapper(BaseModel):
 
         elif len(res.results) > 0:
             return "\n\n".join(
-                [r.get("content", "") for r in res.results[: self.searx_search_top_k_results]]
+                [r.get("content", "") for r in res.results[: self.searxng_search_top_k_results]]
             )
         else:
             return "No good search result found"

@@ -6,7 +6,7 @@ from .. import get_packages
 from .. import ToolRegister
 
 # news_tool_register = ToolRegister()
-from ..all_tool_list import main_tool_register as news_tool_register
+from ..tool_register import main_tool_register as news_tool_register
 
 try:
     all_tool_package_list = get_packages(f"{os.path.dirname(os.path.abspath(__file__))}")

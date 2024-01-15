@@ -5,7 +5,6 @@ from typing import Optional
 
 from ..common.callbacks import BaseCallbackManager
 from ..common.log import LOG
-from ..common.utils import get_from_dict_or_env
 from . import BaseTool, ToolRegister
 
 from rich.console import Console

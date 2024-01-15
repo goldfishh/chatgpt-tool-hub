@@ -5,7 +5,7 @@ from pydantic import Field
 from rich.console import Console
 
 from .. import BaseTool
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 
 default_tool_name = "debug"
 

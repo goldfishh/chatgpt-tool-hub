@@ -30,7 +30,7 @@ class ModelFactory:
     def create_llm_model(self, **llm_model_kwargs):
         _model = get_from_dict_or_env(llm_model_kwargs, "model_name", "MODEL_NAME", DEFAULT_MODEL_NAME)
         match_llm_model = self.match_model(_model)
-        if match_llm_model == "chatgpt":
+        if True or match_llm_model == "chatgpt":
             return ChatOpenAI(**llm_model_kwargs)
         else:
             raise NotImplementedError("implement me!")

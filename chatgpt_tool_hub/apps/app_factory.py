@@ -11,7 +11,7 @@ from ..tools import dynamic_tool_loader
 
 
 class AppFactory:
-    def __init__(self, console=Console()):
+    def __init__(self, console=Console(quiet=True)):
         self.default_tools_list = []
         self.console = console
 
@@ -20,16 +20,16 @@ class AppFactory:
         # set log level
         use_log = get_from_dict_or_env(kwargs, "log", "LOG", True)
         debug_flag = get_from_dict_or_env(kwargs, "debug", "DEBUG", False)
-        if not str(use_log).lower() in TRUE_VALUES_SET:
+        if str(use_log).lower() == "false":
             refresh(logging.CRITICAL)
-        elif str(debug_flag).lower() in TRUE_VALUES_SET:
+        elif str(debug_flag).lower() == "true":
             refresh(logging.DEBUG)
         else:
             refresh(logging.INFO)
 
         # default tools
         no_default_flag = get_from_dict_or_env(kwargs, "no_default", "NO_DEFAULT", False)
-        if str(no_default_flag).lower() in TRUE_VALUES_SET:
+        if str(no_default_flag).lower() == "true":
             self.default_tools_list = []
         else:
             from ..tools.python.tool import default_tool_name as python_tool_name
@@ -38,16 +38,10 @@ class AppFactory:
             from ..tools.meteo.tool import default_tool_name as meteo_name
             self.default_tools_list = [python_tool_name, terminal_tool_name, get_tool_name, meteo_name]
 
-        # set proxy
-        # _proxy = get_from_dict_or_env(kwargs, "proxy", "PROXY", "")
-        # if not _proxy:
-        #     os.environ["http_proxy"] = str(_proxy)
-        #     os.environ["https_proxy"] = str(_proxy)
-
         # dynamic loading tool
-        dynamic_tool_loader()
+        dynamic_tool_loader(**kwargs)
 
-    def create_app(self, app_type: str = 'victorinox', tools_list: list = None, console=Console(quiet=True), **kwargs) -> App:
+    def create_app(self, app_type: str = 'victorinox', tools_list: list = None, **kwargs) -> App:
         tools_list = tools_list if tools_list else []
 
         # todo remove it
@@ -71,11 +65,11 @@ class AppFactory:
                 if default_tool not in tools_list:
                     tools_list.append(default_tool)
 
-            from ..tools.all_tool_list import main_tool_register
+            from ..tools.tool_register import main_tool_register
             if "browser" in main_tool_register.get_registered_tool_names():
                 tools_list = ["browser" if tool == "url-get" else tool for tool in tools_list]
 
-            app = Victorinox(console, **build_model_params(kwargs))
+            app = Victorinox(self.console, **build_model_params(kwargs))
             app.create(tools_list, **kwargs)
             return app
         else:

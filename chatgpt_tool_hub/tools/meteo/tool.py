@@ -5,7 +5,7 @@ from rich.console import Console
 from ...chains.api import APIChain
 from ...models import build_model_params
 from ...models.model_factory import ModelFactory
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .. import BaseTool
 from .docs_prompt import OPEN_METEO_DOCS
 

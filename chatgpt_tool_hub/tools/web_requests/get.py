@@ -5,7 +5,7 @@ from rich.console import Console
 
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .. import BaseTool
 from . import BaseRequestsTool, filter_text, RequestsWrapper
 
@@ -28,7 +28,7 @@ class RequestsGetTool(BaseRequestsTool, BaseTool):
         super().__init__(console=console, requests_wrapper=RequestsWrapper(**tool_kwargs), return_direct=False)
 
         self.use_summary = get_from_dict_or_env(
-            tool_kwargs, 'use_summary', "USE_SUMMARY", ""
+            tool_kwargs, 'url_get_use_summary', "URL_GET_USE_SUMMARY", True
         )
 
     def _run(self, url: str) -> str:

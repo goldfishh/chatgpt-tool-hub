@@ -10,7 +10,7 @@ from ...models.calculate_token import count_string_tokens as get_token_num
 from ...common.log import LOG
 from ...common.utils import get_from_dict_or_env
 from ...models import build_model_params
-from ..all_tool_list import main_tool_register
+from ..tool_register import main_tool_register
 from .. import BaseTool
 
 default_tool_name = "stt"
@@ -21,9 +21,9 @@ class STTTool(BaseTool):
         ""
     )
 
-    api_key: Optional[str]
-    api_region: Optional[str]
-    speech_config: Optional[speechsdk.SpeechConfig]
+    api_key: Optional[str] = None
+    api_region: Optional[str] = None
+    speech_config: Optional[speechsdk.SpeechConfig] = None
 
     def __init__(self, console: Console = Console(), **tool_kwargs: Any):
         super().__init__(console=console)

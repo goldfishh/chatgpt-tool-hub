@@ -1,4 +1,5 @@
 **/dev/
+**/__pycache__/
 
 *.tar.gz
 *.whl
@@ -7,12 +8,13 @@ build/
 *.egg-info/
 dist/
 log/
-**/.DS_Store
 .idea/
+.vscode/
 *.pyc
 **.log
 
 .env
+.DS_Store
 config.json
 
 # dev
